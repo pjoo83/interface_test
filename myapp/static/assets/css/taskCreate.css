@@ -1,0 +1,91 @@
+
+[type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+    position: static;
+    opacity: 1;
+}
+#pageframe {
+    display: none;
+    position: absolute;
+    margin: auto;
+    text-align: center;
+    left: 10%;
+    top: 10%;
+    width: 80%;
+}
+
+.breadcrumb {
+    padding-top: 22px;
+}
+
+.breadcrumb .breadcrumb-item a {
+    font-size: 16px;
+    color: #d9534f;
+}
+
+.breadcrumb > .active {
+    font-size: 16px;
+    color: #d9534f;
+}
+
+.panel-heading {
+    text-align: right;
+    padding: 0px;
+}
+
+input[type=search] {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 300px;
+}
+
+[type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+    position: static;
+    opacity: 1;
+}
+
+.form-control {
+    padding: 0 12px;
+}
+
+.form .date {
+    width: 110px;
+    line-height: 1;
+    height: 1.84em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+
+.form .search {
+    width: 200px !important;
+    height: 4rem !important;
+}
+
+.form .select {
+    display: inline-block;
+    font-size: 14px;
+    width: 200px !important;
+    height: 4rem !important;
+}
+.tit-name{
+    color:#0f0f0f;
+    font-size: 16px;
+    float: left;
+    line-height: 30px;
+}
+.aa{
+    float: left !important;
+}
+
+.one_input{
+    width: 200px !important;
+    border: #999 1px solid !important;
+    float: left !important;
+    border-radius: 5px !important;
+}
+.one_select{
+    display: inline-block;
+    float: left !important;
+    height: 4rem !important;
+    width: 200px !important;
+}

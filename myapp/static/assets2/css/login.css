@@ -1,0 +1,7 @@
+#all{ width: 800px;
+    height: 450px;
+    border: 1px solid green;
+    position:absolute; top:50%;
+    left:50%;
+    margin:-225px 0 0 -400px;
+}

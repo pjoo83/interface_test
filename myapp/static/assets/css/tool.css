@@ -1,0 +1,161 @@
+.breadcrumb {
+    padding-top: 22px !important;
+}
+
+.breadcrumb .breadcrumb-item {
+    font-size: 16px !important;
+    color: #d9534f !important;
+}
+
+.tool-box {
+    width: 97%;
+    margin-left: 1%;
+}
+
+.detail_box {
+    margin-top: 2%;
+    margin-left: 1.4%;
+}
+
+.detailes_box {
+    margin-top: 2%;
+}
+
+.text-detail {
+    margin-left: 1.4%;
+    margin-top: 2%;
+}
+
+.result-detail {
+    margin-left: 5%;
+    margin-top: 2%;
+}
+
+select {
+    display: inline-block;
+    width: 100%;
+    border: #9a9da2 1px solid;
+    background-color: white;
+    height: 42px;
+    border-radius: 5px;
+}
+
+.input-detail {
+    border: 1px solid #9a9da2 !important;
+    border-radius: 5px !important;
+    height: 3.2rem !important;
+    background-color: white !important;
+}
+
+.send_message {
+    border-radius: 8px;
+    height: 38px;
+    width: 80px;
+    font-size: 13px;
+    text-align: center;
+    line-height: 38px;
+    color: white;
+    background-color: #f44336;
+    cursor: pointer;
+}
+
+.clear_data {
+    border-radius: 8px;
+    height: 38px;
+    width: 80px;
+    margin-left: 0px;
+    font-size: 13px;
+    text-align: center;
+    line-height: 38px;
+    color: white;
+    background-color: #f44336;
+    cursor: pointer;
+}
+
+.type {
+    font-size: 13px;
+    color: #b71a18;
+    font-weight: bold;
+    margin-bottom: 13px;
+}
+
+textarea {
+    height: 500px;
+    resize: none;
+    box-shadow: 0 0 5px #6f737c;
+}
+
+::-webkit-input-placeholder {
+    color: #0f0f0f;
+}
+
+.title {
+    color: #b71a18;
+    margin-left: 2%;
+}
+
+#body_input {
+    background-color: white;
+    width: 115%;
+}
+
+#showArea {
+    background-color: white;
+    width: 115%;
+}
+/*key value*/
+.text-key{
+    margin-left: 1.4%;
+    margin-top: 5%;
+    margin-bottom: 1%;
+}
+.all-key{
+    height: 58px;
+}
+.parameter-key{
+    height:50px;
+    width: 40%;
+    float: left;
+    margin-left: 12px;
+}
+.parameter-input{
+    border: 1px solid #9a9da2 !important;
+    border-radius: 5px !important;
+    height: 4.2rem !important;
+    background-color: white !important;
+}
+.button{
+    height:50px;
+    width: 13%;
+    float: left;
+    margin-left: 5px;
+}
+.add{
+    height: 23px;
+    width: 54px;
+    margin-left: 10px;
+    border-radius: 5px;
+    border: 1px #f44336 solid;
+    background-color:#f44336;
+    font-size: 13px;
+    text-align: center;
+    line-height: 23px;
+    color: white;
+    cursor: pointer;
+
+}
+.del{
+    height: 23px;
+    width: 54px;
+    margin-left: 10px;
+    border-radius: 5px;
+    border: 1px #f44336 solid;
+    margin-top: 4px;
+    background-color:#f44336;
+    font-size: 13px;
+    text-align: center;
+    line-height: 23px;
+    color: white;
+    cursor: pointer;
+}
+

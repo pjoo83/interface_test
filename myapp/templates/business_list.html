@@ -1,0 +1,208 @@
+{% extends "temp.html" %}
+{% load static %}
+{% block content %}
+<head>
+    <style>
+        .clearfix {
+            margin-bottom: 20px;
+            margin-top: 50px;
+        }
+
+        .table {
+            background-color: white;
+        }
+
+        #myModal,
+        #editmodel {
+            width: 600px;
+            height: 204px;
+        }
+    </style>
+</head>
+
+<div class="container">
+    <div class="clearfix">
+        <input id='btnAdd' type="button" value="新增业务" class="btn btn-primary">
+
+<!--        <div style="float: right;width: 300px">-->
+<!--            <form method="get">-->
+<!--                <div class="input-group">-->
+<!--                    <input type="text" name="mm" class="form-control" placeholder="Search for...">-->
+<!--                    <span class="input-group-btn">-->
+<!--                    <button class="btn btn-default" type="submit">Go!</button>-->
+<!--                    </span>-->
+<!--                </div>-->
+<!--            </form>-->
+<!--        </div>-->
+    </div>
+    <!--   新建项目-->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">新建业务线</h4>
+                </div>
+                <div>
+                    <input type="text" id='bname' class="form-control" placeholder="业务名称"/>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id='CloseBtn' class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button id="SaveBtn" type="button" class="btn btn-primary">Save ADD</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+            业务列表
+        </div>
+    </div>
+    <div>
+        <!-- Table -->
+        <table class="table table-bordered">
+
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>业务名称</th>
+                <th>创建人</th>
+                <th>修改人</th>
+                <th>创建时间</th>
+                <th>修改时间</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in queryset %}
+            <tr>
+                <th>{{forloop.counter}}</th>
+                <td>{{ item.businessName }}</td>
+                <td>{{ item.createUser }}</td>
+                <td>{{ item.updateUser }}</td>
+                <td>{{ item.createTime }}</td>
+                <td>{{ item.updateTime }}</td>
+                <td>
+                    <input bid="{{ item.id }} " class="btn btn-xs btn-wd" type="button"
+                           value="编 辑">
+                    <input bid="{{ item.id }} " class="btn btn-danger btn-xs btn-delete" type="button"
+                           value="删 除">
+
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!--   业务编辑-->
+    <div class="modal fade" id="editmodel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id=EditlLabel">业务编辑</h4>
+                </div>
+                <div>
+                    <input type="text" id='bname2' class="form-control" placeholder="业务名称"/>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id='CloseBtn2' class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button id="SaveBtn2" type="button" class="btn btn-primary">Save Edit</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var b_id;
+    // 删除
+    $('.btn-delete').click(function () {
+        // $("#DeleteModel").modal("show")
+        var a = confirm("是否删除这条业务");
+        b_id = $(this).attr("bid");
+        // console.log(Delete_id)
+        // console.log(a)
+        if (a) {
+            $.ajax({
+                url: '/autotest/business/del/',
+                type: "get",
+                data: {
+                    'bid': b_id
+                },
+                datasets: 'JSON',
+                success: function (res) {
+                    if (res.status) {
+                        console.log(res)
+                        location.reload()
+                    } else {
+                        alert(res.error)
+                    }
+                }
+            })
+        }
+    })
+    // 允许打开弹窗
+    $('#myModal').modal({
+        dismissible: true
+    });
+    $("#btnAdd").click(function () {
+        $("#myModal").modal("open")
+    })
+    $("#CloseBtn").click(function () {
+        $("#myModal").modal("close")
+    })
+    // 新增
+    $("#SaveBtn").click(function () {
+        // console.log("传数据");
+        $.ajax({
+            url: '/autotest/business/add/',
+            type: "post",
+            data: {
+                businessName: $("#bname").val()
+            },
+            datasets: 'JSON',
+            success: function (res) {
+                if (res.status) {
+                    console.log(res)
+                    location.reload()
+                } else {
+                    console.log(res)
+                }
+            }
+        })
+    })
+    $('#editmodel').modal({
+        dismissible: true
+    });
+
+    //编辑
+    $(".btn-wd").click(function () {
+        $("#editmodel").modal("open");
+        b_id = $(this).attr("bid");
+    })
+    $("#SaveBtn2").click(function (){
+        $.ajax({
+            url:"/autotest/business/edit/",
+            data:{
+                "bid":b_id,
+                 "bname": $("#bname2").val()
+            },
+            datasets:"JSON",
+            success:function (res){
+                if(res.status){
+                    console.log(res)
+                    location.reload()
+                }else {
+                    console.log(res.errors)
+                }
+            }
+        })
+    })
+    $("#CloseBtn2").click(function () {
+        $("#editmodel").modal("close")
+    })
+</script>
+{% endblock %}

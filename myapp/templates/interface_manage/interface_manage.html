@@ -1,0 +1,114 @@
+{% load static %}
+<style>
+    .waves-effect {
+        position: relative;
+        cursor: pointer;
+        display: inline-block;
+        overflow: hidden;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        vertical-align: middle;
+        z-index: 1;
+        will-change: opacity, transform;
+        transition: .3s ease-out;
+    }
+
+    .fa {
+        display: inline-block;
+        font-family: FontAwesome;
+        font-style: normal;
+        font-weight: normal;
+        line-height: 1;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    .nav {
+        padding-left: 0;
+        margin-bottom: 0;
+        list-style: none;
+        list-style-type: none;
+    }
+    #cdd ul{
+        max-height: none;
+    }
+    .cd ul {
+        max-height: 300px;
+        overflow: auto;
+    }
+</style>
+<li id="cdd" class=" cd ">
+    <a href="#" class="waves-effect waves-dark"><i class="fa fa-bar-chart-o "></i>接口管理<span class="fa arrow"></span></a>
+    <ul class="nav nav-second-level collapse" aria-expanded="false" style="">
+        <li>
+
+            <a href="#">全部接口</a>
+        </li>
+        <li>
+<!--                {# <a href=" {% url 'interface_base_list' %}">大象保险app</a>#}
+        -->
+            {# <a href=" #">大象保险app</a>#}
+            <a href="#" id="a" onClick="aclick(this);">大象保险app</a>
+
+        </li>
+        <li>
+{#            <a href="#">象保保app</a>#}
+            <a href="#" id="a" onClick="aclick(this);">象保保app</a>
+        </li>
+        <li>
+{#            <a href="#">大象保险小程序</a>#}
+            <a href="#" id="a" onClick="aclick(this);">大象保险小程序</a>
+        </li>
+        <li>
+{#            <a href="#">大象保险微站</a>#}
+            <a href="#" id="a" onClick="aclick(this);">大象保险微站</a>
+        </li>
+        <li>
+{#            <a href=" #">大象保险险种</a>#}
+            <a href="#" id="a" onClick="aclick(this);">大象保险险种</a>
+        </li>
+        <li>
+{#            <a href="#">象保保险种</a>#}
+            <a href="#" id="a" onClick="aclick(this);">象保保险种</a>
+        </li>
+        <li>
+{#            <a href=" #">象保保微站</a>#}
+             <a href="#" id="a" onClick="aclick(this);">象保保微站</a>
+        </li>
+        <li>
+{#            <a href="#">大象保险官网</a>#}
+             <a href="#" id="a" onClick="aclick(this);">大象保险官网</a>
+        </li>
+        <li>
+{#            <a href="#">下沉平台系统</a>#}
+             <a href="#" id="a" onClick="aclick(this);">下沉平台系统</a>
+        </li>
+        <li>
+{#            <a href=" #">CRM系统</a>#}
+             <a href="#" id="a" onClick="aclick(this);">CRM系统</a>
+        </li>
+        <li>
+{#            <a href=" #">智能保顾系统</a>#}
+             <a href="#" id="a" onClick="aclick(this);">智能保顾系统</a>
+        </li>
+        <li>
+{#            <a href=" #">智能机器人</a>#}
+             <a href="#" id="a" onClick="aclick(this);">智能机器人</a>
+        </li>
+
+    </ul>
+    <form id ="sub" action="#" method="GET">
+        <input type="hidden" name="businessName" id ="businessName">
+    </form>
+    <script>
+        function aclick(e) {
+            var text = $(e).text();<!--$(e).text() 获取这个元素的text-->
+
+            $("#businessName").val(text);
+            sub.submit()
+        }
+    </Script>
+</li>

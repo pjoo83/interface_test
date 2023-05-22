@@ -1,0 +1,96 @@
+.mask{
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.2);
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    display: none;
+}
+/*弹出层最外层div*/
+.mask_rel{
+    position: relative;
+    top:50%;
+    margin:0 auto;
+    width: 200px;
+    height: 150px;
+    background-color: #fff;
+    border-radius:15px 15px 15px 15px;
+    -webkit-transform:translate3d(0,-50%,0);
+    transform:translate3d(0,-50%,0);
+}
+.popout-box{
+    width: 100%;
+    height: 150px;
+    margin:0px auto;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+.popout-img{
+	width: 45px;
+	height: 40px;
+}
+.popout-img img{
+	width: 35px;
+	height: 35px;
+}
+.popout-title{
+	color:#8a8a8a;
+	height: 40px;
+	line-height: 40px;
+}
+/*确定框最外层样式*/
+.confirm-box{
+    position: relative;
+    top:50%;
+    margin:0 auto;
+    width: 200px;
+    height: 150px;
+    background-color: #fff;
+    border-radius:15px 15px 15px 15px;
+    -webkit-transform:translate3d(0,-50%,0);
+    transform:translate3d(0,-50%,0);
+}
+.confirm-top{
+    width: 100%;
+    height: 100px;
+}
+.title-box{
+    width: 80%;
+    height: 100px;
+    margin:0px auto;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+.title{
+    color:#000;
+    font-size: 14px;
+}
+.link-top{
+    width: 100%;
+    height: 1px;
+    border-top: solid #e6e6e6 1px;
+}
+.cancel-box{
+    width: 50%;
+    height: 50px;
+    float: left;
+    line-height: 50px;
+    text-align: center;
+    font-size: 16px;
+    color:#000;
+}
+.sure-box{
+    width: 50%;
+    height: 49px;
+    float: left;
+    line-height: 50px;
+    text-align: center;
+    background-color: #f60201;
+    border-radius: 0px 0px 15px 0px;
+    font-size: 16px;
+    color: #000;
+}

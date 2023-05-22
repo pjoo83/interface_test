@@ -1,0 +1,273 @@
+{% extends "temp.html" %}
+{% load static %}
+{% block content %}
+<ol class="breadcrumb" xmlns="http://www.w3.org/1999/html">
+    <li class="breadcrumb-item">接口测试工具</li>
+</ol>
+
+<link rel="stylesheet" type="text/css" href="/static/assets/css/tool.css">
+<!-- 加载中css-->
+<link rel="stylesheet" href="/static/assets/css/loading.css">
+<div class="tool-box">
+    <div class="row">
+        <div class="col-xs-4 col-md-2 detail_box">
+            <div class="">
+                <select name="" id="reqtype_select" onchange="types()">
+                    <option value="GET" selected>GET</option>
+                    <option value="POST">POST</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-xs-6 col-md-5 detailes_box">
+            <input type="text" name="" id="url_input" class="input-detail" placeholder="请输入接口地址">
+        </div>
+        <div class="col-xs-6 col-md-2 detailes_box">
+            <div class="type_one">
+                <select name="" id="datatype_select" onchange="format()">
+                    <option value="JSON">JSON</option>
+                    <option value="FORM">FORM</option>
+                    <option value="无参">无参</option>
+                    <option value="带参">带参</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-xs-6 col-md-1 detailes_box">
+            <div class="send_message" id="bt_submit" style="cursor:pointer">发送消息</div>
+        </div>
+        <div class="col-xs-6 col-md-1 detailes_box">
+            <div class="clear_data" id="bt_reset" style="cursor:pointer">清空数据</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-5 col-sm-5 text-detail">
+            <div class="type">入参数据:</div>
+            <textarea id="body_input" placeholder="请输入json格式参数...... "></textarea>
+        </div>
+        <div class="col-xs-5 col-sm-5 text-key" id="fieldBox" style="display: none">
+            <div class="all-key" id="field1">
+                <div class="parameter-key">
+                    <input type="text" class="parameter-input" name="parameter-input_key" placeholder="请输入Key值">
+                </div>
+                <div class="parameter-key">
+                    <input type="text" class="parameter-input" name="parameter-input_value" placeholder="请输入Value值">
+                </div>
+                <div class="button">
+                    <div class="add" onclick="add()">添加</div>
+                    <div class="del" onclick="rem(this)" data="1">删除</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-5 col-sm-5 result-detail">
+            <div class="type">返回结果:</div>
+            <textarea disabled="disabled" id="showArea">{{ data }}</textarea>
+        </div>
+    </div>
+</div>
+<!-- 加载中样式html-->
+<div class="loading_rek">
+    <div class="loading_rel">
+        <div class="load-wrapp">
+            <div class="load-5">
+                <p id="loading_style">加载中</p>
+                <div class="ring-2">
+                    <div class="ball-holder">
+                        <div class="ball"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $('#bt_submit').on('click', function () {
+        $("#showArea").val("");
+        var reqtype = $("#reqtype_select").val().trim()
+        var urlInput = $("#url_input").val().trim()
+        var datatype = $("#datatype_select").val().trim()
+        var bodyinput = $("#body_input").val().trim()
+        var all_key_list = new Array() //存键的空数组
+        var all_value_list = new Array() //存值的空数组
+        var all_key_value = [] //存键值对的json数组
+        // 循环所有div类名未all-key下的input的name值为parameter-input_key的输入框，取值存入all_key_list
+        var input_key = $(".all-key input[name='parameter-input_key']").each(function () {
+            //alert($(this).val())
+            all_key_list.push($(this).val())
+
+        });
+        // 循环所有div类名未all-key下的input的name值为parameter-input_value的输入框，取值存入all_value_list
+        var input_value = $(".all-key input[name='parameter-input_value']").each(function () {
+            all_value_list.push($(this).val())
+
+        })
+        // 遍历键值对个数，分别取键值存入字典在存入数据
+        for (var i = 0; i < all_key_list.length; i++) {
+            all_key_value.push({"key": all_key_list[i], "value": all_value_list[i]})
+        }
+        if (!urlInput) {
+            popout('接口地址不能为空', 'fail_one.png', 2)
+            return
+        }
+
+        $(".loading_rek").show();
+
+        all_key_value = JSON.stringify(all_key_value) //转成字符串
+        $.ajax({
+            type: 'POST',
+            url: "/autotest/inter_tools/",
+            data: {
+                method: reqtype,
+                url: urlInput,
+                datatype_select: datatype,
+                body_input: bodyinput,
+                key_value: all_key_value
+            },
+            success: function (data) {
+                if (data.status) {
+                    $(".loading_rek").hide(); //隐藏加载框
+                    popout(data.data.msg, 'sucess_one.png', 2);
+                    $("#showArea").val(data.data.res);
+                } else {
+                    var jsonData = JSON.stringify(JSON.parse(data.data.res), null, 2); //json格式数据格式化
+                    $(".loading_rek").hide();
+                    $("#showArea").val(jsonData);  //返回结果
+                }
+
+            },
+            error: function () {
+                setTimeout(function () {
+                    $(".loading_rek").hide();
+                    popout('数据加载失败', 'fail_one.png', 2)
+                }, 10000);
+            }
+        });
+    });
+    $("#bt_reset").click(function () {
+        //通过刷新 ，直接清除所有数据
+        location.reload()
+        // document.getElementById("url_input").value = "";
+        // var reqtype_select = document.getElementById("reqtype_select").options;
+        // for (i = 0; i < reqtype_select.length; i++) {
+        //     if (reqtype_select[i].value == 'GET') {
+        //         reqtype_select[i].selected = true;
+        //
+        //     } else if (reqtype_select[i].value == 'POST') {
+        //         reqtype_select[i].selected = true;
+        //     }
+        // }
+        // var datatype_select = document.getElementById("datatype_select").options;
+        // for (i = 0; i < datatype_select.length; i++) {
+        //     if (datatype_select[i].value == 'JSON') {
+        //         datatype_select[i].selected = true;
+        //     }
+        // }
+        // $("#showArea").val("");
+        // $("#body_input").val("");
+    });
+
+    //无参判断数据
+    function format() {
+        var res = $("#datatype_select").val();
+        //alert(res)
+        if (res == "无参") {
+            $(".text-detail").show();
+            $(".text-key").hide();
+            //设置只读属性
+            $("#body_input").prop("readonly", true)
+            $("#body_input").val("无需入参数据时，此文本框不可输入...")
+        } else if (res == "带参") {
+            $(".text-detail").hide();
+            $(".text-key").show();
+        } else if (res == "FORM") {
+            $(".text-detail").hide();
+            $(".text-key").show();
+        } else {
+            $(".text-detail").show();
+            $(".text-key").hide();
+            $("#body_input").prop("readonly", false)
+            $("#body_input").val("")
+        }
+    }
+
+    var num = 2;
+
+    function add() {
+        var model = '<div class="all-key" id="filed' + num + '">' +
+            '<div class="parameter-key">\n' +
+            '<input type="text" class="parameter-input" name="parameter-input_key" class="" placeholder="请输入Key值">\n' +
+            '</div>\n' +
+            '<div class="parameter-key">\n' +
+            '<input type="text" class="parameter-input" name="parameter-input_value" class="" placeholder="请输入Value值">\n' +
+            '</div>\n' +
+            '<div class="button">\n' +
+            '<div class="add" onclick="add()">添加</div>\n' +
+            '<div class="del" onclick="rem(this)" data="' + num + '">删除</div>\n' +
+            '</div>' +
+            '</div>';
+        num = num + 1;
+        $(".text-key").append(model);
+
+    }
+
+    function rem(obj) {
+        var delval = $(obj).attr("data");
+        var aa = "filed" + delval;
+        $('#' + aa).remove()
+    }
+
+    // 初始化请求对应的方式选项
+    var initSelect = function () {
+        var selectList = $('#datatype_select>option')
+        selectList.each(function (i, item) {
+            if (i === 0 || i === 1) {
+                $(item).hide()
+            } else {
+                $(item).show()
+            }
+        });
+        $('#datatype_select').val(selectList[2].value)
+        $("#body_input").prop("readonly", true)
+        $("#body_input").val("无需入参数据时，此文本框不可输入...")
+    };
+    initSelect();
+
+    function types() {
+        var rek = $("#reqtype_select").val();
+        //alert('11111111111',rek)
+        var selectList = $('#datatype_select>option')
+        //alert('selectList:',selectList)
+        if (rek === "GET") {
+            $(".text-key").empty();
+            add();
+            selectList.each(function (i, item) {
+                $("#body_input").prop("readonly", true)
+                $("#body_input").val("无需入参数据时，此文本框不可输入...")
+                if (i === 0 || i === 1) {
+                    $(item).hide()
+                } else {
+                    $(item).show()
+                }
+            });
+            $(".text-detail").show();
+            $(".text-key").hide();
+            $("#body_input").prop("readonly", true)
+            $("#body_input").val("无需入参数据时，此文本框不可输入...");
+            $('#datatype_select').val(selectList[2].value)
+        } else {
+            $(".text-key").empty();
+            add();
+            selectList.each(function (i, item) {
+                if (i === 3) {
+                    $(item).hide()
+                } else {
+                    $(item).show()
+                }
+            });
+            $('#datatype_select').val(selectList[0].value);
+            $(".text-detail").show();
+            $(".text-key").hide();
+            $("#body_input").prop("readonly", false)
+            $("#body_input").val("")
+        }
+    }
+</script>
+{% endblock %}

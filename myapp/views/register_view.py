@@ -30,6 +30,4 @@ def register(request):
             user_profile.save()
             code = 200
             message = "注册成功,请联系管理员激活账户"
-        msg = {'message': message,
-               'code': code}
-        return JsonResponse(json.dumps(msg))
+        return JsonResponse({"code": code, "message": message})

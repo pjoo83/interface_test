@@ -37,8 +37,12 @@ class RunMethod:
         return data
 
 
+# 接口工具
 @csrf_exempt
 def inter_tools(request):
+    """
+    新建工具
+    """
     if request.method == "GET":
         return render(request, 'interface_tool.html')
     elif request.method == "POST":

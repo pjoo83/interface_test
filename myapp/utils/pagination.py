@@ -1,10 +1,16 @@
-import requests
 from django.utils.safestring import mark_safe
 import copy
 
 
 class Pagination(object):
     def __init__(self, request, queryset, page_size=10, plus=5, page_param="page"):
+        """
+        :param request: 请求的对象
+        :param queryset: 符合条件的数据（根据这个数据给他进行分页处理）
+        :param page_size: 每页显示多少条数据
+        :param page_param: 在URL中传递的获取分页的参数，例如：/etty/list/?page=12
+        :param plus: 显示当前页的 前或后几页（页码）
+        """
         query_dict = copy.deepcopy(request.GET)
         self.query_dict = query_dict
         self.page_param = page_param

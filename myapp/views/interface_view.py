@@ -1,5 +1,6 @@
 import datetime
 import json
+from django.forms import ModelForm
 
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -16,15 +17,19 @@ def interface_manage(request):
 
 
 # 接口列表
+@login_required
+@csrf_exempt
 def interface_list(request):
     if request.method == 'GET':
-        return render(request, 'interface_manage/interface_list.html')
+        queryset = models.interface_base.objects.all()
+
+        return render(request, 'interface_manage/interface_list.html', {"queryset": queryset})
 
 
-class BusinessCategories(ModelForm):
-    class Meta:
-        models = models.interface_base
-        fields = '__all__'
+# class BusinessCategories(ModelForm):
+#     class Meta:
+#         models = models.interface_base
+#         fields = '__all__'
 
 
 @csrf_exempt
@@ -88,4 +93,4 @@ def interface_creat(request):
             expected_result=expected_result,
             format=format)
         ApiParameters.save()
-        return redirect("/autotest/interface_base")
+        return redirect("/autotest/inter/list/")

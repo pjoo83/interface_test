@@ -72,6 +72,10 @@ REQUEST_PARAMETER_TYPE_CHOICE = (
 
 
 class interface_base(models.Model):
+    requestType_choice = (
+        (1, "post"),
+        (2, "get")
+    )
     requestType = models.CharField(max_length=50, verbose_name="请求方式", choices=REQUEST_TYPE)
     businessCategories = models.ManyToManyField(interface_businessCategories, verbose_name="业务分类'")
     interfaceName = models.CharField(max_length=100, verbose_name="接口名称")
@@ -185,7 +189,7 @@ class ApiParameter(models.Model):
 
 # 接口测试结果
 class interfaceRunResult(models.Model):
-    interfaceapi = models.ForeignKey(interface_base, on_delete=models.CASCADE, verbose_name="所属接口")
+    interface_api = models.ForeignKey(interface_base, on_delete=models.CASCADE, verbose_name="所属接口")
     response = models.TextField(verbose_name="响应结果")
     header = models.TextField(verbose_name="响应header")
     statusCode = models.IntegerField(verbose_name="状态码")

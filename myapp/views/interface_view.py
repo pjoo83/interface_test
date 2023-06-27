@@ -7,13 +7,19 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.forms import ModelForm
 from django.views.decorators.csrf import csrf_exempt
-
 from .. import models
-
+from ..utils.pagination import Pagination
 
 # 接口管理
 def interface_manage(request):
     return render(request, "interface_manage/interface_manage.html")
+
+
+# 实例化列表
+class Interface_listModel(ModelForm):
+    class Meta:
+        model = models.interface_base
+        fields = '__all__'
 
 
 # 接口列表
@@ -21,15 +27,16 @@ def interface_manage(request):
 @csrf_exempt
 def interface_list(request):
     if request.method == 'GET':
+        form = Interface_listModel()
         queryset = models.interface_base.objects.all()
+        page_object = Pagination(request, queryset)
+        context = {
+            "form": form,
+            "queryset": page_object.page_queryset,
+            "page_string": page_object.html()
+        }
 
-        return render(request, 'interface_manage/interface_list.html', {"queryset": queryset})
-
-
-# class BusinessCategories(ModelForm):
-#     class Meta:
-#         models = models.interface_base
-#         fields = '__all__'
+        return render(request, 'interface_manage/interface_list.html', context)
 
 
 @csrf_exempt

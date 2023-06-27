@@ -13,7 +13,7 @@
                 </div>
             <div class="panel-body">
                 <div class="table">
-                    <table class="table  table-sm   table-hover" id="dataTables-example">
+                    <table class="table table-bordered" id="dataTables-example">
                         <thead>
                             <tr>
                                 <th>接口名称</th>
@@ -24,39 +24,42 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for object in queryset %}
-
+                        {% for object in queryset %}
                             <tr>
                                 <td>{{object.interfaceName}}</td>
                                 <td>{{object.interfaceAddress}}</td>
-                                <td>{{object.requestType}}</td>
+                                <td>{{object.get_requestType_display}}</td>
                                 <td>{{object.createTime }}</td>
                                 <td>
-                                    <a class="playitbtn tryitbtnsyntax" href=#>运行</a>
-                                    <a class="playitbtn tryitbtnsyntax" href=#>结果</a>
+                                    <a class="btn btn-primary btn-xs" href="#">编辑</a>
+                                    <a class="btn btn-primary btn-xs" href=#>运行</a>
+                                    <a class="btn btn-primary btn-xs" href=#>结果</a>
                                 </td>
                             </tr>
-                            {% endfor %}
+                        {% endfor %}
                         </tbody>
                     </table>
                     <div class="pagination">
-                            <span class="step-links">
-                                {% if objects.has_previous %}
-                                   
-                                    <a href="?page={{ object.previous_page_number }}">上一页</a>
-                                {% endif %}
-                        
-                                <span class="current">
-                                    Page {{ objects.number }} of {{ objects.paginator.num_pages }}.
-                                </span>
-                        
-                                {% if objects.has_next %}
-                                    <a href="?page={{ objects.next_page_number }}">下一页</a>
-                                    
-                                {% endif %}
-                            </span>
-                        </div>
-                </div>
+                        {{ page_string }}
+                    </div>
+<!--                    <div class="pagination">-->
+<!--                            <span class="step-links">-->
+<!--                                {% if objects.has_previous %}-->
+<!--                                   -->
+<!--                                    <a href="?page={{ object.previous_page_number }}">上一页</a>-->
+<!--                                {% endif %}-->
+<!--                        -->
+<!--                                <span class="current">-->
+<!--                                    Page {{ objects.number }} of {{ objects.paginator.num_pages }}.-->
+<!--                                </span>-->
+<!--                        -->
+<!--                                {% if objects.has_next %}-->
+<!--                                    <a href="?page={{ objects.next_page_number }}">下一页</a>-->
+<!--                                    -->
+<!--                                {% endif %}-->
+<!--                            </span>-->
+<!--                        </div>-->
+<!--                </div>-->
                 <!-- /.table-responsive -->
             </div>
             <!-- /.panel -->

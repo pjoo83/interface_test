@@ -42,13 +42,6 @@ def interface_list(request):
         return render(request, 'interface_manage/interface_list.html', context)
 
 
-def interface_edit(request):
-    """
-    :param request: 接口内容编辑
-    :return:
-    """
-    return render(request, 'interface_manage/interface_edit.html')
-
 
 @csrf_exempt
 @login_required
@@ -57,6 +50,7 @@ def interface_creat(request):
      :param request: 新建接口
     """
     if request.method == "GET":
+
         interface_BusinessCategories = models.interface_businessCategories.objects.all()
         return render(request, 'interface_manage/interface_create.html',
                       {"interface_BusinessCategories": interface_BusinessCategories})
@@ -109,9 +103,32 @@ def interface_creat(request):
             description=descriptions_list,
             raw_data=raw,
             expected_result=expected_result,
-            format=format)
+            format=format, api_id=api_id)
         ApiParameters.save()
         return redirect("/autotest/inter/list/")
+
+
+def interface_edit(request,):
+    """
+    :param request: 接口内容编辑
+    :return:
+    """
+    if request.method == "GET":
+        Iid = request.GET.get("id")
+        print(Iid)
+        exists = models.interface_base.objects.filter(id=Iid).exists()
+        if not exists:
+            return JsonResponse({"status": 200, "message": "数据未查到"})
+        else:
+            inter_head = models.interface_base.objects.get(id=Iid)
+            print(inter_head)
+            ApiParameters = models.ApiParameter.objects.filter(api_id=Iid)
+            interface_BusinessCategories = models.interface_businessCategories.objects.all()
+            busResult = inter_head.businessCategories.all()
+            print(busResult)
+            # for i in busResult:
+            #     print(i)
+        return render(request, 'interface_manage/interface_edit.html')
 
 
 def interface_run(request):

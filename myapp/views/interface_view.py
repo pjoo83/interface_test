@@ -10,6 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .. import models
 from ..utils.pagination import Pagination
 
+
 # 接口管理
 def interface_manage(request):
     return render(request, "interface_manage/interface_manage.html")
@@ -22,10 +23,12 @@ class Interface_listModel(ModelForm):
         fields = '__all__'
 
 
-# 接口列表
 @login_required
 @csrf_exempt
 def interface_list(request):
+    """
+    :param request: 全部接口显示
+    """
     if request.method == 'GET':
         form = Interface_listModel()
         queryset = models.interface_base.objects.all()
@@ -39,11 +42,19 @@ def interface_list(request):
         return render(request, 'interface_manage/interface_list.html', context)
 
 
+def interface_edit(request):
+    """
+    :param request: 接口内容编辑
+    :return:
+    """
+    return render(request, 'interface_manage/interface_edit.html')
+
+
 @csrf_exempt
 @login_required
 def interface_creat(request):
     """
-    内容: 新建接口
+     :param request: 新建接口
     """
     if request.method == "GET":
         interface_BusinessCategories = models.interface_businessCategories.objects.all()
@@ -101,3 +112,12 @@ def interface_creat(request):
             format=format)
         ApiParameters.save()
         return redirect("/autotest/inter/list/")
+
+
+def interface_run(request):
+    """
+
+    :param request: 单个接口运行
+    :return:
+    """
+    pass

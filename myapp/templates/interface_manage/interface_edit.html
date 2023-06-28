@@ -1,0 +1,890 @@
+{% extends "temp.html" %}
+
+{% block content %}
+    <div id="page-inner">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="#">全部接口</a>
+            </li>
+            <li class="breadcrumb-item active">编辑接口</li>
+            {#            /*<h4 class="panel panel-default">#}
+            {#            </h4>*/#}
+        </ol>
+        <style>
+            .breadcrumb {
+                padding-top: 22px;
+
+            }
+
+            .breadcrumb .breadcrumb-item a {
+                font-size: 16px;
+                color: #d9534f;
+            }
+
+            #row_nu{
+                padding-left: 100px;
+                margin-top: 15px;
+            }
+            #padd {
+                padding-left: 100px; /*容器里面的内容从左边距离边框10个像素*/
+                margin-top: 15px;
+            }
+
+            .breadcrumb > .active {
+                font-size: 16px;
+                color: #d9534f;
+            }
+
+
+            input[type=search] {
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                width: 300px;
+            }
+
+            [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+                position: static;
+                opacity: 1;
+            }
+
+            .form-control {
+                padding: 0 12px;
+                width: 512px;
+                display: inline;
+                height: 4rem;
+
+            }
+
+            .form .date {
+                width: 110px;
+                line-height: 1;
+                height: 1.84em;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                background-color: white;
+
+            }
+
+            .padding {
+                padding: 0 5rem;
+                padding-top: 15px; /*容器里面的内容从上边距离边框10个像素*/
+            }
+
+            .padding-01 {
+                padding: 0 7.4rem;
+            }
+
+            .form .search {
+                width: 200px;
+            }
+
+            .form .select {
+                display: inline-block;
+                font-size: 14px;
+                width: 130px;
+
+            }
+
+            * {
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                box-sizing: border-box;
+            }
+
+            .aaa {
+                text-align: center;
+                height: 80px;
+            }
+
+            .wy {
+                display: inline-block;
+            }
+
+            .wy input {
+                position: inherit !important;
+                z-index: inherit !important;
+                left: inherit !important;
+                opacity: 1 !important;
+                -webkit-appearance: radio;
+            }
+
+
+            .xs li {
+                width: 2rem;
+                height: 0.8rem;
+                font-size: 0.34rem;
+                color: #35BEF5;
+                line-height: 0.8rem;
+                text-align: center;
+                background: #fff;
+                float: left;
+            }
+
+
+            .xs li:first-child {
+                border-radius: .08rem 0 0 .08rem
+            }
+
+            .xs li:last-child {
+                border-radius: 0 .08rem .08rem 0
+            }
+
+            .xs li.active {
+                color: #fff;
+                background: #35BEF5;
+            }
+
+            #dat {
+                background-color: white;
+            }
+
+            .row {
+                margin-bottom: 0;
+            }
+
+            .row select {
+                margin-bottom: 20px;
+            }
+
+
+            .input-field label {
+                position: static;
+                font-size: 15px;
+                width: 100px;
+                padding-right: 10px;
+                text-align: right;
+                color: black;
+            }
+
+            .input-field label.active {
+                font-size: 14px;
+                transform: none;
+            }
+
+            .ys {
+                margin-bottom: inherit;
+
+            }
+
+            .ys input {
+                margin-bottom: inherit;
+            }
+
+            .center {
+                display: flex;
+                align-items: center
+            }
+
+            .input-field {
+                margin-top: 0;
+            }
+
+            #gu {
+                margin-bottom: 80px;
+                margin-top: 20px;
+            }
+
+            .dat {
+                background-color: #fff;
+            }
+
+            .input-field input[type=text] {
+                width: 500px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+            }
+
+            .custom-col .input-field {
+                display: flex;
+            }
+            .input-field {
+                margin-top: 0;
+                margin-left: -2px;
+            }
+            .input-field label {
+                position: static;
+                font-size: 13px;
+                width: 74px;
+                padding-right: 5px;
+                text-align: right;
+                color: black;
+            }
+            select:invalid { color: #cbcbcb; }
+            select:hover { color: #1e1e1e; }
+
+        </style> <!---action 表示跳转的路径-->
+        <!--form表单需要使用POST方法-->
+        <form method="POST" class="form" id="themeForm">
+            {#        action="{% url 'interface_edit' %}"#}
+            <div class="col s12 dat">
+                <!--跳过禁止访问，403-->
+                {% csrf_token %}
+                {% if errmsg %}
+                    <div class="alert alert-warning">
+                        <a href="#" class="close" data-dismiss="alert">
+                            &times;
+                        </a>
+                        <strong>警告！</strong>{{ errmsg }}
+                    </div>
+                {% endif %}
+
+                <div class="row padding">
+                    <div class="input-field col s12">
+                        <label>接口名:</label>
+                        <!--从数据库中进行取值-->
+                        <input name="interfaceName" placeholder="请输入接口名" class="validate" id="interfaceName" type="text"
+                               value="{{ interfaces.interfaceName }}" maxlength="50">
+                    </div>
+                </div>
+                <div class="row padding">
+                    <div class="input-field col s12">
+                        <label>业务分类:</label>
+                        <select name="businessCategories" id="businessCategories" class="form-control">
+                            <!--循环业务分类表，取出业务分类的值-->
+                            <option value="{{ businessCategories }}">{{ businessCategories }}</option>
+                            {% for interface_bc in interface_businessCategories %}
+                                <option value="{{ interface_bc.businessName }}">{{ interface_bc.businessName }}</option>
+                            {% endfor %}
+                        </select>
+
+                    </div>
+                </div>
+                <div class="row padding">
+                    <div class="input-field col s12">
+                        <label>请求方式:</label>
+                        <select name="requestType" id="type-select" class="form-control"
+                                value="{{ interfaces.requestType }}" required onchange="request_type()">
+                            <option value="" selected="selected">请选择请求方式</option>
+                            <!--根据后台传过来的value，来展示前端应该显示name-->
+                            <option value="1" {% if interfaces.requestType == "1" %} selected {% endif %}>post</option>
+                            <option value="2" {% if interfaces.requestType == "2" %} selected {% endif %}>get</option>
+<!--                            <option value="3" {% if interfaces.requestType == "3" %} selected {% endif %}>put</option>-->
+<!--                            <option value="4" {% if interfaces.requestType == "4" %} selected {% endif %}>delete</option>-->
+                        </select>
+                    </div>
+                </div>
+                <div class="row padding">
+                    <div class="input-field col s12">
+                        <label>接口地址:</label>
+                        <input name="interfaceAddress" id="dat" placeholder="请输入接口地址" id="interfaceAddress" class="dat"
+                               type="text" value="{{ interfaces.interfaceAddress }}" maxlength="500">
+                    </div>
+                </div>
+                <div class="row padding">
+                    <div class="input-field col s12">
+                        <label>状态:</label>
+                        <select name="status" id="status" class="form-control" value="{{ interfaces.status }}" required>
+                            <option value="" selected="selected">请选择接口状态</option>
+                            <option value="1" {% if interfaces.status == "1" %} selected {% endif %}>有效</option>
+                            <option value="0" {% if interfaces.status == "0" %} selected {% endif %}>无效</option>
+                        </select>
+                    </div>
+
+                </div>
+
+
+{#                <div class="row padding">#}
+{#                    <div class="input-field col s12">#}
+{#                        <label>是否有效:</label>#}
+{#                        <select name="yn" id="first_name" class="form-control" value="{{ interfaces.yn }}">#}
+{#                            <option value=" " selected="selected">请选择是否有效</option>#}
+{#                            <option value="1" {% if interfaces.yn == "1" %} selected {% endif %}>正常</option>#}
+{#                            <option value="0" {% if interfaces.yn == "0" %} selected {% endif %}>删除</option>#}
+{#                        </select>#}
+{#                    </div>#}
+{#                </div>#}
+            <div class="cs-hidden">
+                <div class="wy input-field col s12 padding">
+                    <label>是否传参:</label>
+                </div>
+                <div class="wy input-field col s12 padding " style="margin-left: 20px;">
+                    <input style="display:inline-block" name="transfer" class="checkbox" checked=checked type="radio"
+                           value="1" onclick="transferel(this)" data="1">是
+                </div>
+                <div class="wy input-field col s12 padding">
+                    <input style="display:inline-block" name="transfer" {% if format == "3" %} checked {% endif %} type="radio" value="0" onclick="transferel(this)" data="0">否
+                </div>
+                <input type="hidden" value="1" id="transferel_val" name="transferel_val">
+                <input type="hidden" id="Initial_transferel" value="{{ format }}">
+
+                <div class="cs-hiddenel">
+                    <div class="input-field col s12 padding">
+                        <label>请求头:</label>
+                    </div>
+                    <!--第一个-->
+                    <!--循环从前端传递过来的信息，根据有几条数据循环创建显示所用的表格-->
+                    <div class="row-tab01 input-field col s12" id="padd">
+                        {% if not ApiParameters %}
+                            <div class="row center">
+                                <div class="custom-col center">
+                                    <div class="input-field ys center">
+                                        <label>头参数名:</label>
+                                        <input style="width: 100px" class="name" placeholder="请输入参数名" id="first_name"
+                                               value="{{ i.name }}"
+                                               class="validate"
+                                               type="text" maxlength="50">
+                                    </div>
+                                </div>
+
+                                <div class="custom-col center">
+                                    <div class="input-field ys center">
+                                        <label>头参数值:</label>
+                                        <input style="width: 100px" class="value" placeholder="请输入参数值" id="canshuzhi"
+                                               value="{{ i.value }}"
+                                               class="validate"
+                                               type="text" maxlength="200">
+                                    </div>
+                                </div>
+                                <div class="custom-col center">
+                                    <div class="input-field ys center">
+                                        <label>头参数类型:</label>
+                                        <select id="hu"
+                                                style="width: 145px" class="type" value="" id="type-select"
+                                                class="form-control"
+                                                value="{{ i.type }}">
+                                            <option value="" selected="selected">请选择参数类型</option>
+                                            <option value="0" {% if i.type == "0" %} selected {% endif %} >string
+                                            </option>
+                                            <option value="1" {% if i.type == "1" %} selected {% endif %}>int
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="custom-col center">
+                                    <div class="input-field ys center">
+                                        <label>请求头描述:</label>
+                                        <input style="width: 100px" class="description" placeholder="请输入参数说明"
+                                               id="first_name" value="{{ i.desc }}"
+                                               class="validate"
+                                               type="text" maxlength="100">
+                                    </div>
+                                </div>
+                                <div class="custom-col ys center">
+                                    <input type="button" class="add" vaLue="添加">
+                                    <input type="button" class="del" value="删除">
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% for i in ApiParameters %}
+                            <div class="row center">
+                                <div class="custom-col center">
+                                    <div class="input-field ys center">
+                                        <label>头参数名:</label>
+                                        <input style="width: 100px" class="name" placeholder="请输入参数名" id="first_name"
+                                               value="{{ i.name }}"
+                                               class="validate"
+                                               type="text"  maxlength="50">
+                                    </div>
+                                </div>
+
+                                <div class="custom-col center">
+                                    <div class="input-field ys center">
+                                        <label>头参数值:</label>
+                                        <input style="width: 100px" class="value" placeholder="请输入参数值" id="canshuzhi"
+                                               value="{{ i.value }}"
+                                               class="validate"
+                                               type="text" maxlength="200">
+                                    </div>
+                                </div>
+                                <div class="custom-col center">
+                                    <div class="input-field ys center">
+                                        <label>头参数类型:</label>
+                                        <select id="hu"
+                                                style="width: 145px" class="type" value="" id="type-select"
+                                                class="form-control"
+                                                value="{{ i.type }}">
+                                            <option value="" selected="selected">请选择参数类型</option>
+                                            <option value="0" {% if i.type == "0" %} selected {% endif %} >string
+                                            </option>
+                                            <option value="1" {% if i.type == "1" %} selected {% endif %}>int
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="custom-col center">
+                                    <div class="input-field ys center">
+                                        <label>请求头描述:</label>
+                                        <input style="width: 100px" class="description" placeholder="请输入参数说明"
+                                               id="first_name" value="{{ i.desc }}"
+                                               class="validate"
+                                               type="text" maxlength="100">
+                                    </div>
+                                </div>
+                                <div class="custom-col ys center">
+                                    <input type="button" class="add" vaLue="添加">
+                                    <input type="button" class="del" value="删除">
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="wy input-field col s12 padding">
+                        <label>参数格式:</label>
+                    </div>
+
+                    <div class="wy j-wy input-field col s12 padding">
+                        <input name='format' class="checkbox wy" {% if format == "2" %} checked {% endif %}
+                               type="radio" value="2">x-www-form-urlencoded
+                    </div>
+                    <div class="wy j-wy input-field col s12 padding">
+                        <input name='format' class="checkbox wy" {% if format == "1" %} checked {% endif %}
+                               type="radio" value="1">源数据(raw-json)
+                    </div>
+                    {# 隐藏表单(form-data)，暂时用不到#}
+{#                    <div class="wy j-wy input-field col s12 padding " hidden>#}
+{#                        <!--根据后台传过来的formatde的值来判断是否被选中-->#}
+{#                        <input name="format" class="checkbox wy"  {% if format == "0" %} checked {% endif %}#}
+{#                               type="radio" value="0">表单(form-data)#}
+{#                    </div>#}
+                    <!--第一个-->
+                    <div class="row-tab input-field col s12" id="row_nu">
+                        <!--如果后端没有传数据过来，也要显示一行表格-->
+                        {% if not abc1 %}
+                            <div class="row center">
+                                <div class="custom-col center">
+                                    <div class="input-field ys center">
+                                        <label>参数名:</label>
+                                        <input style="width: 100px" class="name" placeholder="请输入参数名" id="first_name"
+                                               class="validate"
+                                               type="text" maxlength="50">
+                                    </div>
+                                </div>
+                                <div class="custom-col center">
+                                    <div class="input-field ys center">
+                                        <label>参数值:</label>
+                                        <input style="width: 100px" class="value" placeholder="请输入参数值" id="canshuzhi"
+                                               class="validate"
+                                               type="text" maxlength="200">
+                                    </div>
+                                </div>
+                                <div class="custom-col center">
+                                    <div class="input-field ys center">
+                                        <label>参数类型:</label>
+                                        <select id="hu" class="type"
+                                                style="width: 145px" id="type-select" class="form-control">
+                                            <option value="" selected="selected">请选择参数类型</option>
+                                            <option value="0">string</option>
+                                            <option value="1">int</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="custom-col center">
+                                    <div class="input-field ys center">
+                                        <label>参数说明:</label>
+                                        <input style="width: 100px" class="description" placeholder="请输入参数说明"
+                                               id="first_name"
+                                               class="validate"
+                                               type="text" maxlength="100">
+                                    </div>
+                                </div>
+                                <div class="custom-col ys center">
+                                    <input type="button" class="add" vaLue="添加">
+                                    <input type="button" class="del" value="删除">
+                                </div>
+                            </div>
+                        {% endif %}
+                        <!--有数据传过来，根据条数循环创建表格-->
+                        {% for j in  abc1 %}
+                            <div class="row center">
+                                <div class="custom-col center">
+                                    <div class="input-field ys center">
+                                        <label>参数名:</label>
+                                        <!--取返回的数据的name值-->
+                                        <input style="width: 100px" class="name" placeholder="请输入参数名" id="first_name"
+                                               value="{{ j.name }}"
+                                               class="validate"
+                                               type="text" maxlength="50">
+                                    </div>
+                                </div>
+                                <div class="custom-col center">
+                                    <div class="input-field ys center">
+                                        <label>参数值:</label>
+                                        <input style="width: 100px" class="value" placeholder="请输入参数值" id="canshuzhi"
+                                               value="{{ j.value }}"
+                                               class="validate"
+                                               type="text" maxlength="200">
+                                    </div>
+                                </div>
+                                <div class="custom-col center">
+                                    <div class="input-field ys center">
+                                        <label>参数类型:</label>
+                                        <select id="hu" class="type"
+                                                style="width: 145px" id="type-select" class="form-control"
+                                                value="{{ j.type }}">
+                                            <option value="" selected="selected">请选择参数类型</option>
+                                            <option value="0" {% if j.type == "0" %} selected {% endif %}>string</option>
+                                            <option value="1" {% if j.type == "1" %} selected {% endif %}>int</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="custom-col center">
+                                    <div class="input-field ys center">
+                                        <label>参数说明:</label>
+                                        <input style="width: 100px" class="description" placeholder="请输入参数说明"
+                                               value="{{ j.desc }}"
+                                               id="first_name"
+                                               class="validate"
+                                               type="text" maxlength="100">
+                                    </div>
+                                </div>
+                                <div class="custom-col ys center">
+                                    <input type="button" class="add" vaLue="添加">
+                                    <input type="button" class="del" value="删除">
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <!--第二个-->
+                <div class="row-tab" style="display:none;">
+                    {#            <div class="row-tab input-field col s12" style="display:none;">#}
+                    <div class="row padding-01">
+                        <div class="col-md-6 custom-col">
+                            {#                    <div class="input-field">#}
+                            <div class="input-field">
+                                <label>raw:</label>
+                                <textarea name="raw" id="first_name" class="form-control validate"
+                                          style="min-height: 100px;min-width: 400px;max-height: 100px; max-width: 200px;">{{ raw_data }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!--第三个-->
+                <div class="row-tab input-field col s12" id="row_nu">
+                    <!--第三个和第一个一样的循环方式-->
+                    {% if not abc %}
+                        <div class="row center">
+                            <div class="custom-col center">
+                                <div class="input-field ys center">
+                                    <label>参数名:</label>
+                                    <input style="width: 100px" class="name" placeholder="请输入参数名" id="first_name"
+                                           class="validate"
+                                           type="text" maxlength="50">
+                                </div>
+                            </div>
+                            <div class="custom-col center">
+                                <div class="input-field ys center">
+                                    <label>参数值:</label>
+                                    <input style="width: 100px" class="value" placeholder="请输入参数值" id="canshuzhi"
+                                           class="validate"
+                                           type="text" maxlength="200">
+                                </div>
+                            </div>
+                            <div class="custom-col center">
+                                <div class="input-field ys center">
+                                    <label>参数类型:</label>
+                                    <select id="hu" class="type"
+                                            style="width: 145px" id="type-select" class="form-control">
+                                        <option value="" selected="selected">请选择参数类型</option>
+                                        <option value="0">string</option>
+                                        <option value="1">int</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="custom-col center">
+                                <div class="input-field ys center">
+                                    <label>参数说明:</label>
+                                    <input style="width: 100px" class="description" placeholder="请输入参数说明"
+                                           id="first_name"
+                                           class="validate"
+                                           type="text" maxlength="100">
+                                </div>
+                            </div>
+                            <div class="custom-col ys center">
+                                <input type="button" class="add" vaLue="添加">
+                                <input type="button" class="del" value="删除">
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% for j in  abc %}
+                        <div class="row center">
+                            <div class="custom-col center">
+                                <div class="input-field ys center">
+                                    <label>参数名:</label>
+                                    <input style="width: 100px" class="name" placeholder="请输入参数名" id="first_name"
+                                           value="{{ j.name }}"
+                                           class="validate"
+                                           type="text" maxlength="50">
+                                </div>
+                            </div>
+                            <div class="custom-col center">
+                                <div class="input-field ys center">
+                                    <label>参数值:</label>
+                                    <input style="width: 100px" class="value" placeholder="请输入参数值" id="canshuzhi"
+                                           value="{{ j.value }}"
+                                           class="validate"
+                                           type="text" maxlength="200">
+                                </div>
+                            </div>
+                            <div class="custom-col center">
+                                <div class="input-field ys center">
+                                    <label>参数类型:</label>
+                                    <select id="hu" class="type"
+                                            style="width: 145px" id="type-select" class="form-control"
+                                            value="{{ j.type }}">
+                                        <option value="" selected="selected">请选择参数类型</option>
+                                        <option value="0" {% if j.type == "0" %} selected {% endif %}>string</option>
+                                        <option value="1" {% if j.type == "1" %} selected {% endif %}>int</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="custom-col center">
+                                <div class="input-field ys center">
+                                    <label>参数说明:</label>
+                                    <input style="width: 100px" class="description" placeholder="请输入参数说明"
+                                           value="{{ j.desc }}"
+                                           id="first_name"
+                                           class="validate"
+                                           type="text" maxlength="100">
+                                </div>
+                            </div>
+                            <div class="custom-col ys center">
+                                <input type="button" class="add" vaLue="添加">
+                                <input type="button" class="del" value="删除">
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="row padding-01">
+                <div class="col-md-6 custom-col" id="gu">
+                    {#                    <div class="input-field">#}
+                    <div class="input-field">
+                        <label>期望结果:</label>
+                        <!--textarea的值回显，需要写在两个尖括号的中间-->
+                        <textarea name="expected_result" id="expected_result" class="form-control validate" value=""
+                                  style="width: 360px;height: 150px">{{ expected_result }}</textarea>
+                    </div>
+                </div>
+            </div>
+    </div>
+    <!--定义了两个隐藏的input输入框-->
+    <input type="hidden" class="head" name="head" value="">
+    <input type="hidden" class="request" name="request" value="">
+    <div class="aaa" id="dat">
+        <button type="sumbit" class="btn btn-danger" onclick="submitForm()"> 保存</button>
+        <button class="btn btn-danger" name="button">返回</button>
+    </div>
+    </form>
+
+
+    </div>
+    <script src="/static/assets/js/jquery.form.min.js"></script>
+    <script>
+
+        $("form").submit(function(e){
+            if(isNull($('#interfaceName').val())){
+                popout('接口名称不能为空或纯空格！', "sucess_one.png", 1);
+                return false
+            }else if(isNull($('#businessCategories').val())){
+                popout('业务分类不能为空或纯空格！', "sucess_one.png", 1);
+            }else if(isNull($('#type-select').val())){
+                popout('请选择请求方式！', "sucess_one.png", 1);
+            }else if(isNull($('#interfaceAddress').val())){
+                popout('接口地址不能为空或纯空格！', "sucess_one.png", 1);
+            }else if(isNull($('#status').val())){
+                popout('请选择接口状态！', "sucess_one.png", 1);
+            }else if(isNull($('#expected_result').val())){
+                popout('期望结果不能为空或纯空格！', "sucess_one.png", 1);
+            }else{
+                return true
+            }
+            return false
+        });
+
+        function submitForm() {}
+
+        function isNull(str){
+            if (str == "") return true;
+            var regu = "^[ ]+$";
+            var re = new RegExp(regu);
+            return re.test(str);
+        }
+
+        // 限制输入框不允许输入特殊字符
+        function showKeyPress(evt) {
+            evt = (evt) ? evt : window.event;
+            return checkSpecificKey(evt.keyCode);
+        }
+        // 限制输入框不允许输入特殊字符
+        function checkSpecificKey(keyCode) {
+            var specialKey = "[`¥@%……-=+～·「」《》\"~!#$^&*()=|{}':;',\\[\\].<>/?~！#……&*（）——|{}【】‘；：”“'。，、？]‘’";//Specific Key list
+            var realkey = String.fromCharCode(keyCode);
+            var flg = false;
+            flg = (specialKey.indexOf(realkey) >= 0);
+            if (flg) {
+                if(realkey==' '){
+                    popout('不允许输入空格！！！','fail_one.png',1);
+                }else{
+                    popout('请勿输入特殊字符: ' + realkey,'fail_one.png',1);
+                }
+                return false;
+            }
+            return true;
+         }
+         document.getElementById('interfaceName').onkeypress = showKeyPress;
+
+
+        $(function () {
+            <!--each循环遍历，，function（索引，当前元素）-->
+            $(".j-wy").each(function (index, el) {
+                <!--如果那个单选按钮的选中状态是true，就需要显示那个选项-->
+                var isChecked = $(this).find('input').is(':checked')
+                if (isChecked) {
+                    $(".j-wy").removeClass("active");
+                    <!--移除所有的样式-->
+                    $(this).addClass("active");
+                    <!--给当前元素添加当前的样式-->
+                    //$('html, body').animate({scrollTop:0}, 'fast');
+                    $(".row-tab").hide();
+                    $(".row-tab").eq(index).show();
+                    <!--eq选择哪个元素就显示哪个-->
+                }
+                $(this).click(function () {<!--this就是当前元素-->
+                    $(".j-wy").removeClass("active");
+                    <!--移除所有的样式-->
+                    $(this).addClass("active");
+                    <!--给当前元素添加当前的样式-->
+                    //$('html, body').animate({scrollTop:0}, 'fast');
+                    $(".row-tab").hide();
+                    $(".row-tab").eq(index).show();
+                    <!--eq选择哪个元素就显示哪个-->
+                });
+            });
+            <!--点击添加的事件，触发这个克隆事件-->
+            $(".add").click(function () {
+                var row = $(this).parents('.row').clone(true),
+                    rowTab = $(this).parents('.row-tab,.row-tab01');
+
+                rowTab.append(row)
+                {#                return false;<!--阻止默认事件，不跳转-->#}
+
+            })
+            $(".del").click(function () {
+                <!--判断当行数大于1的时候可以执行删除事件，当小于1的时候弹窗提示，第一行不能删除-->
+                if ($(this).parents('.row-tab,.row-tab01').find('.row').length > 1) {
+                    $(this).parents('.row').remove();
+                } else {
+                    //alert('第一行不能删除')
+                   popout("第一行不能删除！！!", "fail_one.png", 3);
+                }
+                return false;
+
+            })
+            //使用jQuery 事件-submit()方法
+            $('.form').on('submit', function () {
+                //自定义两个空的数组
+                var head = [], request = []
+                //获取定位到如下类名的行
+
+                $('.row-tab01 .row').each(function () {
+                    //自定义字段名也就是上边的class的值
+                    var name, value, type, description;
+                    //获取到name的值，命名为name  .val就是取他的值（value）
+                    name = $.trim($(this).find('.name').val());
+                    value = $.trim($(this).find('.value').val());
+                    type = $.trim($(this).find('.type').val());
+                    description = $.trim($(this).find('.description').val());
+                    //||表示或，
+                    if (name || value || type || description) {
+                        //判断当前元素的父类的长度，如果大于0提交下面的参数
+                        //.push就是提交
+                        head.push({
+                            name: name,
+                            value: value,
+                            type: type,
+                            description: description
+                        })
+                    }
+
+                })
+
+                $('.row-tab .row').each(function () {
+                    //自定义字段名也就是上边的class的值
+                    var name, value, type, description;
+                    //获取到name的值，命名为name  .val就是取他的值（value）
+                    name = $.trim($(this).find('.name').val());
+                    value = $.trim($(this).find('.value').val());
+                    type = $.trim($(this).find('.type').val());
+                    description = $.trim($(this).find('.description').val());
+                    //||表示或，
+                    if (name || value || type || description) {
+                        //判断当前元素的父类的长度，如果大于0提交下面的参数
+                        request.push({
+                            name: name,
+                            value: value,
+                            type: type,
+                            description: description
+                        })
+                    }
+
+                })
+                //将json转换为str类型
+                head = JSON.stringify(head)
+                request = JSON.stringify(request);
+                $('.head').val(head)
+                $('.request').val(request)
+                if (!$('.head').val() || !$('.request').val()) return false;
+            })
+        })
+        // 判断请求方式，决定是否隐藏参数内容
+        function request_type(){
+            // var req_val = $("#type-select").val();
+            // if(req_val == "2"){
+            //     $(".cs-hidden").hide();
+            // }else{
+            //     $(".cs-hidden").show();
+            // }
+
+        }
+        // 判断是否传参，觉得是否隐藏内容
+        function transferel(obj){
+            var tran_val = $(obj).attr("data");
+            // 把tran_val传给#transferel_val
+            $("#transferel_val").val(tran_val);
+            if(tran_val == "0"){
+                $(".cs-hiddenel").hide();
+                $(".row-tab").hide();
+            }else{
+                $(".cs-hiddenel").show();
+                $(".row-tab").show();
+            }
+        }
+
+
+
+        // 判断初始请求方式，决定是否隐藏参数内容
+        function Initial_Edit(){
+            // var Initial_req_val = document.getElementById("type-select").value;
+            // var Initial_tran_val = document.getElementById("Initial_transferel").value;
+            // // 判断初始请求方式
+            // if(Initial_req_val == "2"){
+            //     $(".cs-hidden").hide();
+            // }else{
+            //     $(".cs-hidden").show();
+            // }
+            // //判断初始是否传参
+            // if(Initial_tran_val == "3"){
+            //     $(".cs-hiddenel").hide();
+            //     $(".row-tab").hide();
+            // }else{
+            //     $(".cs-hiddenel").show();
+            //     $(".row-tab").show();
+            // }
+        }
+
+        //初始化页面
+        Initial_Edit()
+        //window.onload=function(){
+          //      alert(123)
+            //}
+    </script>
+{% endblock %}
+
+
+
+
+
+

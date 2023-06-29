@@ -18,7 +18,7 @@ urlpatterns = [
     path("inter/list/", interface_view.interface_list),
     path("inter/creat/", interface_view.interface_creat),
     path("inter/edit/", interface_view.interface_edit),
-    path("inter/run",interface_view.interface_run),
+    path("inter/run/", interface_view.interface_run),
 
     # 业务管理
     path("business/", business_view.business_list),

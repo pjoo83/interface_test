@@ -116,20 +116,43 @@ def interface_edit(request, ):
     """
     if request.method == "GET":
         Iid = request.GET.get("id")
-        print(Iid)
         exists = models.interface_base.objects.filter(id=Iid).exists()
         if not exists:
             return JsonResponse({"status": 200, "message": "数据未查到"})
         else:
             inter_head = models.interface_base.objects.get(id=Iid)
-            print(inter_head)
-            ApiParameters = models.ApiParameter.objects.filter(api_id=Iid)
+            ApiParameters = models.ApiParameter.objects.filter(api_id=Iid).values()
             interface_BusinessCategories = models.interface_businessCategories.objects.all()
             busResult = inter_head.businessCategories.all()
-            print(busResult)
-            # for i in busResult:
-            #     print(i)
-        return render(request, 'interface_manage/interface_edit.html')
+            for i in busResult:
+                businessCategories = i.businessName
+            ApiHead = ApiParameters[0]["ApiHead"]
+            print(ApiHead)
+            types = ApiParameters[0]["_type"]
+            description = ApiParameters[0]["description"]
+            expected_result = ApiParameters[0]["expected_result"]
+            request_value = ApiParameters[0]["request_value"]
+            raw_data = ApiParameters[0]["raw_data"]
+            format = ApiParameters[0]["format"]
+            # 定义一个空的字符串，命名为format
+            format_nu = ''
+            # 当format等于0时，format_nu = "abc"【因为前端的0和2存到库中用的字段是一样的，因此需要做一下判断来进行回显】
+            if format == '0':
+                format_nu = "abc"
+            elif format == '2':
+                format_nu = "abc1"
+            context = {
+                "interfaces": inter_head,
+                "interface_businessCategories": interface_BusinessCategories,
+                # "ApiParameters": ApiHead,
+                "expected_result": expected_result,
+                format_nu: request_value,
+                "format": format, "raw_data": raw_data,
+                "businessCategories": businessCategories
+            }
+        return render(request, 'interface_manage/interface_edit.html', context)
+    else:
+        Iid = request.GET.get("id")
 
 
 def interface_run(request):

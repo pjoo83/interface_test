@@ -32,15 +32,16 @@ def interface_list(request):
     if request.method == 'GET':
         form = Interface_listModel()
         queryset = models.interface_base.objects.all()
-        page_object = Pagination(request, queryset)
-        context = {
-            "form": form,
-            "queryset": page_object.page_queryset,
-            "page_string": page_object.html()
-        }
-
-        return render(request, 'interface_manage/interface_list.html', context)
-
+        if len(queryset) > 0:
+            page_object = Pagination(request, queryset)
+            context = {
+                "form": form,
+                "queryset": page_object.page_queryset,
+                "page_string": page_object.html()
+            }
+            return render(request, 'interface_manage/interface_list.html', context)
+        else:
+            return render(request, 'interface_manage/interface_list.html')
 
 
 @csrf_exempt
@@ -108,7 +109,7 @@ def interface_creat(request):
         return redirect("/autotest/inter/list/")
 
 
-def interface_edit(request,):
+def interface_edit(request, ):
     """
     :param request: 接口内容编辑
     :return:

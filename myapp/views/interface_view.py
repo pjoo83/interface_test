@@ -109,7 +109,7 @@ def interface_creat(request):
         return redirect("/autotest/inter/list/")
 
 
-def interface_edit(request, ):
+def interface_edit(request):
     """
     :param request: 接口内容编辑
     :return:
@@ -127,7 +127,7 @@ def interface_edit(request, ):
             for i in busResult:
                 businessCategories = i.businessName
             ApiHead = ApiParameters[0]["ApiHead"]
-            print(ApiHead)
+            # print(ApiHead)
             types = ApiParameters[0]["_type"]
             description = ApiParameters[0]["description"]
             expected_result = ApiParameters[0]["expected_result"]
@@ -148,11 +148,42 @@ def interface_edit(request, ):
                 "expected_result": expected_result,
                 format_nu: request_value,
                 "format": format, "raw_data": raw_data,
-                "businessCategories": businessCategories
+                # "businessCategories": businessCategories
             }
         return render(request, 'interface_manage/interface_edit.html', context)
     else:
         Iid = request.GET.get("id")
+        update_inter = models.interface_base.objects.get(id=Iid)
+        # 通过POST.get的方法进行获取前端的值，与数据库中的值进行替换
+        update_inter.interfaceName = request.POST.get("interfaceName")
+        update_inter.requestType = request.POST.get("requestType")
+        update_inter.interfaceAddress = request.POST.get("interfaceAddress")
+        update_inter.status = request.POST.get("status")
+        businessCategories = request.POST.get('businessCategories')
+        update_inter.save()
+
+        obj = update_inter.businessCategories.all()
+        update_inter.businessCategories.remove(*obj)
+        bus_obj = models.interface_businessCategories.objects.get(businessName=businessCategories)
+        update_inter.businessCategories.add(bus_obj)
+        bus_obj.businessName = businessCategories
+        bus_obj.save()
+
+        # 获取是否传参的状态
+        transfer = request.POST.get("transfer")
+        if transfer == '0':
+            update_result = models.ApiParameter.objects.get(api_id=Iid)
+            update_result.expected_result = request.POST.get("expected_result")
+            update_result.save()
+        else:
+            # 修改请求头
+            update_api = models.ApiParameter.objects.get(api_id=Iid)
+            update_api.ApiHead = request.POST.get("head")
+            # 修改请求请求体从参数
+            update_api.request_value = request.POST.get("request_value")
+            update_api.expected_result = request.POST.get("expected_result")
+            update_api.save()
+            print("+++++++++++++++++++++++++++修改成功++++++++++++++++++++++++++++++++++++++++++++++")
 
 
 def interface_run(request):

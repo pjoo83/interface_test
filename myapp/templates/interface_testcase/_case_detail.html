@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+{% block content %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'interfacetestcase' %}">用例管理</a>
+        </li>
+        <li class="breadcrumb-item active">用例详情</li>
+    </ol>
+    <style>
+
+        [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+            position: static;
+            opacity: 1;
+        }
+
+        #pageframe {
+            display: none;
+            position: absolute;
+            margin: auto;
+            text-align: center;
+            left: 10%;
+            top: 10%;
+            width: 80%;
+        }
+
+        .breadcrumb {
+            padding-top: 22px;
+        }
+
+        .breadcrumb .breadcrumb-item a {
+            font-size: 16px;
+            color: #d9534f;
+        }
+
+        .breadcrumb > .active {
+            font-size: 16px;
+            color: #d9534f;
+        }
+
+        input[type=search] {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 300px;
+        }
+
+        [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+            position: static;
+            opacity: 1;
+        }
+
+        .form .date {
+            width: 110px;
+            line-height: 1;
+            height: 1.84em;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .form .search {
+            width: 200px;
+        }
+
+        .form .select {
+            display: inline-block;
+            font-size: 14px;
+            width: 130px;
+        }
+
+    </style>
+
+    <form class="form">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-action">
+                        请编辑用例信息
+                    </div>
+                    <div class="card-content">
+                        <form class="col s12">
+                            <div class="row">
+                                <span class="span-select">任务名称:</span>
+                                <input class="date" type="text" id="describe1" value="{{ comname }}" name="comname"
+                                       style="width: 20%">
+
+                                <div class="input-field col s12">
+                                    <input id="describe2" type="text" class="validate">
+                                    <!--
+                                    <label for="password">请填写用例描述</label>
+                                    -->
+                                </div>
+                                <select class="select" name="businessCategories" id="businessCategories"
+                                        value="{{ businessCategories }}" style="width: 15%">
+                                    {% for case_bus in businessCategories %}
+                                        <option value="{{ case_bus.businessName }}">{{ case_bus.businessName}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-13">
+                                <!--   Kitchen Sink -->
+                                <div class="card">
+                                    <div class="card-action">
+                                        此用例包含接口如下
+                                    </div>
+                                    <div class="card-content">
+                                        <div class="table-responsive">
+                                            <div id="createtableFront" class="table"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- End  Kitchen Sink -->
+                            </div>
+                            <div style="text-align: center;margin-right: 20px">
+                                <a href="#" class="btn btn-danger" onclick="javascript:window.history.back(-1);">返回</a>
+                            </div>
+                        </form>
+                        <div class="clearBoth"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="pageframe">
+            <div class="card">
+                <div class="card-action">
+                    <form>
+                        <div class="form">
+                            {% csrf_token %}
+                            <span class="span-select">接口id:</span>
+                            <input class="date" type="text" id="interface_id" value="{{ comname }}" name="comname">
+                            <span class="span-select">接口名称:</span>
+                            <input class="date" type="text" id="interface_name" value="{{ comname }}" name="comname">
+                            <div>
+                                <div style="text-align: right;margin-right: 20px">
+                                    <button type="button" class="btn btn-danger" onclick="queryCominfo()"> 查询</button>
+                                    <button type="reset" class="btn btn-danger" id="reset_cominfo">重置</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-content">
+                    <div class="table-responsive">
+                        <div id="createtable" class="table"></div>
+                        <div id="pagination"></div>
+                    </div>
+                    <button type="button" class="btn btn-danger" id="add_inteface_to_case" onclick="add()"> 添加至用例
+                    </button>
+                    <button type="button" class="btn btn-danger" onclick="closeDiv()"> 关闭</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <!-- /.panel-body -->
+    <!-- /.panel -->
+    </div>
+    <!-- /.col-lg-12 -->
+    </div>
+
+    <script type="text/javascript">
+        // 循环创建表格函数-一级层
+        var method_status = {
+                '1': '有效',
+                '0': '无效',
+                '': '',
+                ' ': ''
+                };
+        function CreateTableF(data) {
+            var datainfo = {
+                "columns": [
+                    {
+                        "field": "id",
+                        "title": "ID"
+                    },
+                    {
+                        "field": "requestType",
+                        "title": "请求方式"
+                    },
+                    {
+                        "field": "interfaceName",
+                        "title": "接口名称"
+                    },
+                    {
+                        "field": "status",
+                        "title": "是否有效"
+                    },
+                ],
+                "rows": []
+            };
+
+
+            datainfo.rows = data;
+
+            $("#createtableFront")[0].textContent = '';
+
+            var rowCount = datainfo.rows.length;
+            var cellCount = datainfo.columns.length;
+
+            var table = $('<table border="1" class="table  table-sm   table-hover"></table>');
+            table.appendTo($("#createtableFront"));
+
+            var thead = $("<thead></thead>");
+            thead.appendTo(table);
+
+            var trHeader = $("<tr></tr>");
+            trHeader.appendTo(thead);
+            for (var j = 0; j < cellCount; j++) {
+                var th = $("<th>" + datainfo.columns[j].title + "</th>");
+                th.appendTo(trHeader);
+            }
+
+            var tbody = $("<tbody></tbody>");
+            tbody.appendTo(table);
+
+            if (!rowCount) {
+                var tr = $("<tr></tr>");
+                tr.appendTo(tbody);
+                var td = $('<td colspan="9" style="text-align: center">此用例无可执行接口，请先添加接口</td>');
+                td.appendTo(tr);
+            }
+
+            for (var i = 0; i < rowCount; i++) {
+                var tr = $("<tr></tr>");
+                tr.appendTo(tbody);
+                for (var j = 0; j < cellCount; j++) {
+                    var field = datainfo.columns[j].field;
+                    var val = "";
+                    if (datainfo.rows[i][field] != null) {
+                        if (field=="status"){
+                            val = method_status[datainfo.rows[i][field]];
+                        }else {
+                            val = datainfo.rows[i][field];
+                        }
+                    }
+                    var td = $("<td>" + val + "</td>");
+                    td.appendTo(tr);
+                }
+            }
+            $("#createtableFront").append("</table>");
+        };
+
+        /**/
+        // 添加至用例
+        function add() {
+            for (var i = 0; i < check_list.length; i++) {
+                if (!tableFrontList.includes(check_list[i])) {
+                    tableFrontList.push(check_list[i])
+                }
+            }
+            CreateTableF(tableFrontList);
+            closeDiv();  // 关闭弹层
+        };
+
+        // 移除用例
+        function deleteInfo(value) {
+            for (var i = 0; i < tableFrontList.length; i++) {
+                if (tableFrontList[i]['id'] == value) {
+                    tableFrontList.splice(i, 1);
+                }
+            }
+            CreateTableF(tableFrontList)
+        }
+
+         var test = window.location.href;
+         console.log(test);
+         var url_list = test.split("/");
+         console.log(url_list);
+         var caseID = parseInt(url_list[5]);
+         console.log(caseID);
+         var info = "/test_edit/" + caseID +"/";
+        console.log(info);
+
+        // 保存用例
+        $(function (value) {
+            $('#save_case').click(function () {
+                var case_name = document.getElementById('describe1').value;//获取输入的用例名称
+                console.log(case_name);
+                var case_depiction = document.getElementById('describe2').value;//获取输入的用例描述
+                console.log(case_depiction);
+                var case_object = document.getElementById('businessCategories').value;//获取用例所属的项目
+                console.log(case_object);
+                //定义一个空的数组存储接口id
+                /*var interface_id = new Array();*/
+                var interface_idid = '';
+                /*for(var i=0;i<tableFrontList.length;i++){
+                    interface_id.push(tableFrontList[i]['id'])
+                }*/
+                //取出对应的接口id
+                for (var i = 0; i < tableFrontList.length; i++) {
+                    if (tableFrontList[i]['id']) {
+                        if (interface_idid) {
+                            interface_idid = interface_idid + '#' + tableFrontList[i]['id']
+                        } else {
+                            interface_idid = tableFrontList[i]['id']
+                        }
+                    }
+                }
+                console.log(interface_id);
+                $.ajax({
+                    type: 'POST',
+                    url: "{% url 'add_Testcase' %}",
+                    data: {
+                        case_name: case_name,
+                        case_depiction: case_depiction,
+                        case_object: case_object,
+                        'interface_idid': interface_idid,
+                        operation: 'save_case',
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                    },
+                    success: function (result) {
+                        $('#baseHtml').html(result);
+                        if (result.status == 200) {
+                            popout(result.msg,'success_one.png',2);
+                            window.location.href = 'http://127.0.0.1:8000/autotest/testcase/';
+                        } else {
+                            popout(result.msg,'fail_one.png',2);
+                        }
+                    }
+                });
+            })
+        });
+
+
+        //执行回调详情页的参数进行回填
+        var dataData = {{ data1|safe }};//获取后端回传的用例详情数据
+        function detailData(data) {
+            dataData = data;//将后端回传值赋值给此方法
+            //console.log(dataData);
+            document.getElementById("describe1").value = dataData['case_name'];//给用例名称赋值
+            document.getElementById("describe1").disabled = 'disabled';//给用例名称添加disabled属性
+            document.getElementById("businessCategories").value = dataData['case_objest'];//给所属项目赋值
+            document.getElementById("businessCategories").disabled = 'disabled';//给所属项目添加disabled属性
+            document.getElementById("describe2").value = dataData['description'];//将用例描述赋值给输入框
+            document.getElementById("describe2").disabled = 'disabled';//给用例描述添加disabled属性
+            var intefaceList =dataData['interface_list']['data'];//取出用例包含的接口列表
+            CreateTableF(intefaceList);//用例中的接口数据，生成列表
+        }
+        detailData(dataData);//执行回填方法
+
+
+        var tableFrontList = new Array();  // 定义一个空列表，用来存储已添加的接口数据
+        var checkall_state = false;  // 定义变量表示全部勾选的状态
+
+    </script>
+
+{% endblock %}
+
+

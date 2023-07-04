@@ -3,7 +3,7 @@ import json
 from django.forms import ModelForm
 
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.forms import ModelForm
 from django.views.decorators.csrf import csrf_exempt
@@ -68,7 +68,6 @@ def interface_creat(request):
             # 代表post的无参请求
             format = "3"
         head = json.loads(request.POST.get("head"))
-        print(head)
         raw = request.POST.get("raw")
         type_list = []
         descriptions_list = []
@@ -76,6 +75,10 @@ def interface_creat(request):
         for i in head:
             type_list.append(i.pop("type"))
             descriptions_list.append(i.pop("description"))
+        req = json.loads(request.POST.get("request"))
+        for r in req:
+            type_list.append(r.pop("type"))
+            descriptions_list.append(r.pop("description"))
         interfaces = models.interface_base(
             interfaceName=interface_name,
             requestType=requestType,
@@ -177,13 +180,28 @@ def interface_edit(request):
             update_result.save()
         else:
             # 修改请求头
+            type_list = []
+            description_list = []
+            raw = request.POST.get("raw")
             update_api = models.ApiParameter.objects.get(api_id=Iid)
-            update_api.ApiHead = request.POST.get("head")
+            head = json.loads(request.POST.get("head"))
+            req = json.loads(request.POST.get("request"))
+            for h in head:
+                type_list.append(h.pop("type"))
+                description_list.append(h.pop("description"))
+            for d in req:
+                type_list.append(d.pop("type"))
+                description_list.append(d.pop("description"))
+            update_api.ApiHead = head
             # 修改请求请求体从参数
-            update_api.request_value = request.POST.get("request_value")
+            update_api.request_value = req
             update_api.expected_result = request.POST.get("expected_result")
+            update_api.type = type_list
+            update_api.description = description_list
+            update_api.raw_data = raw
             update_api.save()
-            print("+++++++++++++++++++++++++++修改成功++++++++++++++++++++++++++++++++++++++++++++++")
+            # return HttpResponse({"code": 200, "mse": "新增成功"})
+        return redirect("/autotest/inter/list/")
 
 
 def interface_run(request):

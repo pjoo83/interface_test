@@ -1,0 +1,650 @@
+{% extends "temp.html" %}
+{% block content %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'interfacetestcase' %}">用例列表</a>
+        </li>
+        <li class="breadcrumb-item active">用例编辑</li>
+    </ol>
+    <style>globalData
+
+        [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+            position: static;
+            opacity: 1;
+        }
+
+        #pageframe {
+            display: none;
+            position: absolute;
+            margin: auto;
+            text-align: center;
+            left: 10%;
+            top: 10%;
+            width: 80%;
+        }
+
+        .breadcrumb {
+            padding-top: 22px;
+        }
+
+        .breadcrumb .breadcrumb-item a {
+            font-size: 16px;
+            color: #d9534f;
+        }
+
+        .breadcrumb > .active {
+            font-size: 16px;
+            color: #d9534f;
+        }
+
+
+        input[type=search] {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 300px;
+        }
+
+        [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+            position: static;
+            opacity: 1;
+        }
+
+        .form .date {
+            width: 110px;
+            line-height: 1;
+            height: 1.84em;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .form .search {
+            width: 200px;
+        }
+
+        .form .select {
+            display: inline-block;
+            font-size: 14px;
+            width: 130px;
+        }
+
+    </style>
+
+    <form class="form">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-action">
+                        请编辑用例信息
+                    </div>
+                    <div class="card-content">
+                        <form class="col s12">
+                            <div class="row">
+                                <span class="span-select">用例名称:</span>
+                                <input class="date" type="text" id="describe1" value="{{ comname }}" name="comname"
+                                       style="width: 20%" maxlength="50">
+
+                                <div class="input-field col s12">
+                                    <input id="describe2" type="text" class="validate" maxlength="100">
+                                    <!--
+                                    <label for="password">请填写用例描述</label>
+                                    -->
+                                </div>
+                                <select class="select" name="businessCategories" id="businessCategories"
+                                        value="{{ businessCategories }}" style="width: 15%">
+                                    {% for case_bus in businessCategories %}
+                                        <option value="{{ case_bus.businessName }}">{{ case_bus.businessName}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-13">
+                                <!--   Kitchen Sink -->
+                                <div class="card">
+                                    <div class="card-action">
+                                        此用例包含接口如下
+                                        <div style="text-align: right;margin-right: 20px">
+                                            <button type="button" class="btn btn-danger" onclick="openDiv()"> 添加接口
+                                            </button>
+                                            <!--
+                                            <button type="button" class="btn btn-danger"> 重置</button>
+                                            -->
+                                        </div>
+                                    </div>
+                                    <div class="card-content">
+                                        <div class="table-responsive">
+                                            <div id="createtableFront" class="table"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <center>
+                                    <div>
+                                        <button type="button" class="btn btn-danger" id="save_edit"> 保存</button>
+                                        <input type="button" class="btn btn-danger" name="button" id="remove_cominfo"
+                                               value="关闭" onclick="close_to_caselist()" style="background: #d9534f">
+                                    </div>
+                                </center>
+                                <!-- End  Kitchen Sink -->
+                            </div>
+                        </form>
+                        <div class="clearBoth"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="pageframe">
+            <div class="card">
+                <div class="card-action">
+                    <form>
+                        <div class="form">
+                            {% csrf_token %}
+                            <span class="span-select">接口id:</span>
+                            <input class="date" type="text" id="interface_id" value="{{ comname }}" name="comname" maxlength="20" onkeyup="value=value.replace(/[^\d]/g,'')">
+                            <span class="span-select">接口名称:</span>
+                            <input class="date" type="text" id="interface_name" value="{{ comname }}" name="comname" maxlength="50">
+                            <div>
+                                <div style="text-align: right;margin-right: 20px">
+                                    <button type="button" class="btn btn-danger" onclick="queryCominfo()"> 查询</button>
+                                    <button type="reset" class="btn btn-danger" id="reset_cominfo">重置</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-content">
+                    <div class="table-responsive">
+                        <div id="createtable" class="table"></div>
+                        <div id="pagination"></div>
+                    </div>
+                    <button type="button" class="btn btn-danger" id="add_inteface_to_case" onclick="add()"> 保存更改
+                    </button>
+                    <button type="button" class="btn btn-danger" onclick="closeDiv()"> 关闭</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <!-- /.panel-body -->
+    <!-- /.panel -->
+    </div>
+    <!-- /.col-lg-12 -->
+    </div>
+
+    <script type="text/javascript">
+        // 限制输入框不允许输入特殊字符
+        function showKeyPress(evt) {
+            evt = (evt) ? evt : window.event;
+            return checkSpecificKey(evt.keyCode);
+        }
+        // 限制输入框不允许输入特殊字符
+        function checkSpecificKey(keyCode) {
+            var specialKey = "[`¥@%……-=+～·「」《》_\"~!#$^&*()=|{}':;',\\[\\].<>/?~！#……&*（）——|{}【】‘；：”“'。，、？]‘’";//Specific Key list
+            var realkey = String.fromCharCode(keyCode);
+            var flg = false;
+            flg = (specialKey.indexOf(realkey) >= 0);
+            if (flg) {
+                popout('请勿输入特殊字符: ' + realkey,'fail_one.png',1);
+                return false;
+            }
+            return true;
+         }
+         document.getElementById('describe1').onkeypress = showKeyPress;
+         document.getElementById('interface_name').onkeypress = showKeyPress;
+
+
+        // 增加弹层
+        function openDiv() {
+            document.getElementById("pageframe").style.display = 'block';
+            alreadyCheck()
+        };
+
+        // 给弹窗层增加已有接口信息的勾选状态
+        function alreadyCheck() {
+            // back_list = [];
+            check_list = [];
+            var checkall_state_num = 0;
+            var check = document.getElementsByClassName('checkbox');
+            for (var i = 0; i < intefaceList.length; i++) {
+                back_list.push(intefaceList[i]['id'])
+                check_list.push(intefaceList[i]);
+            }
+            for (var i = 0; i < check.length; i++) {
+                if(back_list.includes(parseInt(check[i].value))){
+                    check[i].checked = true;
+                    checkall_state_num += 1
+                }
+            }
+            if(checkall_state_num==check.length){
+                var checkall = document.getElementById('checkboxall');
+                checkall.checked = true;
+                checkall_state = true;
+            }else{
+                checkall_state = false;
+            }
+        }
+        
+        // 关闭弹层
+        function closeDiv() {
+            document.getElementById("pageframe").style.display = 'none';
+            // 清空勾选
+            var check = document.getElementsByClassName('checkbox');
+            for (var i = 0; i < check.length; i++) {
+                check[i].checked = false;
+            }
+
+            // 清空全选按钮
+            var checkall = document.getElementById('checkboxall');
+            checkall.checked = false;
+            checkall_state = false;
+
+            // 清空待添加用例列表
+            check_list = [];
+            //回填勾选数据所用数组
+            back_list = [];
+        };
+
+        // 点击翻页时调用此函数-弹窗层
+        function loadData(currPage, pageSize) {
+            // 发起ajax请求
+            $.ajax({
+                type: 'POST',
+                url: "/autotest/testcase_edit/" + caseID + '/',
+                data: {
+                    interface_id: $('#interface_id').val(),
+                    interface_name: $('#interface_name').val(),
+                    operation: 'page',
+                    page_size: pageSize,
+                    page: currPage,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                // 成功后回调
+                success: function (data) {
+                    globalData = data;
+                    CreateTable(globalData);  // 调用根据后台json数据data循环创建表格函数
+                    intefaceList = check_list;
+                    alreadyCheck();
+                    var page = globalData.page;
+                    // 调用翻页组件中的setPage方法，让界面中的翻页组件根据点击事件发生变化，parseInt是转换为整型
+                    $("#pagination").whjPaging("setPage",
+                        {
+                            currPage: parseInt(page.cur_page),
+                            totalPage: parseInt(page.total_pages),
+                            totalSize: parseInt(page.total_records)
+                        });
+                }
+            });
+        };
+
+        // 加载初始化翻页组件的函数-弹窗层
+        function loadingPage(page) {
+            if (page.total_records) {
+                $("#pagination").whjPaging({
+                    css: 'css-5',
+                    currPage: parseInt(page.cur_page),
+                    totalSize: parseInt(page.total_records),
+                    totalPage: parseInt(page.total_pages),
+                    pageSize: 5,
+                    pageSizeOpt: [
+                        {value: 5, text: '5条/页'},
+                        {value: 10, text: '10条/页', selected: true},
+                        {value: 15, text: '15条/页'},
+                        {value: 20, text: '20条/页'}
+                    ],
+                    showPageNum: 5,
+                    isResetPage: true,
+                    callBack: function (currPage, pageSize) {
+                        loadData(currPage, pageSize);
+                    }
+                });
+            }
+        };
+
+        // 根据后端json数据data循环创建表格函数-弹窗层
+        var method_status = {
+                '1': '有效',
+                '0': '无效',
+                '': '',
+                ' ': ''
+                };
+        function CreateTable(data) {
+            var item = data.data;
+            var datainfo = {
+                "columns": [
+                    {
+                        "field": "checkBox",
+                        "title": '<input type="checkbox" id="checkboxall" onclick="checkAll()">'
+                    },
+                    {
+                        "field": "id",
+                        "title": "ID"
+                    },
+                    {
+                        "field": "interfaceName",
+                        "title": "接口名称"
+                    },
+                    {
+                        "field": "status",
+                        "title": "是否有效"
+                    },
+                    {
+                        "field": "detailedInformation",
+                        "title": "操作"
+                    },
+                ],
+                "rows": []
+            };
+            for (var i = 0; i < item.length; i++) {
+                item[i]['checkBox'] = '<input class="checkbox" type="checkbox" value="' + item[i].id + '" onclick="checkSelect(value)">';
+                item[i]['detailedInformation'] = '<a class="detailedInformation" style="cursor: pointer" value="' + item[i].id + '" href="'+"/autotest/interface_detail/1/" + item[i].id + '" target="_blank">详情</a>';
+                datainfo['rows'].push(item[i]);
+            }
+            $("#createtable")[0].textContent = '';
+
+            var rowCount = datainfo.rows.length;
+            var cellCount = datainfo.columns.length;
+
+            var table = $('<table border="1" class="table  table-sm   table-hover"></table>');
+            table.appendTo($("#createtable"));
+
+            var thead = $("<thead></thead>");
+            thead.appendTo(table);
+
+            var trHeader = $("<tr></tr>");
+            trHeader.appendTo(thead);
+            for (var j = 0; j < cellCount; j++) {
+                var th = $("<th>" + datainfo.columns[j].title + "</th>");
+                th.appendTo(trHeader);
+            }
+
+            var tbody = $("<tbody></tbody>");
+            tbody.appendTo(table);
+
+            if (!rowCount) {
+                var tr = $("<tr></tr>");
+                tr.appendTo(tbody);
+                var td = $('<td colspan="9" style="text-align: center">查询无结果，请重新选择筛选条件</td>');
+                td.appendTo(tr);
+            }
+
+            for (var i = 0; i < rowCount; i++) {
+                var tr = $("<tr></tr>");
+                tr.appendTo(tbody);
+                for (var j = 0; j < cellCount; j++) {
+                    var field = datainfo.columns[j].field;
+                    var val = "";
+                    if (datainfo.rows[i][field] != null) {
+                        if (field=="status"){
+                            val = method_status[datainfo.rows[i][field]];
+                        } else {
+                            val = datainfo.rows[i][field];
+                        }
+
+                    }
+                    var td = $("<td>" + val + "</td>");
+                    td.appendTo(tr);
+                }
+            }
+            $("#createtable").append("</table>");
+        };
+
+        // 操作check_list添加或删除元素
+        function operationCheckList(opertype, id, data) {
+            if(opertype=='add'){
+                check_list.push(data)
+            }else{
+                for (var i=0; i<check_list.length; i++){
+                    if(check_list[i]['id'] == id){
+                        check_list.splice(i, 1)
+                    }
+                }
+            }
+        }
+
+        // 操作back_list添加或删除元素
+        function operationBackList(opertype, id) {
+            if(opertype=='add'){
+                back_list.push(id)
+            }else{
+                back_list.splice(back_list.indexOf(id), 1);
+            }
+        }
+
+        // 处理全选或取消全选函数-弹窗层
+        function checkAll() {
+            var check = document.getElementsByClassName('checkbox');
+            if (checkall_state) {
+                for (var i = 0; i < check.length; i++) {
+                    check[i].checked = false;
+                    operationCheckList('delete', check[i].value, '')
+                    operationBackList('delete', check[i].value)
+                }
+                checkall_state = false;
+            } else {
+                for (var i = 0; i < check.length; i++) {
+                    check[i].checked = true;
+                }
+                for (var i= 0; i < globalData.data.length; i++){
+                   if(!back_list.includes(globalData.data[i]['id'])){
+                       operationCheckList('add', globalData.data[i]['id'], globalData.data[i]);
+                       operationBackList('add', globalData.data[i]['id'])
+                   }
+                }
+                checkall_state = true;
+            }
+        };
+
+        // 勾选单个方框时调用此函数记录勾选的id-弹窗层
+        function checkSelect(id) {
+            for(var i=0; i<globalData.data.length; i++){
+               if (globalData.data[i]['id'] == id){
+                   if(back_list.includes(globalData.data[i]['id'])){
+                       operationCheckList('delete', id, '');
+                       operationBackList('delete', id)
+                   }else{
+                       operationCheckList('add', id, globalData.data[i]);
+                       operationBackList('add', id)
+                   }
+               }
+            }
+        };
+
+        // 查询按钮-弹窗层
+        function queryCominfo() {
+            $.ajax({
+                type: 'POST',
+                url: "/autotest/testcase_edit/" + caseID + '/',
+                data: {
+                    interface_id: $('#interface_id').val(),
+                    interface_name: $('#interface_name').val(),
+                    operation: 'query',
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function (data) {
+                    globalData = data;
+                    CreateTable(globalData);
+                    var page = globalData.page;
+                    loadingPage(page)
+                }
+            });
+        };
+
+        // 循环创建表格函数-一级层
+        function CreateTableF(data) {
+            var datainfo = {
+                "columns": [
+                    {
+                        "field": "id",
+                        "title": "ID"
+                    },
+                    {
+                        "field": "requestType",
+                        "title": "请求方式"
+                    },
+                    {
+                        "field": "interfaceName",
+                        "title": "接口名称"
+                    },
+                    {
+                        "field": "status",
+                        "title": "是否有效"
+                    },
+                    {
+                        "field": "deleteInfo",
+                        "title": "操作"
+                    },
+                ],
+                "rows": []
+            };
+            for (var i = 0; i < data.length; i++) {
+                data[i]['deleteInfo'] = '<a class="delete" style="cursor: pointer" onclick="deleteInfo(' + data[i].id + ')">移除</a>';
+            }
+
+            datainfo.rows = data;
+
+            $("#createtableFront")[0].textContent = '';
+
+            var rowCount = datainfo.rows.length;
+            var cellCount = datainfo.columns.length;
+
+            var table = $('<table border="1" class="table  table-sm   table-hover"></table>');
+            table.appendTo($("#createtableFront"));
+
+            var thead = $("<thead></thead>");
+            thead.appendTo(table);
+
+            var trHeader = $("<tr></tr>");
+            trHeader.appendTo(thead);
+            for (var j = 0; j < cellCount; j++) {
+                var th = $("<th>" + datainfo.columns[j].title + "</th>");
+                th.appendTo(trHeader);
+            }
+
+            var tbody = $("<tbody></tbody>");
+            tbody.appendTo(table);
+
+            if (!rowCount) {
+                var tr = $("<tr></tr>");
+                tr.appendTo(tbody);
+                var td = $('<td colspan="9" style="text-align: center">此用例无可执行接口，请先添加接口</td>');
+                td.appendTo(tr);
+            }
+
+            for (var i = 0; i < rowCount; i++) {
+                var tr = $("<tr></tr>");
+                tr.appendTo(tbody);
+                for (var j = 0; j < cellCount; j++) {
+                    var field = datainfo.columns[j].field;
+                    var val = "";
+                    if (datainfo.rows[i][field] != null) {
+                        if (field=="status"){
+                            val = method_status[datainfo.rows[i][field]];
+                        }else {
+                            val = datainfo.rows[i][field];
+                        }
+
+                    }
+
+                    var td = $("<td>" + val + "</td>");
+                    td.appendTo(tr);
+                }
+            }
+            $("#createtableFront").append("</table>");
+        };
+
+        // 添加至用例
+        function add() {
+            intefaceList = check_list;
+            CreateTableF(intefaceList);
+            closeDiv();  // 关闭弹层
+        };
+
+        // 移除用例
+        function deleteInfo(value) {
+            for (var i = 0; i < intefaceList.length; i++) {
+                if (intefaceList[i]['id'] == value) {
+                    intefaceList.splice(i, 1);
+                }
+            }
+            CreateTableF(intefaceList)//重新生成底层用例编辑列表
+        }
+
+        var test = window.location.href;
+        var url_list = test.split("/");
+        var caseID = url_list[5];
+
+        // 保存用例
+        $(function () {
+            $('#save_edit').click(function () {
+                var case_name = document.getElementById('describe1').value;//获取输入的用例名称
+                var case_depiction = document.getElementById('describe2').value;//获取输入的用例描述
+                var case_object = document.getElementById('businessCategories').value;//获取用例所属的项目
+                /*var interface_id = new Array();*/
+                var interface_idid = '';//定义一个空的数组存储接口id
+                //取出对应的接口id
+                /*for(var i=0;i<tableFrontList.length;i++){
+                    interface_id.push(tableFrontList[i]['id'])
+                }*/
+                for (var i = 0; i < intefaceList.length; i++) {
+                    if (intefaceList[i]['id']) {
+                        if (interface_idid) {
+                            interface_idid = interface_idid + '#' + intefaceList[i]['id']
+                        } else {
+                            interface_idid = intefaceList[i]['id']
+                        }
+                    }
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: "/autotest/testcase_edit/" + caseID + '/',
+                    data: {
+                        case_name: case_name,
+                        case_depiction: case_depiction,
+                        case_object: case_object,
+                        'interface_idid': interface_idid,
+                        operation: 'edit_case',
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                    },
+                    success: function (data) {
+                        if (data.status == 0) {
+                            popout(data.msg,"sucess_one.png",2);
+                            window.location.href = '{% url 'interfacetestcase' %}';
+                        } else {
+                            popout(result.msg,'fail_one.png',2);
+                        }
+                    }
+                });
+            })
+        });
+
+        //页面关闭按钮-回跳会用例管理列表页
+        function close_to_caselist() {
+            window.location = '{% url 'interfacetestcase' %}';
+        }
+
+        //执行回调详情页的参数进行回填
+        var dataData = {{ data1|safe }};//获取后端回传的用例详情数据
+        var intefaceList = dataData['interface_list']['data'];//取出用例包含的接口列表
+        function detailData(data) {
+            dataData = data;//将后端回传值赋值给此方法
+            document.getElementById("describe1").value = dataData['case_name'];//给用例名称赋值
+            //document.getElementById("describe1").disabled = 'disabled';//给用例名称添加disabled属性
+            document.getElementById("businessCategories").value = dataData['case_objest'];//给所属项目赋值
+            //document.getElementById("businessCategories").disabled = 'disabled';//给所属项目添加disabled属性
+            document.getElementById("describe2").value = dataData['description'];//将用例描述赋值给输入框
+            //document.getElementById("describe2").disabled = 'disabled';//给用例描述添加disabled属性
+
+            CreateTableF(intefaceList);//用例中的接口数据，生成列表
+        }
+        detailData(dataData);//执行回填方法
+
+        var globalData = JSON.parse('{{ data|safe }}'); //接收后端数据并转换为json格式
+        CreateTable(globalData);  // 循环创建表格
+        var check_list = new Array();// 定义一个空列表，用来存储勾选要添加的用例数据
+        var back_list = new Array();// 定义一个空列表，用来回填勾选的数据
+        var tableFrontList = new Array();  // 定义一个空列表，用来存储已添加的用例数据
+        var checkall_state = false;  // 定义变量表示全部勾选的状态
+        var page = globalData.page;  // 定义页数变量
+        loadingPage(page); // 初始化翻
+    </script>
+
+{% endblock %}
+
+

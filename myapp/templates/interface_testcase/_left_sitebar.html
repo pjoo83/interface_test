@@ -1,0 +1,36 @@
+{% load static %}
+<style>
+    .waves-effect {
+    position: relative;
+    cursor: pointer;
+    display: inline-block;
+    overflow: hidden;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    vertical-align: middle;
+    z-index: 1;
+    will-change: opacity, transform;
+    transition: .3s ease-out;
+}
+
+.fa {
+    display: inline-block;
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.cd ul{
+    max-height: 300px;
+    overflow: auto;
+}
+</style>
+<li class="cd">
+    <a href="{% url 'interfacetestcase' %}" class="waves-effect waves-dark"><i class="fa fa-sitemap"></i> 用例管理</a>
+</li>

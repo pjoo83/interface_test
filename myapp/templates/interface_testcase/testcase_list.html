@@ -1,0 +1,465 @@
+{% extends "temp.html" %}
+{% block content %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'interfacetestcase' %}">用例列表</a>
+        </li>
+    </ol>
+    <style>
+        .breadcrumb {
+            padding-top: 22px;
+        }
+
+        .breadcrumb .breadcrumb-item a {
+            font-size: 16px;
+            color: #d9534f;
+        }
+
+        .breadcrumb > .active {
+            font-size: 16px;
+            color: #d9534f;
+        }
+
+
+        input[type=search] {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 300px;
+        }
+
+        [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+            position: static;
+            opacity: 1;
+        }
+
+
+        .form .date {
+            background-color: white;
+            width: 120px;
+            line-height: 1;
+            height: 20px;
+            border: 1px solid #060706;
+            border-radius: 4px;
+        }
+
+        .form .search {
+            width: 200px;
+        }
+
+        .form .select {
+            display: inline-block;
+            font-size: 14px;
+            width: 130px;
+        }
+
+        .form .span-select {
+
+            margin-left: 20px;
+        }
+
+        select{
+            display: inline-block;
+            width:80px;
+        }
+
+    </style>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="form" action={% url "interfacetestcase" %} method='post'>
+                {% csrf_token %}
+                <span class="span-select">用例名称或id:</span>
+                <input class="date" type="text" id="case_name_case_id" value="{{ comname }}" name="comname" maxlength="50">
+                <span class="span-select">所属项目:</span>
+                <select class="select" name="businessCategories" id="businessCategories"
+                        value="{{ businessCategories }}">
+                    <option value="" selected>全部</option>
+                    {% for case_bus in businessCategories %}
+                        <option value="{{ case_bus.businessName }}">{{ case_bus.businessName}}</option>
+                    {% endfor %}
+                </select>
+                <span class="span-select">状态:</span>
+                <select class="select" name="status" id="status">
+                    <option value="" selected>全部</option>
+                    <option value="1">有效</option>
+                    <option value="0">无效</option>
+                </select>
+                <span style="margin-left: 15px">创建时间: 开始</span>
+                <input class="date" type="text" value="{{ startTime }}" name="{{ startTime }}" id="datetimepickerStart" readonly="true"/>
+                <span>至</span>
+                <input class="date" type="text" value="{{ endTime }}" id="datetimepickerEnd" readonly="true"/><br>
+                <br>
+                <div>
+                    <div style="text-align: right;margin-right: 20px">
+                        <a class="waves-effect waves-light btn" href="{% url 'add_Testcase' %}"
+                           style="background: #d9534f">添加用例</a>
+                        <input type="button" class="btn btn-danger" id="query_cominfo" value="查询">
+                        <button type="reset" class="btn btn-danger" id="reset_cominfo" onclick="resetCominfo()">重置</button>
+                        <input type="button" class="btn btn-danger" name="button" id="remove_cominfo"
+                               onclick="del_case()" value="删除" style="background: #d9534f">
+                    </div>
+                </div>
+            </div>
+            <div class="card-content" style="padding: 10px">
+                <div class="table-responsive">
+                    <div id="createtable" class="table"></div>
+                    <div id="pagination" style="text-align: center"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        // 限制输入框不允许输入特殊字符
+        function showKeyPress(evt) {
+            evt = (evt) ? evt : window.event;
+            return checkSpecificKey(evt.keyCode);
+        }
+        // 限制输入框不允许输入特殊字符
+        function checkSpecificKey(keyCode) {
+            var specialKey = "[`¥@%……-=+～·「」《》_\"~!#$^&*()=|{}':;',\\[\\].<>/?~！#……&*（）——|{}【】‘；：”“'。，、？]‘’";//Specific Key list
+            var realkey = String.fromCharCode(keyCode);
+            var flg = false;
+            flg = (specialKey.indexOf(realkey) >= 0);
+            if (flg) {
+                popout('请勿输入特殊字符: ' + realkey,'fail_one.png',1);
+                return false;
+            }
+            return true;
+         }
+         document.getElementById('case_name_case_id').onkeypress = showKeyPress;
+
+
+        //获取用例列表页搜索条件
+        $(document).ready(function () {
+            //点击id="query_cominfo"时调用此js方法
+            $("#query_cominfo").click(function () {
+                $.ajax({
+                    type: 'POST',
+                    url: "{% url 'interfacetestcase' %}",
+                    data: {
+                        //获取用例id或名称的值
+                        case_name_case_id: $('#case_name_case_id').val(),
+                        //获取项目名称下拉菜单的值
+                        businessCategories: $("#businessCategories").val(),
+                        //获取状态拉菜单的值
+                        status: $("#status").val(),
+                        //获取创建时间的值
+                        startTime: $('#datetimepickerStart')[0].value,
+                        endTime: $('#datetimepickerEnd')[0].value,
+                        //定义方法名称，后端判断请求
+                        operation: 'search_case',
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                    },
+                    success: function (data) {
+                        globalData = data;
+                        CreateTable(globalData);
+                        var page = globalData.page;
+                        loadingPage(page)
+                    }
+                });
+            });
+        });
+
+        // 根据后端json数据data循环创建表格函数-弹窗层
+        var method_status = {
+                '1': '有效',
+                '0': '无效',
+                '': '',
+                ' ': ''
+                };
+        function CreateTable(data) {
+            var item = data.data;
+            var datainfo = {
+                "columns": [
+                    {
+                        "field": "checkBox",
+                        "title": '<input type="checkbox" id="checkboxall" onclick="checkAll()">'
+                    },
+                    {
+                        "field": "id",
+                        "title": "用例ID"
+                    },
+                    {
+                        "field": "caseName",
+                        "title": "用例名称"
+                    },
+                    {
+                        "field": "interfaceNumber",
+                        "title": "接口数量"
+                    },
+                    {
+                        "field": "executeNumber",
+                        "title": "执行次数"
+                    },
+                    {
+                        "field": "createUser",
+                        "title": "创建人"
+                    },
+                    {
+                        "field": "createTime",
+                        "title": "创建时间"
+                    },
+                    {
+                        "field": "updateTime",
+                        "title": "修改时间"
+                    },
+                    {
+                        "field": "status",
+                        "title": "状态"
+                    },
+                    {
+                        "field": "detailedInformation",
+                        "title": "操作"
+                    },
+                ],
+                "rows": []
+            };
+            for (var i = 0; i < item.length; i++) {
+                item[i]['checkBox'] = '<input class="checkbox" type="checkbox" value="' + item[i].id + '">';
+                item[i]['detailedInformation'] = '<a class="detailedInformation" style="cursor: pointer" onclick="Information()" value="' + item[i].id + '" " href="'+ "/autotest/testcase_detail/" + item[i].id + "/" +'">详情</a>'+ " " + '<a class="editInformation" style="cursor: pointer" onclick="Information()" value="' + item[i].id + '" href="'+ "/autotest/testcase_edit/" + item[i].id + "/" +'">编辑</a>';
+                //item[i]['editInformation'] = '<a class="editInformation" style="cursor: pointer" onclick="Information()" value="' + item[i].id + '" href="'+ "/autotest/testcase/testcase_edit/" + item[i].id + "/" +'">编辑</a>';
+                datainfo['rows'].push(item[i]);
+            }
+            $("#createtable")[0].textContent = '';
+
+            var rowCount = datainfo.rows.length;
+            var cellCount = datainfo.columns.length;
+
+            var table = $('<table border="1" class="table  table-sm   table-hover"></table>');
+            table.appendTo($("#createtable"));
+
+            var thead = $("<thead></thead>");
+            thead.appendTo(table);
+
+            var trHeader = $("<tr></tr>");
+            trHeader.appendTo(thead);
+            for (var j = 0; j < cellCount; j++) {
+                var th = $("<th>" + datainfo.columns[j].title + "</th>");
+                th.appendTo(trHeader);
+            }
+
+            var tbody = $("<tbody></tbody>");
+            tbody.appendTo(table);
+
+            if (!rowCount) {
+                var tr = $("<tr></tr>");
+                tr.appendTo(tbody);
+                var td = $('<td colspan="9" style="text-align: center">查询无结果，请重新选择筛选条件</td>');
+                td.appendTo(tr);
+            }
+
+            for (var i = 0; i < rowCount; i++) {
+                var tr = $("<tr></tr>");
+                tr.appendTo(tbody);
+                for (var j = 0; j < cellCount; j++) {
+                    var field = datainfo.columns[j].field;
+                    var val = "";
+                    if (datainfo.rows[i][field] != null) {
+                        if(field == "status"){
+                            val = method_status[datainfo.rows[i][field]];
+                        }else {
+                            val = datainfo.rows[i][field];
+                        }
+
+                    }
+
+                    var td = $("<td>" + val + "</td>");
+                    td.appendTo(tr);
+                }
+            }
+            $("#createtable").append("</table>");
+        };
+
+        // 处理全选或取消全选函数
+        function checkAll(){
+            var check = document.getElementsByClassName('checkbox');
+            for (var i = 0;i < check.length;i++){
+                if(check[i].checked){
+                    check[i].checked = false;
+                }else{
+                    check[i].checked = true;
+                }
+            }
+        };
+
+        // 点击翻页时调用此函数
+        function loadData(currPage, pageSize) {
+            // 发起ajax请求
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'interfacetestcase' %}",
+                data: {
+                    //获取用例id或名称的值
+                    case_name_case_id: $('#case_name_case_id').val(),
+                    //获取项目名称下拉菜单的值
+                    businessCategories: $("#businessCategories").val(),
+                    //获取状态拉菜单的值
+                    status: $("#status").val(),
+                    //获取创建时间的值
+                    startTime: $('#datetimepickerStart')[0].value,
+                    endTime: $('#datetimepickerEnd')[0].value,
+                    operation: 'page',
+                    page_size: pageSize,
+                    page: currPage,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                // 成功后回调
+                success: function (data) {
+                    globalData = data;
+                    CreateTable(globalData);  // 调用根据后台json数据data循环创建表格函数
+                    var page = globalData.page;
+
+                    // 调用翻页组件中的setPage方法，让界面中的翻页组件根据点击事件发生变化，parseInt是转换为整型
+                    $("#pagination").whjPaging("setPage",
+                        {
+                            currPage: parseInt(page.cur_page),
+                            totalPage: parseInt(page.total_pages),
+                            totalSize: parseInt(page.total_records)
+                        });
+                }
+            });
+        };
+
+        // 加载初始化翻页组件的函数
+        function loadingPage(page) {
+            if (page.total_records) {
+                $("#pagination").whjPaging({
+                    css: 'css-5',
+                    currPage: parseInt(page.cur_page),
+                    totalSize: parseInt(page.total_records),
+                    totalPage: parseInt(page.total_pages),
+                    pageSize: 5,
+                    pageSizeOpt: [
+                        {value: 5, text: '5条/页'},
+                        {value: 10, text: '10条/页', selected: true},
+                        {value: 15, text: '15条/页'},
+                        {value: 20, text: '20条/页'}
+                    ],
+                    showPageNum: 5,
+                    isResetPage: true,
+                    callBack: function (currPage, pageSize) {
+                        loadData(currPage, pageSize);
+                    }
+                });
+            }
+        };
+
+        // 加载初始化日期选择框组件的函数
+        function loadingDate(){
+            $('#datetimepickerStart').datetimepicker({value:'',step:1, lang:'ch', format:'Y-m-d H:i'});
+            $('#datetimepickerEnd').datetimepicker({value:'',step:1, lang:'ch', format:'Y-m-d H:i'});
+        };
+
+
+        //列表页复选框多选及
+        $(document).ready(function () {
+            //默认checkboxall复选框状态为false
+            var checkall_status = false;
+            //定义点击事件
+            $("#checkboxall").click(function () {
+                //定义变量check利用原生js获取checkbox复选框的数量状态，check 会返回一个数组 给出元素数量和 length
+
+                var check = document.getElementsByClassName('checkbox');
+
+                for (var i = 0; i < check.length; i++) {
+                    if (checkall_status) {
+                        //判断check中的复选框是否被选中.checked
+                        check[i].checked = false;
+                    } else {
+                        check[i].checked = true;
+                    }
+                }
+                if (checkall_status) {
+                    //判断表头复选框是否被选中
+                    checkall_status = false;
+                } else {
+                    checkall_status = true;
+                }
+            });
+        });
+
+
+
+        //删除用例
+        function del_case() {
+                var check = document.getElementsByClassName('checkbox');//利用原生的js定位要删除的用例的单选框
+                var checkInfo = '';
+                for (var i = 0;i < check.length;i++){//将选择的用例的id利用#号拼接成字符串准备传给后端使用
+                    if(check[i].checked){
+                        if(checkInfo){
+                            checkInfo = checkInfo + '#' + check[i].value
+                        }else{
+                            checkInfo = check[i].value
+                        }
+                    }
+                }
+            if(checkInfo !== ''){
+                confirms('是否确认删除？注意：删除用例后将删除对应的测试任务中的用例信息！')
+                $('.sure-box').click(function () {
+                    $(".confirm").hide();
+                     $.ajax({
+                        type: 'POST',
+                        url: "{% url 'interfacetestcase' %}",
+                        data: {
+                            'info': checkInfo,
+                            operation: 'del_case',
+                            csrfmiddlewaretoken: '{{ csrf_token }}'
+                        },
+                        success: function (data) {
+                            CreateTable(data); //重新生成列表
+                            var page = data.page;
+                            loadingPage(page)
+                            popout('删除成功','sucess_one.png',2)
+                        }
+                    });
+                });
+
+                $('.cancel-box').click(function () {
+                    $(".confirm").hide();
+                })
+                }else{
+                    popout('没有选择要删除的内容！！！','fail_one.png',2)
+            }
+        }
+
+        // 重置按钮函数
+        function resetCominfo(){
+            var myDate = new Date();
+            var year=myDate.getFullYear();        //获取当前年
+            var month=myDate.getMonth()+1;   //获取当前月(0-11)
+            var date=myDate.getDate();            //获取当前日
+            var h=myDate.getHours();              //获取当前小时数(0-23)
+            var m=myDate.getMinutes();          //获取当前分钟数(0-59)
+            var start_date = document.getElementById("datetimepickerStart").name;
+            var now_date = year + '-' + ('0'+month).slice(-2) + '-' + ('0'+date).slice(-2) + ' ' + ('0'+h).slice(-2) + ':' + ('0'+m).slice(-2);
+
+            document.getElementById("case_name_case_id").value="";
+            //document.getElementById("datetimepickerStart").value=start_date;
+            //document.getElementById("datetimepickerEnd").value=now_date;
+            document.getElementById("datetimepickerStart").value="";
+            document.getElementById("datetimepickerEnd").value="";
+
+            var all_options_businessCategories = document.getElementById("businessCategories").options;
+            for (i=0; i<all_options_businessCategories.length; i++) {
+                if(all_options_businessCategories[i].value == ''){
+                    all_options_businessCategories[i].selected = true;
+                }
+            };
+            var all_options_status = document.getElementById("status").options;
+            for (i=0; i<all_options_status.length; i++) {
+                if(all_options_status[i].value == ''){
+                    all_options_status[i].selected = true;
+                }
+            };
+        };
+
+        //公共参数
+        var globalData = JSON.parse('{{ data|safe }}'); //接收后端数据并转换为json格式
+        CreateTable(globalData);//生成用例列表
+        var page = globalData.page;  // 定义页数变量
+        loadingPage(page); // 初始化翻
+        loadingDate();//初始化日期组件
+        var checkall_state = false;  // 定义变量表示全部勾选的状态
+    </script>
+{% endblock %}

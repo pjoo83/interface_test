@@ -1,15 +1,14 @@
 import pymysql
 
 
-def execute_sql():
+def execute_sql(channel_id):
     db = pymysql.connect(
         host='127.0.0.1',
         user='root',
         password='zxcv1234',
         database='localhost_interface'
     )
-    filter_execute_statistics = "select * from  translate_statistics a inner join translate_channel" \
-                                " b on a.channel_id =b.channel_id"
+    filter_execute_statistics = f"select * from  translate_statistics where channel_id ={channel_id} order by time desc;"
     cursor = db.cursor()
     try:
         cursor.execute(filter_execute_statistics)
@@ -22,4 +21,4 @@ def execute_sql():
 
 
 if __name__ == '__main__':
-    execute_sql()
+    print(execute_sql(2))

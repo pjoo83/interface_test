@@ -146,6 +146,7 @@ $(function () {
             success: function (res) {
                 // 将返回的数据，返回到options中
                 if (res.status) {
+                    console.log(res.data.data_list)
                     option.legend.data = res.data.legend;
                     option.series = res.data.data_list;
                     option.xAxis.data = res.data.date_list;
@@ -161,8 +162,7 @@ $(function () {
      function initBar1() {{
         var chartDom = document.getElementById('m2')
         var myChart = echarts.init(chartDom);
-        var option;
-        option = {
+        var option = {
           tooltip: {
             trigger: 'item'
           },
@@ -194,19 +194,27 @@ $(function () {
               labelLine: {
                 show: false
               },
-              data: [
-                { value: 1048, name: '安卓' },
-                { value: 735, name: 'ios' },
-                { value: 580, name: 'server' },
-                { value: 484, name: 'unity' },
-                { value: 300, name: 'flutter' }
-              ]
+              data: []
             }
           ]
         };
+         $.ajax({
+            url:'index_translate_pie/',
+            type:'get',
+            dataType: 'JSON',
+            success:function (res){
+                if (res.status){
+                    console.log(res.data)
+                    option.series[0].data =res.data.data_list;
+                }
+                myChart.setOption(option)
+            }
 
-        option && myChart.setOption(option);
-        }}
+            }
+
+        )
+        }
+    }
 
 
     </script>

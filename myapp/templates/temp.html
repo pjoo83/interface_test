@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 {% load static %}
-<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>接口自动化测试平台</title>
+    <title>自动化测试仪表盘</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="/static/assets/materialize/css/materialize.min.css" media="screen,projection"/>
     <!-- Bootstrap Styles-->
@@ -51,6 +50,7 @@
             color: #fff !important;
         }
     </style>
+
 </head>
 
 <body style="overflow-x: hidden" id="baseHtml">
@@ -58,7 +58,7 @@
     <nav class="navbar navbar-default top-navbar" role="navigation">
         <div class="navbar-header">
             <a class="navbar-brand waves-effect waves-dark" href="#"><i class="large material-icons">track_changes</i>
-                <p>接口自动化测试平台</p>
+                <p>自动化测试仪表盘</p>
             </a>
             <div id="sideNav" href="">
                 <i class="material-icons dp48">toc</i>
@@ -77,7 +77,7 @@
     <ul id="dropdown1" class="dropdown-content">
         <li>
             <a href="/autotest/logout/">
-                <i class="fa fa-sign-out fa-fw"></i> 退出
+                <i class="fa fa-sign-out fa-fw"></i> 退出登陆
             </a>
         </li>
     </ul>
@@ -250,53 +250,50 @@
                     <a href="/autotest/business/" class="waves-effect waves-dark"><i
                             class="fa fa-sitemap"></i> 业务管理</a>
                 </li>
-                <li id="ID_JKGL">
-                    <a class="waves-effect waves-dark">
-                        <i class="fa fa-sitemap"></i> 接口管理
-                        <span class="fa arrow"></span>
-                    </a>
-                    <ul class="nav nav-second-level" style="opacity: 0;height:0">
-                        <li>
-                            <a data-record="ID_JKGL,ID_QBJK" href="/autotest/inter/list" onClick="record(this)">全部接口</a>
-                        </li>
-                        <!--                        此行可以通过li进行列表添加，添加更多的分页部分-->
+<!--                <li id="ID_JKGL">-->
+<!--                    <a class="waves-effect waves-dark">-->
+<!--                        <i class="fa fa-sitemap"></i> 接口管理-->
+<!--                        <span class="fa arrow"></span>-->
+<!--                    </a>-->
+<!--                    <ul class="nav nav-second-level" style="opacity: 0;height:0">-->
+<!--                        <li>-->
+<!--                            <a data-record="ID_JKGL,ID_QBJK" href="/autotest/inter/list" onClick="record(this)">全部接口</a>-->
+<!--                        </li>-->
+<!--                        &lt;!&ndash;                        此行可以通过li进行列表添加，添加更多的分页部分&ndash;&gt;-->
 
-                        <!-- <li>
-                            <a href="#">Second Level Link<span class="fa arrow"></span></a>
-                            <ul class="nav nav-third-level">
-                                <li>
-                                    <a href="#">Third Level Link</a>
-                                </li>
-                                <li>
-                                    <a href="#">Third Level Link</a>
-                                </li>
-                                <li>
-                                    <a href="#">Third Level Link</a>
-                                </li>
+<!--                        &lt;!&ndash; <li>-->
+<!--                            <a href="#">Second Level Link<span class="fa arrow"></span></a>-->
+<!--                            <ul class="nav nav-third-level">-->
+<!--                                <li>-->
+<!--                                    <a href="#">Third Level Link</a>-->
+<!--                                </li>-->
+<!--                                <li>-->
+<!--                                    <a href="#">Third Level Link</a>-->
+<!--                                </li>-->
+<!--                                <li>-->
+<!--                                    <a href="#">Third Level Link</a>-->
+<!--                                </li>-->
 
-                            </ul>
+<!--                            </ul>-->
 
-                        </li> -->
-                    </ul>
-                </li>
+<!--                        </li> &ndash;&gt;-->
+<!--                    </ul>-->
+<!--                </li>-->
 
-                <li class="cd">
-                    <a href="#" class="waves-effect waves-dark"><i
-                            class="fa fa-sitemap"></i> 用例管理</a>
-                </li>
-                <li>
-                    <a href="#" class="waves-effect waves-dark"><i
-                            class="fa fa-desktop"></i> 任务列表</a>
-                </li>
-                <li>
-                    <a href="#" class="waves-effect waves-dark"><i class="fa fa-bar-chart-o"></i> 测试报告</a>
-                </li>
+<!--                <li class="cd">-->
+<!--                    <a href="#" class="waves-effect waves-dark"><i-->
+<!--                            class="fa fa-sitemap"></i> 用例管理</a>-->
+<!--                </li>-->
+<!--                <li>-->
+<!--                    <a href="#" class="waves-effect waves-dark"><i-->
+<!--                            class="fa fa-desktop"></i> 任务列表</a>-->
+<!--                </li>-->
+<!--                <li>-->
+<!--                    <a href="#" class="waves-effect waves-dark"><i class="fa fa-bar-chart-o"></i> 测试报告</a>-->
+<!--                </li>-->
                 <li>
                     <a href="/autotest/inter_tools" class="waves-effect waves-dark"><i class="fa fa-qrcode"></i>
                         接口测试工具</a>
-                </li>
-                <li>
-                    {# <a href="#" class="waves-effect waves-dark"><i class="fa fa-table"></i> 发送邮件</a>#}
                 </li>
             </ul>
 
@@ -304,7 +301,7 @@
 
     </nav>
     <!-- /. NAV SIDE  -->
-    <div id="page-wrapper">
+    <div id="page-wrapper" style="background-image: url('/static/assets2/img/backing.png');background-attachment:fixed">
 
         {% block content %}
         <div id="page-inner">

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import login_view, register_view, index, intertools_view, interface_view, business_view
+from .views import login_view, register_view, index, intertools_view, business_view, dashboard_view
 
 urlpatterns = [
     # 登录注册
@@ -9,16 +9,21 @@ urlpatterns = [
 
     # 首页
     path("index/", index.index),
+    path("index/index_translate_bar/", index.translate_bar, name='translate_bar'),
+    path("index/index_translate_pie/", index.translate_pie, name='translate_pie'),
 
+    # 仪表页面
+    path("dashboard/", dashboard_view.dashboard_index, name='dashboard_index'),
+    path("dashboard/dashboard_translate_bar/", dashboard_view.dashboard_translate_bar,
+         name='rom ..utils.database_tools import execute_sql'),
+    path("dashboard/dashboard_language_count/", dashboard_view.dashboard_language_count,
+         name='dashboard_language_count'),
+    path("dashboard/dashboard_executions_total/", dashboard_view.dashboard_executions_total,
+         name='dashboard_executions_total'),
+    path("dashboard/dashboard_translate_pie/",dashboard_view.dashboard_translate_pie, name='dashboard_translate_pie'),
     # 工具
-    path("inter_tools/", intertools_view.inter_tools),
 
-    # 接口管理
-    path("inter/manage", interface_view.interface_manage),
-    path("inter/list/", interface_view.interface_list),
-    path("inter/creat/", interface_view.interface_creat),
-    path("inter/edit/", interface_view.interface_edit),
-    path("inter/run/", interface_view.interface_run),
+    path("inter_tools/", intertools_view.inter_tools),
 
     # 业务管理
     path("business/", business_view.business_list),

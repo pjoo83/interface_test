@@ -1,6 +1,6 @@
 from hashlib import md5
 
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django import forms
 from django.contrib.auth import authenticate, login, logout
@@ -27,7 +27,7 @@ def user_login(request):
                     login(request, user)
                     request.session['info'] = {'id': request.POST.get("id"), 'name': username}
                     request.session.set_expiry(60 * 60 * 24)
-                    return redirect("/autotest/index/")
+                    return redirect("/autotest/dashboard/")
                 else:
                     return render(request, 'login.html',
                                   {"username": username, "password": password, "msg": "请联系管理员激活账号"})

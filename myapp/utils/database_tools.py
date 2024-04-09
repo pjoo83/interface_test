@@ -21,4 +21,4 @@ def execute_sql(channel_id, content):
 
 
 if __name__ == '__main__':
-    print(execute_sql(2, '*'))
+    print(execute_sql(2, 'quantity'))

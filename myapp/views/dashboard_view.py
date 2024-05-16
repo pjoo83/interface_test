@@ -71,7 +71,7 @@ def dashboard_translate_bar(request):
         "data": {
             # "legend": legend,
             "data_list": series,
-            "date_list": date_list
+            "date_list": date_list[::-1]
         }
     }
     print(series)

@@ -12,44 +12,29 @@
     <div class="topbnt_left fl">
         <!-- 顶部动态显示数据-->
         <ul>
-            <li>Android：</li>
-            <li>Ios：</li>
-            <li>Server：</li>
-            <li>Flutter：</li>
-        </ul>
-        <ul>
-            <li id="android_count"></li>
-            <li id='ios_count'></li>
-            <li id='server_count'></li>
-            <li id='flutter_count'></li>
+            <li>Android:<span id="android_count"></span></li>
+            <li>Ios:<span id="ios_count"></span></li>
+            <li>Server:<span id='server_count'></span></li>
+            <li>Flutter:<span id='flutter_count'></span></li>
         </ul>
     </div>
     <h1 class="tith1 fl">测试数据平台</h1>
-    <div class=" fr topbnt_right">
-        <ul>
-            <li><a href="#">返回</a></li>
-            <li><a href="#">分析报告</a></li>
-            <li><a href="#">交通</a></li>
-            <li><a href="#">舆情</a></li>
-        </ul>
-        </ul>
-    </div>
+<!--    <div class=" fr topbnt_right">-->
+<!--        <ul>-->
+<!--            <li><a href="/autotest/inter_tools/">接口测试工具</a></li>-->
+<!--            <li><a href="#">分析报告</a></li>-->
+<!--            <li><a href="#">交通</a></li>-->
+<!--            <li><a href="#">舆情</a></li>-->
+<!--        </ul>-->
+<!--        </ul>-->
+<!--    </div>-->
 </div>
 <!-- bnt end -->
 <div class="puleft fl">
-    <div class="pulefttop"><h2 class="tith2"><span>多语言自动化结果</span></h2>
-        <div class="lefttoday_tit"><p class="fl"></p>
-            <p class="fr"></p></div>
-        <div class="row">
-            <div id="" class="col-xs-8 col-lg-8 line-chart">
-                <div class=" line">
-                    <div id="main">
-                        <!-- 折线图区域-->
-                            <div id='m1' style="width:90%; height:110%;margin-left:5%"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="pulefttop">
+        <!-- 折线图区域-->
+        <h2 class="tith2">多语言自动化结果</h2>
+        <div id='m1' style="width:90%; height:88%;margin-left:5%"></div>
     </div>
     <div class="puleftboxtmidd">
         <h2 class="tith2">多语言统计</h2>
@@ -188,7 +173,6 @@
         <div id="purightboxbott" class="purightboxbottcont"></div>
     </div>
 </div>
-<!-- mrbox_top_right end -->
 
 
 <script type="text/javascript">
@@ -594,18 +578,18 @@
                 fontSize: 10,
                 color: 'rgba(255,255,255,.7)'
             },
-            data: ['境外', '境内']
+            data: ['境外', '境内','外国']
         },
         series: [
             {
                 name: '访问来源',
                 type: 'pie',
                 radius: '55%',
-                center: ['50%', '55%'],
+                center: ['50%', '55%','30%'],
                 data: [
                     {value: 335, name: '境外'},
-                    {value: 310, name: '境内'}
-
+                    {value: 310, name: '境内'},
+                     {value: 330, name: '境内'}
                 ],
                 itemStyle: {
                     emphasis: {
@@ -623,44 +607,157 @@
     $(function () {
         initBar();
         initBar1();
+        initBar2();
     })
 
     // 初始化折线图
     function initBar() {
         var myChart = echarts.init(document.getElementById('m1'))
-        var option = {
-            title: {
-                text: '多语言结果',
-                left: "center",
-                textAlign: "auto"
-            },
-            tooltip: {},
-            legend: {
-                data: [],
-                bottom: 0
-            },
-            xAxis: {
-                data: []
-            },
-            yAxis: {},
-            series: []
+        var option  = {
+            backgroundColor: 'rgba(1,202,217,.2)',
+          tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+              type: 'shadow'
+            }
+          },
+          legend: {
+                textStyle:{
+                    color:'yellow'
+                }
+          },
+          grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+          },
+          xAxis: [
+            {
+              type: 'category',
+              data: [],
+                axisLabel: {
+            textStyle: {
+                color: 'white' // 这里设置字体颜色为红色
+            }
+        }
+            }
 
+          ],
+          yAxis: [
+            {
+              type: 'value',
+                axisLabel: {
+            textStyle: {
+                color: 'white' // 这里设置字体颜色为蓝色
+            }
+        }
+            }
+          ],
+          series: [
+            // {
+            //   name: 'Direct',
+            //   type: 'bar',
+            //   emphasis: {
+            //     focus: 'series'
+            //   },
+            //   data: [320, 332, 301, 334, 390, 330, 320]
+            // },
+            // {
+            //   name: 'Email',
+            //   type: 'bar',
+            //   stack: 'Ad',
+            //   emphasis: {
+            //     focus: 'series'
+            //   },
+            //   data: [120, 132, 101, 134, 90, 230, 210]
+            // },
+            // {
+            //   name: 'Union Ads',
+            //   type: 'bar',
+            //   stack: 'Ad',
+            //   emphasis: {
+            //     focus: 'series'
+            //   },
+            //   data: [220, 182, 191, 234, 290, 330, 310]
+            // },
+            // {
+            //   name: 'Video Ads',
+            //   type: 'bar',
+            //   stack: 'Ad',
+            //   emphasis: {
+            //     focus: 'series'
+            //   },
+            //   data: [150, 232, 201, 154, 190, 330, 410]
+            // },
+            // // {
+            // //   name: 'Search Engine',
+            // //   type: 'bar',
+            // //   data: [862, 1018, 964, 1026, 1679, 1600, 1570],
+            // //   emphasis: {
+            // //     focus: 'series'
+            // //   },
+            // //   markLine: {
+            // //     lineStyle: {
+            // //       type: 'dashed'
+            // //     },
+            // //     data: [[{ type: 'min' }, { type: 'max' }]]
+            // //   }
+            // // },
+            // {
+            //   name: 'Baidu',
+            //   type: 'bar',
+            //   barWidth: 5,
+            //   stack: 'Search Engine',
+            //   emphasis: {
+            //     focus: 'series'
+            //   },
+            //   data: [620, 732, 701, 734, 1090, 1130, 1120]
+            // },
+            // {
+            //   name: 'Google',
+            //   type: 'bar',
+            //   stack: 'Search Engine',
+            //   emphasis: {
+            //     focus: 'series'
+            //   },
+            //   data: [120, 132, 101, 134, 290, 230, 220]
+            // },
+            // {
+            //   name: 'Bing',
+            //   type: 'bar',
+            //   stack: 'Search Engine',
+            //   emphasis: {
+            //     focus: 'series'
+            //   },
+            //   data: [60, 72, 71, 74, 190, 130, 110]
+            // },
+            // {
+            //   name: 'Others',
+            //   type: 'bar',
+            //   stack: 'Search Engine',
+            //   emphasis: {
+            //     focus: 'series'
+            //   },
+            //   data: [62, 82, 91, 84, 109, 110, 120]
+            // }
+          ]
         };
-
         $.ajax({
             url: 'dashboard_translate_bar/',
             type: "get",
             dataType: "JSON",
             success: function (res) {
                 if (res.status) {
-                    console.log(res)
-                    option.legend.data = res.data.length;
+                    console.log(res.data.date_list)
+                    // option.legend.data = res.data.length;
                     option.series = res.data.data_list;
-                    option.xAxis.data = res.data.data_list;
+                    option.xAxis[0].data = res.data.date_list;
                 }
-                // myChart.setOption(option);
+                myChart.setOption(option);
             }
         })
+      myChart.setOption(option)
     }
 
     <!--   顶部变量显示-->
@@ -696,6 +793,7 @@
     })
 
 
+    // 多语言饼图
     function initBar1() {
         var chartDom = document.getElementById('m2')
         var myChart = echarts.init(chartDom);
@@ -719,6 +817,7 @@
                         borderRadius: 30
                     },
                     label: {
+
                         show: false,
                         position: 'center'
                     },
@@ -737,18 +836,105 @@
             ]
         };
         $.ajax({
-            url:"dashboard_translate_pie/",
-            type:"get",
-            dataType:"JSON",
-            success:function (res){
-                if(res.status){
-                    console.log(res.data)
+            url: "dashboard_translate_pie/",
+            type: "get",
+            dataType: "JSON",
+            success: function (res) {
+                if (res.status) {
                     option.series[0].data = res.data.data_list;
                 }
                 myChart.setOption(option)
             }
         })
     }
+
+    function initBar2() {
+        var chartDom = document.getElementById('m1');
+        var myChart = echarts.init(chartDom);
+        var series = [
+            {
+                data: [120, 200, 150, 80, 70, 110, 130],
+                type: 'bar',
+                stack: 'a',
+                name: 'a'
+            },
+            {
+                data: [10, 46, 64, '-', 0, '-', 0],
+                type: 'bar',
+                stack: 'a',
+                name: 'b'
+            },
+            {
+                data: [30, '-', 0, 20, 10, '-', 0],
+                type: 'bar',
+                stack: 'a',
+                name: 'c'
+            },
+            {
+                data: [30, '-', 0, 20, 10, '-', 0],
+                type: 'bar',
+                stack: 'b',
+                name: 'd'
+            },
+            {
+                data: [10, 20, 150, 0, '-', 50, 10],
+                type: 'bar',
+                stack: 'b',
+                name: 'e'
+            }
+        ];
+        const stackInfo = {};
+        for (let i = 0; i < series[0].data.length; ++i) {
+            for (let j = 0; j < series.length; ++j) {
+                const stackName = series[j].stack;
+                if (!stackName) {
+                    continue;
+                }
+                if (!stackInfo[stackName]) {
+                    stackInfo[stackName] = {
+                        stackStart: [],
+                        stackEnd: []
+                    };
+                }
+                const info = stackInfo[stackName];
+                const data = series[j].data[i];
+                if (data && data !== '-') {
+                    if (info.stackStart[i] == null) {
+                        info.stackStart[i] = j;
+                    }
+                    info.stackEnd[i] = j;
+                }
+            }
+        }
+        for (let i = 0; i < series.length; ++i) {
+            const data = series[i].data;
+            const info = stackInfo[series[i].stack];
+            for (let j = 0; j < series[i].data.length; ++j) {
+                // const isStart = info.stackStart[j] === i;
+                const isEnd = info.stackEnd[j] === i;
+                const topBorder = isEnd ? 20 : 0;
+                const bottomBorder = 0;
+                data[j] = {
+                    value: data[j],
+                    itemStyle: {
+                        borderRadius: [topBorder, topBorder, bottomBorder, bottomBorder]
+                    }
+                };
+            }
+        }
+        option = {
+            xAxis: {
+                type: 'category',
+                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: series
+        };
+        myChart.setOption(option)
+    }
+
 </script>
 </body>
 </html>

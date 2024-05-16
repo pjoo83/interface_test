@@ -284,7 +284,7 @@ textarea {
 .fl{ float: left;}
 .fr{ float: right;}
 .topbnt_left ul{ padding-top: 38px; padding-left: 30px; width: 620px}
-.topbnt_left li { background:url(../img/bnt.png); font-size: 14px; line-height: 33px;background-repeat: no-repeat;width:91px; height:35px;float: left; text-align: center; margin-left: 33px}
+.topbnt_left li { background:url(../img/bnt.png); font-size: 11px; line-height: 33px;background-repeat: no-repeat;width:91px; height:35px;float: left; text-align: center; margin-left: 33px}
 .topbnt_left li.active,.topbnt_right li.active{background:url(../img/bntactive.png); }
 .topbnt_left li a{ text-decoration: none; color: #fff;}
 .tith1{ 

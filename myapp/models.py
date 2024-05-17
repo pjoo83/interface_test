@@ -194,3 +194,15 @@ class interfaceRunResult(models.Model):
     header = models.TextField(verbose_name="响应header")
     statusCode = models.IntegerField(verbose_name="状态码")
     assertResult = models.CharField(max_length=20, null=True, verbose_name="断言结果")
+
+
+# 接口表测试结果表
+class interface_result(models.Model):
+    total_interface = models.IntegerField(verbose_name='接口总数', null=False)
+    total_pass = models.IntegerField(verbose_name='接口通过数', null=False)
+    total_fail = models.IntegerField(verbose_name='接口失败数', null=False)
+    total_unexpected = models.IntegerField(verbose_name='未执行的数量', null=True)
+    passing_rate = models.CharField(max_length=15, verbose_name='接口成功率', null=False)
+    execution_time = models.FloatField(verbose_name='执行消耗时间时间', null=False)
+    responsible_person = models.CharField(max_length=30, verbose_name='接口负责人', null=True)
+    datatime = models.DateTimeField(auto_now_add=True, verbose_name='执行时间', null=True)

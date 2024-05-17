@@ -677,16 +677,18 @@
     android = document.getElementById('android_count')
     ios = document.getElementById('ios_count')
     server = document.getElementById('server_count')
-    flutter = document.getElementById('flutter_data')
+    flutter = document.getElementById('flutter_count')
     $.ajax({
         url: 'dashboard_language_count/',
         type: "get",
         dataType: "JSON",
         success: function (res) {
+            console.log( res.data.flutter)
             if (res.status) {
                 android.textContent = res.data.android;
                 ios.textContent = res.data.ios;
-                server.textContent = res.data.server
+                server.textContent = res.data.server;
+                flutter.textContent = res.data.flutter;
             }
         }
     })

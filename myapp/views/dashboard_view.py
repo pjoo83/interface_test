@@ -12,9 +12,9 @@ def dashboard_translate_bar(request):
     package_execute(android_new_list, 1, 1, 'newly_quantity')
     android_modify_list = []
     package_execute(android_modify_list, 1, 1, 'modify_quantity')
-    ios_new_list =[]
+    ios_new_list = []
     package_execute(ios_new_list, 1, 2, 'newly_quantity')
-    ios_modify_list=[]
+    ios_modify_list = []
     package_execute(ios_modify_list, 1, 2, 'modify_quantity')
     server_new_list = []
     package_execute(server_new_list, 1, 3, 'newly_quantity')
@@ -74,7 +74,6 @@ def dashboard_translate_bar(request):
             "date_list": date_list[::-1]
         }
     }
-    print(series)
     return JsonResponse(result)
 
 
@@ -87,17 +86,20 @@ def dashboard_language_count(request):
     ios_count = execute_sql(1, 2, 'quantity')[0]
     server_count = execute_sql(1, 3, 'quantity')[0]
     # unity_count = execute_sql(4, 'quantity')[0]
+    flutter_count = 201
     data = {
         'android': android_count,
         'ios': ios_count,
         'server': server_count,
         # 'unity_count': unity_count
+        'flutter': flutter_count
     }
     result = {
         "status": True,
         'data': data
     }
 
+    print(data)
     return JsonResponse(result)
 
 

@@ -128,8 +128,8 @@ def dashboard_translate_pie(request):
         {'value': android, 'name': '安卓'},
         {'value': ios, 'name': 'ios'},
         {'value': server, 'name': 'server'},
-        {'value': 484, 'name': 'unity'},
-        {'value': 300, 'name': 'flutter'}
+        # {'value': 484, 'name': 'unity'},
+        {'value': 201, 'name': 'flutter'}
     ]
     result = {
         "status": True,

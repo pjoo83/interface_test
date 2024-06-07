@@ -21,10 +21,14 @@
     <h1 class="tith1 fl">测试数据平台</h1>
     <div class=" fr topbnt_right">
         <ul>
-            <li><a href="https://rg975ojk5z.feishu.cn/base/RGz2bX9TNagr2PsJp57c1tKlne8?table=tblI9mr4bogNeUpx&view=vewMnpNgGD">总结与分享</a></li>
-            <li><a href="https://rg975ojk5z.feishu.cn/base/V3OMbRyLpasVNGsdbwacONhanBd?table=tblpedovHXYyrNJp&view=vewOyZHEdg">线上反馈</a></li>
+            <li>
+                <a href="https://rg975ojk5z.feishu.cn/base/RGz2bX9TNagr2PsJp57c1tKlne8?table=tblI9mr4bogNeUpx&view=vewMnpNgGD">总结与分享</a>
+            </li>
+            <li>
+                <a href="https://rg975ojk5z.feishu.cn/base/V3OMbRyLpasVNGsdbwacONhanBd?table=tblpedovHXYyrNJp&view=vewOyZHEdg">线上反馈</a>
+            </li>
             <li><a href="http://10.41.3.60:8080/">安卓打包机</a></li>
-             <li><a href="http://10.41.3.223:8080/view/StarMaker/">ios打包机</a></li>
+            <li><a href="http://10.41.3.223:8080/view/StarMaker/">ios打包机</a></li>
         </ul>
         </ul>
     </div>
@@ -48,23 +52,23 @@
             <p class="fr">时间段：2018-06-10 至 2018-06-14</p></div>
         <div class="box pbox">
             <div id="puleftboxtbott1" class="fl puleftboxtbott1"></div>
-            <div class="puleftboxtbott2 fr">
-                <div class="widget-inline-box text-center ">
-                    <p>ui自动化执行次数</p>
-                    <h3 class=" ceeb1fd">54</h3>
-                    <h4 class="text-muted ">环比<img src="/static/assets/img/iconup.png" height="16"/>2%</h4>
-                </div>
-                <div class="widget-inline-box text-center ">
-                    <p>接口自动化执行次数</p>
-                    <h3 class=" c24c9ff">54</h3>
-                    <h4 class="text-muted ">环比<img src="/static/assets/img/icondown.png" height="16"/>3%</h4>
-                </div>
-                <div class="widget-inline-box text-center ">
-                    <p>本月舆情总数</p>
-                    <h3 class=" cffff00">4</h3>
-                    <h4 class="text-muted ">环比<img src="/static/assets/img/icondown.png" height="16"/>3%</h4>
-                </div>
-            </div>
+            <!--            <div class="puleftboxtbott2 fr">-->
+            <!--                <div class="widget-inline-box text-center ">-->
+            <!--                    <p>ui自动化执行次数</p>-->
+            <!--                    <h3 class=" ceeb1fd">54</h3>-->
+            <!--                    <h4 class="text-muted ">环比<img src="/static/assets/img/iconup.png" height="16"/>2%</h4>-->
+            <!--                </div>-->
+            <!--                <div class="widget-inline-box text-center ">-->
+            <!--                    <p>接口自动化执行次数</p>-->
+            <!--                    <h3 class=" c24c9ff">54</h3>-->
+            <!--                    <h4 class="text-muted ">环比<img src="/static/assets/img/icondown.png" height="16"/>3%</h4>-->
+            <!--                </div>-->
+            <!--                <div class="widget-inline-box text-center ">-->
+            <!--                    <p>本月舆情总数</p>-->
+            <!--                    <h3 class=" cffff00">4</h3>-->
+            <!--                    <h4 class="text-muted ">环比<img src="/static/assets/img/icondown.png" height="16"/>3%</h4>-->
+            <!--                </div>-->
+            <!--            </div>-->
         </div>
     </div>
 </div>
@@ -78,7 +82,7 @@
             <div class="puleft2height">
                 <div class="widget-inline-box text-center ">
                     <p>多语言执行总数</p>
-                    <h3 class=" ceeb1fd f30" id='executions_total'></h3>
+                    <h3 class=" ceeb1fd f30" id='executions_translate_total'></h3>
                     <h4 class="text-muted ">增长<img src="/static/assets/img/iconup.png" height="16"/>1次</h4>
                 </div>
                 <div class="widget-inline-box text-center ">
@@ -88,7 +92,7 @@
                 </div>
                 <div class="widget-inline-box text-center ">
                     <p>接口自动化执行次数</p>
-                    <h3 class=" cffff00 f30">4</h3>
+                    <h3 class=" cffff00 f30" id="executions_interface_total"></h3>
                     <h4 class="text-muted ">环比<img src="/static/assets/img/icondown.png" height="16"/>3%</h4>
                 </div>
                 <div class="widget-inline-box text-center ">
@@ -136,21 +140,13 @@
             </div>
         </div>
     </div>
-    <!--  amidd_bott end-->
+    <!--   接口测试结果区域-->
     <div class="pmiddboxtbott">
-        <h2 class="tith2 pt1">舆情同比分析</h2>
+        <h2 class="tith2 pt1">接口测试结果</h2>
         <div class="lefttoday_tit"><p class="fl">状态：已调节</p>
             <p class="fr">时间段：2018-06-10 至 2018-06-14</p></div>
-        <div class="box pbox">
-            <div id="pumiddboxtbott1" class="fl pumiddboxtbott1cont"></div>
-            <div class="pumiddboxtbott2 fr">
-                <div class="widget-inline-box text-center ">
-                    <p>今年舆情总数</p>
-                    <h3 class=" ceeb1fd f30">54</h3>
-                    <h4 class="text-muted ">环比<img src="/static/assets/img/iconup.png" height="16"/>2%</h4>
-                </div>
-
-            </div>
+        <div style="height: 80%;width: 100%">
+            <div id="pumiddboxtbott1" class="fl " style="width: 100%;height: 100%"></div>
         </div>
     </div>
     <!-- amidd_bott end -->
@@ -305,153 +301,6 @@
     myChart.setOption(option);
 </script>
 <script type="text/javascript">
-    var myChart = echarts.init(document.getElementById('pumiddboxtbott1'));
-    option = {
-        backgroundColor: 'rgba(1,202,217,.2)',
-        grid: {
-            left: 60,
-            right: 60,
-            top: 70,
-            bottom: 40
-        },
-
-        toolbox: {
-            feature: {
-                dataView: {show: true, readOnly: false},
-                magicType: {show: true, type: ['line', 'bar']},
-                restore: {show: true},
-                saveAsImage: {show: true}
-            }
-        },
-        legend: {
-            top: 10,
-            textStyle: {
-                fontSize: 10,
-                color: 'rgba(255,255,255,.7)'
-            },
-            data: ['2017年', '2018年', '同比增速']
-        },
-        xAxis: [
-            {
-                type: 'category',
-                axisLine: {
-                    lineStyle: {
-                        color: 'rgba(255,255,255,.2)'
-                    }
-                },
-                splitLine: {
-                    lineStyle: {
-                        color: 'rgba(255,255,255,.1)'
-                    }
-                },
-                axisLabel: {
-                    color: "rgba(255,255,255,.7)"
-                },
-
-                data: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
-                axisPointer: {
-                    type: 'shadow'
-                }
-            }
-        ],
-        yAxis: [
-            {
-                type: 'value',
-                name: '',
-                min: 0,
-                max: 250,
-                interval: 50,
-                axisLine: {
-                    lineStyle: {
-                        color: 'rgba(255,255,255,.3)'
-                    }
-                },
-                splitLine: {
-                    lineStyle: {
-                        color: 'rgba(255,255,255,.01)'
-                    }
-                },
-
-                axisLabel: {
-                    formatter: '{value} ml'
-                }
-            },
-            {
-                type: 'value',
-                name: '',
-                max: 25,
-                interval: 5,
-                axisLine: {
-                    lineStyle: {
-                        color: 'rgba(255,255,255,.3)'
-                    }
-                },
-                splitLine: {
-                    lineStyle: {
-                        color: 'rgba(255,255,255,.1)'
-                    }
-                },
-                axisLabel: {
-                    formatter: '{value} °C'
-                }
-            }
-        ],
-        series: [
-
-            {
-                name: '2017年',
-                type: 'bar',
-                itemStyle: {
-                    normal: {
-                        color: new echarts.graphic.LinearGradient(
-                            0, 0, 0, 1,
-                            [
-                                {offset: 0, color: '#b266ff'},
-                                {offset: 1, color: '#121b87'}
-                            ]
-                        )
-                    }
-                },
-                data: [2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3]
-            },
-            {
-                name: '2018年',
-                type: 'bar',
-                itemStyle: {
-                    normal: {
-                        color: new echarts.graphic.LinearGradient(
-                            0, 0, 0, 1,
-                            [
-                                {offset: 0, color: '#00f0ff'},
-                                {offset: 1, color: '#032a72'}
-                            ]
-                        )
-                    }
-                },
-                data: [2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3]
-            },
-            {
-                name: '同比增速',
-                type: 'line',
-                itemStyle: {
-                    normal: {
-                        color: new echarts.graphic.LinearGradient(
-                            0, 0, 0, 1,
-                            [
-                                {offset: 0, color: '#fffb34'},
-                                {offset: 1, color: '#fffb34'}
-                            ]
-                        )
-                    }
-                },
-                yAxisIndex: 1,
-                data: [2.0, 2.2, 3.3, 4.5, 6.3, 10.2, 20.3, 23.4, 23.0, 16.5, 12.0, 6.2]
-            }
-        ]
-    };
-    myChart.setOption(option);
-</script>
-<script type="text/javascript">
     var myChart = echarts.init(document.getElementById('purightboxtop'));
     option = {
         color: ['#76c4bf', '#e5ffc7', '#508097', '#4d72d9'],
@@ -483,7 +332,7 @@
                 roseType: 'area',
                 data: [
                     {value: 10, name: '涉蒙'},
-                    {value: 5, name: '涉疆'},
+                    {value: 50, name: '涉疆'},
                     {value: 15, name: '涉军'},
                     {value: 25, name: '涉恐'},
                     {value: 5, name: '涉藏'},
@@ -578,18 +427,18 @@
                 fontSize: 10,
                 color: 'rgba(255,255,255,.7)'
             },
-            data: ['境外', '境内','外国']
+            data: ['境外', '境内', '外国']
         },
         series: [
             {
                 name: '访问来源',
                 type: 'pie',
                 radius: '55%',
-                center: ['50%', '55%','30%'],
+                center: ['50%', '55%', '30%'],
                 data: [
                     {value: 335, name: '境外'},
                     {value: 310, name: '境内'},
-                     {value: 330, name: '境内'}
+                    {value: 330, name: '境内'}
                 ],
                 itemStyle: {
                     emphasis: {
@@ -603,7 +452,7 @@
     };
     myChart.setOption(option);
 </script>
-<script>
+<script type="text/javascript">
     $(function () {
         initBar();
         initBar1();
@@ -613,49 +462,49 @@
     // 初始化折线图
     function initBar() {
         var myChart = echarts.init(document.getElementById('m1'))
-        var option  = {
+        var option = {
             backgroundColor: 'rgba(1,202,217,.2)',
-          tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-              type: 'shadow'
-            }
-          },
-          legend: {
-                textStyle:{
-                    color:'yellow'
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
                 }
-          },
-          grid: {
-            left: '3%',
-            right: '4%',
-            bottom: '3%',
-            containLabel: true
-          },
-          xAxis: [
-            {
-              type: 'category',
-              data: [],
-                axisLabel: {
-            textStyle: {
-                color: 'white' ,// 这里设置字体颜色为红色,
-                fontSize:10,
-            }
-        }
-            }
+            },
+            legend: {
+                textStyle: {
+                    color: 'yellow'
+                }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    data: [],
+                    axisLabel: {
+                        textStyle: {
+                            color: 'white',// 这里设置字体颜色为红色,
+                            fontSize: 10,
+                        }
+                    }
+                }
 
-          ],
-          yAxis: [
-            {
-              type: 'value',
-                axisLabel: {
-            textStyle: {
-                color: 'white' // 这里设置字体颜色为蓝色
-            }
-        }
-            }
-          ],
-          series: []
+            ],
+            yAxis: [
+                {
+                    type: 'value',
+                    axisLabel: {
+                        textStyle: {
+                            color: 'white' // 这里设置字体颜色为蓝色
+                        }
+                    }
+                }
+            ],
+            series: []
         };
         $.ajax({
             url: 'dashboard_translate_bar/',
@@ -663,14 +512,13 @@
             dataType: "JSON",
             success: function (res) {
                 if (res.status) {
-                    console.log(res.data.date_list)
+                    // console.log(res.data.date_list)
                     option.series = res.data.data_list;
                     option.xAxis[0].data = res.data.date_list;
                 }
                 myChart.setOption(option);
             }
         })
-      myChart.setOption(option)
     }
 
     <!--   顶部变量显示-->
@@ -683,7 +531,7 @@
         type: "get",
         dataType: "JSON",
         success: function (res) {
-            console.log( res.data.flutter)
+            console.log(res.data.flutter)
             if (res.status) {
                 android.textContent = res.data.android;
                 ios.textContent = res.data.ios;
@@ -693,20 +541,30 @@
         }
     })
 
-    //     执行总次数
-    executions_total = document.getElementById('executions_total')
+    // 执行总次数区域
+    executions_translate_total = document.getElementById('executions_translate_total')
     $.ajax({
-        url: "dashboard_executions_total/",
+        url: "dashboard_executions_translate_total/",
         data: "get",
         dataType: "JSON",
         success: function (res) {
             if (res.status) {
                 // console.log(res.data)
-                executions_total.textContent = res.data
+                executions_translate_total.textContent = res.data
             }
         }
     })
-
+    executions_interface_total = document.getElementById('executions_interface_total')
+    $.ajax({
+        url: "dashboard_executions_interface_total/",
+        data: "get",
+        dataType: "JSON",
+        success: function (res) {
+            if (res.status) {
+                executions_interface_total.textContent = res.count
+            }
+        }
+    })
 
     // 多语言饼图
     function initBar1() {
@@ -720,8 +578,8 @@
             legend: {
                 top: '5%',
                 left: 'center',
-                textStyle:{
-                    color:'yellow'
+                textStyle: {
+                    color: 'yellow'
                 }
             },
             series: [
@@ -766,93 +624,183 @@
         })
     }
 
+    // 接口测试折线图区域
     function initBar2() {
-        var chartDom = document.getElementById('m1');
-        var myChart = echarts.init(chartDom);
-        var series = [
-            {
-                data: [120, 200, 150, 80, 70, 110, 130],
-                type: 'bar',
-                stack: 'a',
-                name: 'a'
-            },
-            {
-                data: [10, 46, 64, '-', 0, '-', 0],
-                type: 'bar',
-                stack: 'a',
-                name: 'b'
-            },
-            {
-                data: [30, '-', 0, 20, 10, '-', 0],
-                type: 'bar',
-                stack: 'a',
-                name: 'c'
-            },
-            {
-                data: [30, '-', 0, 20, 10, '-', 0],
-                type: 'bar',
-                stack: 'b',
-                name: 'd'
-            },
-            {
-                data: [10, 20, 150, 0, '-', 50, 10],
-                type: 'bar',
-                stack: 'b',
-                name: 'e'
-            }
-        ];
-        const stackInfo = {};
-        for (let i = 0; i < series[0].data.length; ++i) {
-            for (let j = 0; j < series.length; ++j) {
-                const stackName = series[j].stack;
-                if (!stackName) {
-                    continue;
-                }
-                if (!stackInfo[stackName]) {
-                    stackInfo[stackName] = {
-                        stackStart: [],
-                        stackEnd: []
-                    };
-                }
-                const info = stackInfo[stackName];
-                const data = series[j].data[i];
-                if (data && data !== '-') {
-                    if (info.stackStart[i] == null) {
-                        info.stackStart[i] = j;
-                    }
-                    info.stackEnd[i] = j;
-                }
-            }
-        }
-        for (let i = 0; i < series.length; ++i) {
-            const data = series[i].data;
-            const info = stackInfo[series[i].stack];
-            for (let j = 0; j < series[i].data.length; ++j) {
-                // const isStart = info.stackStart[j] === i;
-                const isEnd = info.stackEnd[j] === i;
-                const topBorder = isEnd ? 20 : 0;
-                const bottomBorder = 0;
-                data[j] = {
-                    value: data[j],
-                    itemStyle: {
-                        borderRadius: [topBorder, topBorder, bottomBorder, bottomBorder]
-                    }
-                };
-            }
-        }
+        var myChart = echarts.init(document.getElementById('pumiddboxtbott1'));
         option = {
-            xAxis: {
-                type: 'category',
-                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+            backgroundColor: 'rgba(1,202,217,.2)',
+            grid: {
+                left: 60,
+                right: 60,
+                top: 70,
+                bottom: 40,
             },
-            yAxis: {
-                type: 'value'
-            },
-            series: series
-        };
-        myChart.setOption(option)
-    }
 
+            toolbox: {
+                feature: {
+                    magicType: {show: true, type: ['line', 'bar']},
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+            legend: {
+                top: 10,
+                textStyle: {
+                    fontSize: 10,
+                    color: 'rgba(255,255,255,.7)'
+                },
+                data: ['接口总数', '成功数', '失败数', '成功率']
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    axisLine: {
+                        lineStyle: {
+                            color: 'rgba(255,255,255,.2)'
+                        }
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            color: 'rgba(255,255,255,.1)'
+                        }
+                    },
+                    axisLabel: {
+                        color: "rgba(255,255,255,.7)"
+                    },
+
+                    data: ['2024-02-28', '2024-02-28'],
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value',
+                    name: '',
+                    min: 0,
+                    max: 600,
+                    interval: 100,
+                    axisLine: {
+                        lineStyle: {
+                            color: 'rgba(255,255,255,.3)'
+                        }
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            color: 'rgba(255,255,255,.01)'
+                        }
+                    },
+
+                    axisLabel: {
+                        formatter: '{value}条'
+                    }
+                },
+                {
+                    type: 'value',
+                    name: '',
+                    max: 100,
+                    interval: 10,
+                    min: 60,
+                    axisLine: {
+                        lineStyle: {
+                            color: 'rgba(255,255,255,.3)'
+                        }
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            color: 'rgba(255,255,255,.1)'
+                        }
+                    },
+                    axisLabel: {
+                        formatter: '{value} %'
+                    }
+                }
+            ],
+            series: [
+                {
+                    name: '接口总数',
+                    type: 'bar',
+                    itemStyle: {
+                        normal: {
+                            color: new echarts.graphic.LinearGradient(
+                                0, 0, 0, 1,
+                                [
+                                    {offset: 0, color: '#b266ff'},
+                                    {offset: 1, color: '#121b87'}
+                                ]
+                            )
+                        }
+                    },
+                    data: []
+                },
+                {
+                    name: '成功数',
+                    type: 'bar',
+                    itemStyle: {
+                        normal: {
+                            color: new echarts.graphic.LinearGradient(
+                                0, 0, 0, 1,
+                                [
+                                    {offset: 0, color: '#00f0ff'},
+                                    {offset: 1, color: '#032a72'}
+                                ]
+                            )
+                        }
+                    },
+                    data: []
+                },
+                {
+                    name: '失败数',
+                    type: 'bar',
+                    itemStyle: {
+                        normal: {
+                            color: new echarts.graphic.LinearGradient(
+                                0, 0, 0, 1,
+                                [
+                                    {offset: 0, color: '#00f0ff'},
+                                    {offset: 1, color: '#032a72'}
+                                ]
+                            )
+                        }
+                    },
+                    data: []
+                },
+                {
+                    name: '成功率',
+                    type: 'line',
+                    itemStyle: {
+                        normal: {
+                            color: new echarts.graphic.LinearGradient(
+                                0, 0, 0, 1,
+                                [
+                                    {offset: 0, color: '#fffb34'},
+                                    {offset: 1, color: '#fffb34'}
+                                ]
+                            )
+                        }
+                    },
+                    yAxisIndex: 1,
+                    data: []
+                }
+            ]
+        };
+        $.ajax({
+            url: 'dashboard_executions_interface_detail/',
+            type: 'get',
+            dataType: "JSON",
+            success: function (res) {
+                if (res.status) {
+                    option.series[0].data = res.data['total_interface'];
+                    option.series[1].data = res.data['total_pass'];
+                    option.series[2].data = res.data['total_fail'];
+                    option.series[3].data = res.data['passing_rate'];
+                    console.log(res.data['passing_rate'])
+                }
+                myChart.setOption(option)
+            }
+        });
+    }
 </script>
 </body>
 </html>

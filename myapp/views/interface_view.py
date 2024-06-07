@@ -1,6 +1,9 @@
+from django.core import serializers
+from django.forms import ModelForm
 from django.http import JsonResponse
 from django.shortcuts import render
 
+from myapp import models
 from myapp.models import interface_result
 
 
@@ -38,3 +41,40 @@ def interface_insert_data(request):
                 insert_data.save()
                 data = {"code": 200, "msg": "数据插入成功"}
             return JsonResponse(data)
+
+
+def dashboard_executions_interface_total(request):
+    """
+    :param request:
+    :return: 返回执行次数
+    """
+    count = interface_result.objects.count()
+    data = {
+        'status': True,
+        'count': count
+    }
+    return JsonResponse(data)
+
+
+def dashboard_executions_interface_detail(request):
+    """
+    :param request:
+    :return: 返回接口测试的执行的数据
+    """
+    book = interface_result.objects.values_list('total_interface', 'total_pass', 'total_fail', 'passing_rate',
+                                                'datatime')
+    total_interface = [int(item[0]) for item in book]
+    total_pass = [int(item[1]) for item in book]
+    total_fail = [int(item[2]) for item in book]
+    passing_rate = [float(item[3]) for item in book]
+    datatime = [item[4] for item in book]
+    data = {
+        "data": {'total_interface': total_interface,
+                 'total_pass': total_pass,
+                 'total_fail': total_fail,
+                 'passing_rate': passing_rate,
+                 },
+        "status": True,
+    }
+
+    return JsonResponse(data)

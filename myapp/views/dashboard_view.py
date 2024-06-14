@@ -68,7 +68,7 @@ def dashboard_translate_bar(request):
         {
             'name': 'flutter新增',
             'type': 'bar',
-            'stack': 'Ac',
+            'stack': 'Ad',
             'emphasis': {
                 'focus': 'series'
             },

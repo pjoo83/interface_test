@@ -241,11 +241,11 @@ i.redr{background-image:url(../img/ricon1.png);}
 .purightboxtopcont{width:90.2%; height:77%;margin-left:5%;}
 .purightboxmiddcont{width:90.2%; height:77%;margin-left:5%;}
 .purightboxbottcont{width:90.2%; height:77%;margin-left:5%;}
-.pumiddboxtbott1cont{width:62%; height:100%;margin-left:3%;}
+.pumiddboxtbott1cont{width:500px; height:100%;margin-left:3%;}
 
 
 .tith2 span{  display: inline-block; float: left; width: 40%;}
-.pbox{ width: 100%; height: 76%;}
+.pbox{ width: 150%; height: 76%;}
 .pulefttoday_bar{width: 46.7%; height: 100%; margin-left: 2.5%;}
 .pulefttoday_bar2{width: 46.7%; height: 100%; margin-right: 2.5%;}
 .puleftboxtmidd1{width: 46.7%; height: 100%; margin-left: 2.5%;}

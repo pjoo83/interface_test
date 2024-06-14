@@ -18,6 +18,8 @@ def dashboard_translate_bar(request):
     package_execute(ios_modify_list, 1, 2, 'modify_quantity')
     server_new_list = []
     package_execute(server_new_list, 1, 3, 'newly_quantity')
+    flutter_new_list = []
+    package_execute(flutter_new_list, 1, 5, 'newly_quantity')
     series = [
         {
             'name': 'android新增',
@@ -63,6 +65,15 @@ def dashboard_translate_bar(request):
             },
             'data': server_new_list[::-1]
         },
+        {
+            'name': 'flutter新增',
+            'type': 'bar',
+            'stack': 'Ac',
+            'emphasis': {
+                'focus': 'series'
+            },
+            'data': flutter_new_list[::-1]
+        },
     ]
     date_list = []
     package_execute(date_list, 2, 2, 'quantity')
@@ -71,7 +82,7 @@ def dashboard_translate_bar(request):
         "data": {
             # "legend": legend,
             "data_list": series,
-            "date_list": date_list[::-1]
+            "date_list": date_list
         }
     }
     return JsonResponse(result)
@@ -86,7 +97,7 @@ def dashboard_language_count(request):
     ios_count = execute_sql(1, 2, 'quantity')[0]
     server_count = execute_sql(1, 3, 'quantity')[0]
     # unity_count = execute_sql(4, 'quantity')[0]
-    flutter_count = 201
+    flutter_count = execute_sql(1, 5, "quantity")[0][0]
     data = {
         'android': android_count,
         'ios': ios_count,
@@ -98,12 +109,10 @@ def dashboard_language_count(request):
         "status": True,
         'data': data
     }
-
-    print(data)
     return JsonResponse(result)
 
 
-def dashboard_executions_total(request):
+def dashboard_executions_translate_total(request):
     """
     :param request:
     :return: 返回脚本执行次数
@@ -124,12 +133,13 @@ def dashboard_translate_pie(request):
     android = execute_sql(1, 1, "quantity")[0][0]
     ios = execute_sql(1, 2, "quantity")[0][0]
     server = execute_sql(1, 3, "quantity")[0][0]
+    flutter = execute_sql(1, 5, "quantity")[0][0]
     data = [
         {'value': android, 'name': '安卓'},
         {'value': ios, 'name': 'ios'},
         {'value': server, 'name': 'server'},
         # {'value': 484, 'name': 'unity'},
-        {'value': 201, 'name': 'flutter'}
+        {'value': flutter, 'name': 'flutter'}
     ]
     result = {
         "status": True,

@@ -207,3 +207,25 @@ class interface_result(models.Model):
     execution_time = models.FloatField(verbose_name='执行消耗时间时间', null=False)
     responsible_person = models.CharField(max_length=30, verbose_name='接口负责人', null=True)
     datatime = models.DateTimeField(auto_now_add=True, verbose_name='执行时间', null=True)
+
+
+# ui自动化设备表
+class channel_ui(models.Model):
+    channel_name = models.CharField(max_length=30, verbose_name='客户端名')
+
+
+# ui自动化
+class ui_result(models.Model):
+    object = None
+    channel_id = models.ForeignKey(channel_ui, on_delete=models.CASCADE, related_name='books')
+    total_case = models.IntegerField(verbose_name='总用例数', null=False)
+    total_pass = models.IntegerField(verbose_name='用例通过数', null=False)
+    total_fail = models.IntegerField(verbose_name='用例失败数', null=False, default=0)
+    total_unexpected = models.IntegerField(verbose_name='未执行的数量', null=True)
+    live_fail = models.IntegerField(verbose_name='直播模块失败用例数', null=False)
+    room_fail = models.IntegerField(verbose_name='语音房模块失败用例数', null=False)
+    chat_fail = models.IntegerField(verbose_name='聊天模块失败用例数', null=False)
+    me_fail = models.IntegerField(verbose_name='个人模块失败用例数', null=False)
+    moment_fail = models.IntegerField(verbose_name='广场模块用例总数', null=False)
+    sing_fail = models.IntegerField(verbose_name='唱歌页错误用例数', null=False)
+    report_url = models.CharField(max_length=300, verbose_name='报告', null=False)

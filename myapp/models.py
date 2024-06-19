@@ -224,6 +224,7 @@ class ui_result(models.Model):
     total_pass = models.IntegerField(verbose_name='用例通过数', null=False)
     total_fail = models.IntegerField(verbose_name='用例失败数', null=False, default=0)
     total_unexpected = models.IntegerField(verbose_name='未执行的数量', null=True)
+    passing_rate = models.FloatField(max_length=15, verbose_name='通过率', null=False)
     live_fail = models.IntegerField(verbose_name='直播模块失败用例数', null=False)
     room_fail = models.IntegerField(verbose_name='语音房模块失败用例数', null=False)
     chat_fail = models.IntegerField(verbose_name='聊天模块失败用例数', null=False)

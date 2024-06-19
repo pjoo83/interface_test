@@ -24,8 +24,8 @@ def interface_insert_data(request):
             total_unexpected = request.POST.get('total_unexpected')
             passing_rate = request.POST.get('passing_rate')
             execution_time = request.POST.get('execution_time')
-            if total_interface == 'null' or total_pass == 'null' or total_fail == 'null' or \
-                    total_unexpected == 'null' or passing_rate == 'null' or execution_time == 'null':
+            if total_interface == '' or total_pass == '' or total_fail == '' or \
+                    total_unexpected == '' or passing_rate == '' or execution_time == '':
                 data = {"code": 204, "msg": "参数缺少，请检查上传的参数是否正常"}
             else:
                 insert_data = interface_result(
@@ -62,8 +62,6 @@ def dashboard_executions_interface_detail(request):
     ordered_queryset = interface_result.objects.order_by('-id')
     book = ordered_queryset.values_list('total_interface', 'total_pass', 'total_fail', 'passing_rate',
                                         'datatime')[:6]
-
-    print(book)
     total_interface = [int(item[0]) for item in book][::-1]
     total_pass = [int(item[1]) for item in book][::-1]
     total_fail = [int(item[2]) for item in book][::-1]

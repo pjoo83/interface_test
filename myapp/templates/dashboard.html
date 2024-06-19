@@ -48,8 +48,8 @@
     </div>
     <div class="puleftboxtbott">
         <h2 class="tith2 pt1">舆情环比分析</h2>
-        <div class="lefttoday_tit"><p class="fl">状态：已调节</p>
-            <p class="fr">时间段：2018-06-10 至 2018-06-14</p></div>
+        <div class="lefttoday_tit"><p class="fl">状态：正常</p>
+            <p class="fr"></p></div>
         <div class="box pbox">
             <div id="puleftboxtbott1" class="fl puleftboxtbott1"></div>
             <!--            <div class="puleftboxtbott2 fr">-->
@@ -143,8 +143,8 @@
     <!--   接口测试结果区域-->
     <div class="pmiddboxtbott">
         <h2 class="tith2 pt1">接口测试结果</h2>
-        <div class="lefttoday_tit"><p class="fl">状态：已调节</p>
-            <p class="fr">时间段：2018-06-10 至 2018-06-14</p></div>
+        <div class="lefttoday_tit"><p class="fl">状态：正常</p>
+            <p class="fr"></p></div>
         <div style="height: 80%;width: 100%">
             <div id="pumiddboxtbott1" class="fl " style="width: 100%;height: 100%"></div>
         </div>
@@ -153,9 +153,9 @@
 </div>
 <!-- mrbox_top end -->
 <div class="mr_right fl">
-    <div class="purightboxtop"><h2 class="tith2 pt12">舆情类别分析</h2>
+    <div class="purightboxtop"><h2 class="tith2 pt12">ui自动化结果分析</h2>
         <div class="lefttoday_tit"><p class="fl">状态：已调节</p>
-            <p class="fr">时间段：2018-06-10</p></div>
+            <p class="fr">执行时间：2018-06-10</p></div>
         <div id="purightboxtop" class="purightboxtopcont"></div>
     </div>
     <div class="purightboxmidd"><h2 class="tith2 pt12">七日舆情走势分析</h2>
@@ -305,40 +305,80 @@
     option = {
         color: ['#76c4bf', '#e5ffc7', '#508097', '#4d72d9'],
         backgroundColor: 'rgba(1,202,217,.2)',
-        grid: {
-            left: 10,
-            right: 40,
-            top: 0,
-            bottom: 0,
-            containLabel: true
+        tooltip: {
+            trigger: 'item',
+            formatter: '{a} <br/>{b} : {c} ({d}%)'
         },
-        // legend: {
-        //     x : 'center',
-        //     y : 'bottom',
-        //     textStyle:{
-        //       fontSize: 10,
-        //       color:'rgba(255,255,255,.7)'
-        //     },
-        //     data:['涉蒙','涉疆','涉军','涉恐','涉藏','涉稳','涉警']
-        // },
-        calculable: true,
+        legend: {
+            left: 'center',
+            top: 'bottom',
+            data: [
+                'rose1',
+                'rose2',
+                'rose3',
+                'rose4',
+                'rose5',
+                'rose6',
+                'rose7',
+                'rose8'
+            ]
+        },
+        toolbox: {
+            show: true,
+            feature: {
+                mark: {show: true},
+                dataView: {show: true, readOnly: false},
+                restore: {show: true},
+                saveAsImage: {show: true}
+            }
+        },
         series: [
-
             {
-                name: '面积模式',
+                name: 'Radius Mode',
                 type: 'pie',
-                radius: [10, 70],
-                center: ['50%', '50%'],
-                roseType: 'area',
+                radius: [10, 60],
+                center: ['30%', '50%'],
+                roseType: 'radius',
+                itemStyle: {
+                    borderRadius: 5
+                },
+                label: {
+                    show: false
+                },
+                emphasis: {
+                    label: {
+                        show: true
+                    }
+                },
                 data: [
-                    {value: 10, name: '涉蒙'},
-                    {value: 50, name: '涉疆'},
-                    {value: 15, name: '涉军'},
-                    {value: 25, name: '涉恐'},
-                    {value: 5, name: '涉藏'},
-                    {value: 15, name: '涉稳'},
-                    {value: 15, name: '涉警'}
-
+                    {value: 10, name: 'rose 1'},
+                    {value: 33, name: 'rose 2'},
+                    {value: 28, name: 'rose 3'},
+                    {value: 22, name: 'rose 4'},
+                    {value: 20, name: 'rose 5'},
+                    {value: 15, name: 'rose 6'},
+                    {value: 12, name: 'rose 7'},
+                    {value: 10, name: 'rose 8'}
+                ]
+            },
+            {
+                name: 'Area Mode',
+                type: 'pie',
+                radius: [10, 60],
+                center: ['75%', '50%'],
+                roseType: 'area',
+                itemStyle: {
+                    borderRadius: 5
+                },
+                data: [
+                    {value: 30, name: 'rose 1'},
+                    {value: 28, name: 'rose 2'},
+                    {value: 26, name: 'rose 3'},
+                    {value: 24, name: 'rose 4'},
+                    {value: 22, name: 'rose 5'},
+                    {value: 20, name: 'rose 6'},
+                    {value: 18, name: 'rose 7'},
+                    {value: 16, name: 'rose 8'}
                 ]
             }
         ]
@@ -638,7 +678,7 @@
 
             toolbox: {
                 feature: {
-                    magicType: {show: true, type: ['line', 'bar']},
+                    magicType: {show: true, type: ['line']},
                     restore: {show: true},
                     saveAsImage: {show: true}
                 }
@@ -668,7 +708,7 @@
                         color: "rgba(255,255,255,.7)"
                     },
 
-                    data: ['2024-02-28', '2024-02-28'],
+                    data: [],
                     axisPointer: {
                         type: 'shadow'
                     }
@@ -795,7 +835,7 @@
                     option.series[1].data = res.data['total_pass'];
                     option.series[2].data = res.data['total_fail'];
                     option.series[3].data = res.data['passing_rate'];
-                    console.log(res.data['passing_rate'])
+                    option.xAxis[0].data = res.data['date_list']
                 }
                 myChart.setOption(option)
             }

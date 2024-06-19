@@ -211,12 +211,12 @@ class interface_result(models.Model):
 
 # ui自动化设备表
 class channel_ui(models.Model):
+    objects = None
     channel_name = models.CharField(max_length=30, verbose_name='客户端名')
 
 
 # ui自动化
 class ui_result(models.Model):
-    object = None
     channel_id = models.ForeignKey(channel_ui, on_delete=models.CASCADE, related_name='books')
     total_case = models.IntegerField(verbose_name='总用例数', null=False)
     total_pass = models.IntegerField(verbose_name='用例通过数', null=False)

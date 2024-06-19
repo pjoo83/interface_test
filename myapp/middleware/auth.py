@@ -29,7 +29,8 @@ class LoginRequiredMiddleware:
         # 读取session信息
         # 排除不需登录的界面
         exclude_urls = ['/autotest/login/', '/autotest/register/',
-                        '/autotest/dashboard/interface/insert_api/']  # 添加你希望排除的URL
+                        '/autotest/dashboard/interface/insert_api/', '/autotest/dashboard/android/insert_api/',
+                        '/autotest/dashboard/ios/insert_api/']
         if request.path_info in exclude_urls:
             # 如果请求的URL在排除列表中，则直接跳过验证
             response = self.get_response(request)

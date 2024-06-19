@@ -205,8 +205,9 @@ class interface_result(models.Model):
     total_unexpected = models.IntegerField(verbose_name='未执行的数量', null=True)
     passing_rate = models.FloatField(max_length=15, verbose_name='接口成功率', null=False)
     execution_time = models.FloatField(verbose_name='执行消耗时间时间', null=False)
-    responsible_person = models.CharField(max_length=30, verbose_name='接口负责人', null=True)
+    responsible_person = models.CharField(max_length=30, verbose_name='接口负责人', default='王子钊', null=True)
     datatime = models.DateTimeField(auto_now_add=True, verbose_name='执行时间', null=True)
+    report_url = models.CharField(max_length=300, verbose_name='报告', null=True)
 
 
 # ui自动化设备表
@@ -217,6 +218,7 @@ class channel_ui(models.Model):
 
 # ui自动化
 class ui_result(models.Model):
+    objects = None
     channel_id = models.ForeignKey(channel_ui, on_delete=models.CASCADE, related_name='books')
     total_case = models.IntegerField(verbose_name='总用例数', null=False)
     total_pass = models.IntegerField(verbose_name='用例通过数', null=False)

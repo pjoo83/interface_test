@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from myapp.models import interface_result
+import base64
 
 
 def interface_insert_data(request):
@@ -11,7 +12,9 @@ def interface_insert_data(request):
         data = {"code": 206, "msg": "请用post请求"}
         return JsonResponse(data)
     elif request.method == 'POST':
-        if request.POST.get("token") != 'api_qa_inter':
+        token = request.POST.get("token")
+        decoded_string = base64.urlsafe_b64decode(token).decode('utf-8')
+        if decoded_string != 'api_qa_insert_interface_result':
             data = {"code": 403, "msg": "缺少认证内容"}
             return JsonResponse(data)
         else:
@@ -56,13 +59,16 @@ def dashboard_executions_interface_detail(request):
     :param request:
     :return: 返回接口测试的执行的数据
     """
-    book = interface_result.objects.values_list('total_interface', 'total_pass', 'total_fail', 'passing_rate',
-                                                'datatime')
-    total_interface = [int(item[0]) for item in book]
-    total_pass = [int(item[1]) for item in book]
-    total_fail = [int(item[2]) for item in book]
-    passing_rate = [float(item[3]) for item in book]
-    datatime = [item[4] for item in book]
+    ordered_queryset = interface_result.objects.order_by('-id')
+    book = ordered_queryset.values_list('total_interface', 'total_pass', 'total_fail', 'passing_rate',
+                                        'datatime')[:6]
+
+    print(book)
+    total_interface = [int(item[0]) for item in book][::-1]
+    total_pass = [int(item[1]) for item in book][::-1]
+    total_fail = [int(item[2]) for item in book][::-1]
+    passing_rate = [float(item[3]) for item in book][::-1]
+    datatime = [item[4] for item in book][::-1]
     date_list = []
     for day in datatime:
         date_list.append(f"{day.year}-{day.month}-{day.day}")

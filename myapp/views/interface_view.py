@@ -46,12 +46,13 @@ def dashboard_executions_interface_total(request):
     :param request:
     :return: 返回执行次数
     """
-    count = interface_result.objects.count()
-    data = {
-        'status': True,
-        'count': count
-    }
-    return JsonResponse(data)
+    if request.method == 'GET':
+        count = interface_result.objects.count()
+        data = {
+            'status': True,
+            'count': count
+        }
+        return JsonResponse(data)
 
 
 def dashboard_executions_interface_detail(request):
@@ -59,25 +60,26 @@ def dashboard_executions_interface_detail(request):
     :param request:
     :return: 返回接口测试的执行的数据
     """
-    ordered_queryset = interface_result.objects.order_by('-id')
-    book = ordered_queryset.values_list('total_interface', 'total_pass', 'total_fail', 'passing_rate',
-                                        'datatime')[:6]
-    total_interface = [int(item[0]) for item in book][::-1]
-    total_pass = [int(item[1]) for item in book][::-1]
-    total_fail = [int(item[2]) for item in book][::-1]
-    passing_rate = [float(item[3]) for item in book][::-1]
-    datatime = [item[4] for item in book][::-1]
-    date_list = []
-    for day in datatime:
-        date_list.append(f"{day.year}-{day.month}-{day.day}")
-    data = {
-        "data": {'total_interface': total_interface,
-                 'total_pass': total_pass,
-                 'total_fail': total_fail,
-                 'passing_rate': passing_rate,
-                 'date_list': date_list
-                 },
-        "status": True,
-    }
+    if request.method == 'GET':
+        ordered_queryset = interface_result.objects.order_by('-id')
+        book = ordered_queryset.values_list('total_interface', 'total_pass', 'total_fail', 'passing_rate',
+                                            'datatime')[:6]
+        total_interface = [int(item[0]) for item in book][::-1]
+        total_pass = [int(item[1]) for item in book][::-1]
+        total_fail = [int(item[2]) for item in book][::-1]
+        passing_rate = [float(item[3]) for item in book][::-1]
+        datatime = [item[4] for item in book][::-1]
+        date_list = []
+        for day in datatime:
+            date_list.append(f"{day.year}-{day.month}-{day.day}")
+        data = {
+            "data": {'total_interface': total_interface,
+                     'total_pass': total_pass,
+                     'total_fail': total_fail,
+                     'passing_rate': passing_rate,
+                     'date_list': date_list
+                     },
+            "status": True,
+        }
 
-    return JsonResponse(data)
+        return JsonResponse(data)

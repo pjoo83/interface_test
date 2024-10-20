@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import login_view, register_view, index, intertools_view, business_view, dashboard_view, interface_view, \
-    uitest_view
+    uitest_view, resource_increase_view
 
 urlpatterns = [
     # 登录注册
@@ -36,9 +36,12 @@ urlpatterns = [
     path('dashboard/android/insert_api/', uitest_view.ui_android_insert_data, name='android_insert_api'),
     # ui苹果接口输入插入
     path('dashboard/ios/insert_api/', uitest_view.ui_ios_insert_data, name='ios_insert_api'),
+    # 安卓饼图结果
+    path('dashboard/ui_results/', uitest_view.ui_results, name='ui_results'),
     # 工具
     path("inter_tools/", intertools_view.inter_tools),
-
+    # 资源添加
+    path('resource_mount_increase/', resource_increase_view.resource_mount_increase, name='resource_mount_increase'),
     # 业务管理
     path("business/", business_view.business_list),
     path("business/del/", business_view.business_del),

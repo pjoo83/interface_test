@@ -232,3 +232,10 @@ class ui_result(models.Model):
     moment_fail = models.IntegerField(verbose_name='广场模块用例总数', null=False)
     sing_fail = models.IntegerField(verbose_name='唱歌页错误用例数', null=False)
     report_url = models.CharField(max_length=300, verbose_name='报告', null=False)
+
+
+# 资源变化表
+class resource_record(models.Model):
+    record_id = models.IntegerField(verbose_name='资源类别', null=False)
+    record_number = models.IntegerField(verbose_name='资源现裤中编号', null=False)
+    record_name = models.CharField(verbose_name='资源名称', max_length=300, null=True)

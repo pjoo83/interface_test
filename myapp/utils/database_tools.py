@@ -1,33 +1,58 @@
 import pymysql
 
 
-def execute_sql(sid, channel_id, content):
+def execute_sql(sid=None, channel_id=None, content=None, name=None):
     db = pymysql.connect(
         host='127.0.0.1',
         user='root',
         password='zxcv1234',
         database='localhost_interface'
     )
-    if sid == 1:
-        filter_execute_statistics = f"select {content} from  translate_statistics where channel_id ={channel_id} order by time desc limit 5;"
+    if sid in (1, 2, 3):
+        if sid == 1:
+            filter_execute_statistics = f"select {content} from  translate_statistics where channel_id ={channel_id} order by time desc limit 6;"
+            cursor = db.cursor()
+            try:
+                cursor.execute(filter_execute_statistics)
+                result = cursor.fetchall()
+                return result
+            except pymysql.MySQLError as e:
+                print(e, '查询失败')
+            db.commit()
+            db.close()
+        elif sid == 2:
+            filter_execute_statistics = f'SELECT  CAST(time AS DATE) AS date_only, COUNT(*)  FROM translate_statistics  GROUP BY date_only ORDER BY date_only DESC limit 6;'
+            cursor = db.cursor()
+            try:
+                cursor.execute(filter_execute_statistics)
+                result = cursor.fetchall()
+                return result
+            except pymysql.MySQLError as e:
+                print(e, '查询失败')
+            db.commit()
+            db.close()
+        elif sid == 3:
+            filter_execute_statistics = f'SELECT * from myapp_resource_record WHERE record_id = {channel_id}'
+            cursor = db.cursor()
+            try:
+                cursor.execute(filter_execute_statistics)
+                result = cursor.fetchall()
+                return result
+            except pymysql.MySQLError as e:
+                print(e, '查询失败')
+            db.commit()
+            db.close()
+    elif sid == 4:
         cursor = db.cursor()
+        update_execute_statistics = 'UPDATE myapp_resource_record SET record_number = %s,record_name ' \
+                                    '= %s WHERE record_id = %s'
+        value = (content, name, channel_id)
         try:
-            cursor.execute(filter_execute_statistics)
-            result = cursor.fetchall()
-            return result
+            cursor.execute(update_execute_statistics, value)
+            # result = cursor.fetchall()
+            db.commit()
         except pymysql.MySQLError as e:
-            print(e, '查询失败')
-        db.commit()
-        db.close()
-    elif sid == 2:
-        filter_execute_statistics = f'SELECT  CAST(time AS DATE) AS date_only, COUNT(*)  FROM translate_statistics  GROUP BY date_only ORDER BY date_only DESC limit 5;'
-        cursor = db.cursor()
-        try:
-            cursor.execute(filter_execute_statistics)
-            result = cursor.fetchall()
-            return result
-        except pymysql.MySQLError as e:
-            print(e, '查询失败')
+            print(e, '更新失败')
         db.commit()
         db.close()
 
@@ -47,4 +72,4 @@ def package_execute(new_list, sid, cid, statement):
 
 
 if __name__ == '__main__':
-    print(execute_sql(2, 2, 'quantity'))
+    execute_sql(sid=4, channel_id=1, content=1144, name='新增坐骑lea ')

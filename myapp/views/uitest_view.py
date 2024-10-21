@@ -105,3 +105,30 @@ def ui_ios_insert_data(request):
                 insert_data.save()
                 data = {"code": 200, "msg": "数据插入成功"}
             return JsonResponse(data)
+
+
+def ui_results(request):
+    if request.method == 'GET':
+        ordered_queryset = ui_result.objects.filter(channel_id=1).order_by('-id')
+        android_book = ordered_queryset.values_list('live_fail', 'room_fail', 'chat_fail', 'me_fail',
+                                                    'moment_fail', 'sing_fail')[:1][0]
+        android_data = [{"value": android_book[0], "name": '直播错误'},
+                        {"value": android_book[1], "name": '语音房错误'},
+                        {"value": android_book[2], "name": '聊天错误'},
+                        {"value": android_book[3], "name": '跟人页错误'},
+                        {"value": android_book[4], "name": '广场页错误'},
+                        {"value": android_book[5], "name": 'sing错误'}]
+        ordered_queryset = ui_result.objects.filter(channel_id=2).order_by('-id')
+        ios_book = ordered_queryset.values_list('live_fail', 'room_fail', 'chat_fail', 'me_fail',
+                                                'moment_fail', 'sing_fail')[:1][0]
+        ios_data = [{"value": ios_book[0], "name": '直播错误'},
+                    {"value": ios_book[1], "name": '语音房错误'},
+                    {"value": ios_book[2], "name": '聊天错误'},
+                    {"value": ios_book[3], "name": '跟人页错误'},
+                    {"value": ios_book[4], "name": '广场页错误'},
+                    {"value": ios_book[5], "name": 'sing错误'}]
+
+        result = {'status': True,
+                  'android_data': android_data,
+                  'ios_data': ios_data}
+        return JsonResponse(result)

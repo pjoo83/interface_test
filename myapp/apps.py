@@ -1,4 +1,8 @@
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
 from django.apps import AppConfig
+
+from myapp.utils.time import call_api_task
 
 
 class MyappConfig(AppConfig):
@@ -6,5 +10,9 @@ class MyappConfig(AppConfig):
     name = 'myapp'
 
     def ready(self):
-        from myapp.utils.time import scheduler
+        scheduler = BackgroundScheduler()
+        # 每两小时的第0分钟执行
+        # trigger = CronTrigger(minute='*')
+        trigger = CronTrigger(hour='*', minute='0', day_of_week='1-5')
+        scheduler.add_job(call_api_task, trigger=trigger, id='call_api_job', max_instances=1)
         scheduler.start()

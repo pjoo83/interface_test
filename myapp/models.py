@@ -239,3 +239,7 @@ class resource_record(models.Model):
     record_id = models.IntegerField(verbose_name='资源类别', null=False)
     record_number = models.IntegerField(verbose_name='资源现裤中编号', null=False)
     record_name = models.CharField(verbose_name='资源名称', max_length=300, null=True)
+    record_png_url = models.CharField(verbose_name='资源头图', max_length=300, null=True)
+    record_pag_url = models.CharField(verbose_name='资源视频地址', max_length=300, null=True)
+
+

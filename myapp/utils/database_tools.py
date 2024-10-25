@@ -1,11 +1,11 @@
 import pymysql
 
 
-def execute_sql(sid=None, channel_id=None, content=None, name=None):
+def execute_sql(sid=None, channel_id=None, content=None, name=None, record_pag_url=None, record_png_url=None):
     db = pymysql.connect(
         host='127.0.0.1',
         user='root',
-        password='zxcv1234',
+        password='123456',
         database='localhost_interface'
     )
     if sid in (1, 2, 3):
@@ -45,8 +45,8 @@ def execute_sql(sid=None, channel_id=None, content=None, name=None):
     elif sid == 4:
         cursor = db.cursor()
         update_execute_statistics = 'UPDATE myapp_resource_record SET record_number = %s,record_name ' \
-                                    '= %s WHERE record_id = %s'
-        value = (content, name, channel_id)
+                                    '= %s, record_png_url = %s ,record_pag_url= %s  WHERE record_id = %s'
+        value = (content, name, record_png_url, record_pag_url, channel_id,)
         try:
             cursor.execute(update_execute_statistics, value)
             # result = cursor.fetchall()

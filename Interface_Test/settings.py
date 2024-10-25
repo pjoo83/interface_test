@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-=cf@ysjk_t@k2+&=5mix)d+e_2(44aoqfec$-(54qvuv28*%v6
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '10.41.1.89']
 
 # Application definition
 
@@ -77,7 +77,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'localhost_interface',
         'USER': 'root',
-        'PASSWORD': 'zxcv1234',
+        'PASSWORD': '123456',
         'HOST': 'localhost',
         'PORT': '3306',
     }
@@ -126,3 +126,22 @@ LOGIN_URL = '/autotest/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# Interface_Test/settings.py
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Redis 连接字符串
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'  # 存储任务结果的位置
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Shanghai'  # 或者你的本地时区
+broker_connection_retry_on_startup = True
+
+from datetime import timedelta
+from myapp.tasks import my_scheduled_task
+
+CELERY_BEAT_SCHEDULE = {
+    'my-scheduled-task': {
+        'task': 'myapp.tasks.my_scheduled_task',
+        'schedule': timedelta(hours=2),  # 每两小时执行一次
+        # 'schedule': timedelta(minutes=1)
+    },
+}

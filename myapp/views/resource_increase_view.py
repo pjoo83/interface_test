@@ -10,21 +10,18 @@ def resource_mount_increase(request):
         'accept': 'application/json, text/javascript, */*; q=0.01',
         'accept-language': 'zh-CN,zh;q=0.9',
         'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        'cookie': 'csrftoken=yPmniuAZeEdZnlrT7OekdcQPHkft3Hd78Q0c2hmF9bBAYHCuGILkvoFt7X4NOAVB; '
-                  'sessionid=wpp9w8ipqmgarsl0up49kr52vj2pmnhr; _ga_Y5QLWEHNZ4=GS1.1.1729134537.7.0.1729134537.60.0.0; '
-                  '_ga=GA1.1.1792866753.1713751715; sessionid=wpp9w8ipqmgarsl0up49kr52vj2pmnhr; '
-                  'tgw_l7_route=7a3b5e35664bcb9b34e8b8e8ba155169',
+        'cookie': 'csrftoken=q26vhXy7GQz0ikCy1D5xsBzGKBMQnfwQ7YHZETOgNlCNqjCzk7h7i8lbjAPR6e1N; sessionid=z91tcdxx1pdyj3iovo3j3k6mzmbzgye6; sessionid=z91tcdxx1pdyj3iovo3j3k6mzmbzgye6; tgw_l7_route=7a3b5e35664bcb9b34e8b8e8ba155169',
         'origin': 'https://sql.ushow.media',
         'priority': 'u=1, i',
         'referer': 'https://sql.ushow.media/sqlquery/',
-        'sec-ch-ua': '"Google Chrome";v="129", "Not=A?Brand";v="8", "Chromium";v="129"',
+        'sec-ch-ua': '"Chromium";v="128", "Not;A=Brand";v="24", "Google Chrome";v="128"',
         'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua-platform': '"macOS"',
+        'sec-ch-ua-platform': '"Windows"',
         'sec-fetch-dest': 'empty',
         'sec-fetch-mode': 'cors',
         'sec-fetch-site': 'same-origin',
-        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
-        'x-csrftoken': 'yPmniuAZeEdZnlrT7OekdcQPHkft3Hd78Q0c2hmF9bBAYHCuGILkvoFt7X4NOAVB',
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
+        'x-csrftoken': 'q26vhXy7GQz0ikCy1D5xsBzGKBMQnfwQ7YHZETOgNlCNqjCzk7h7i8lbjAPR6e1N',
         'x-requested-with': 'XMLHttpRequest'
     }
     payload = "instance_name=cdb-sg-prod-starmaker-live-r2&db_name=fb_live&schema_name=&tb_name=horse&sql_content" \
@@ -33,15 +30,28 @@ def resource_mount_increase(request):
     Mount_data = resource_check(3, 1)[0][2]
     new_data = data.json()['data']['rows'][0]
     if Mount_data == new_data[0]:
+        print('数据相同，没有新增')
         return JsonResponse({"code": "200",
-                             "msg": '数据相同，没有新增'})
+                             "msg": '数据相同，没有新增111'})
     else:
-        # start_send('注意！！注意！！！有新增坐骑，请注意测试！！！,'
-        #            f'新增id：{new_data[0]},'
-        #            f'新增资源名：{new_data[1]},'
-        #            f'请前往{https://prod.ushow.media/internal/horse/index?page=1}查看')
-        content = [new_data[0], new_data[1]]
-        execute_sql(sid=4, channel_id=1, content=content[0], name=content[1])
+        start_send('注意！！注意！！！有新增坐骑，请注意测试！！！,'
+                   f'新增{new_data[0] - Mount_data}条坐骑资源,'
+                   f'最新新增id：{new_data[0]},'
+                   f'最新新增资源名：{new_data[1]},'
+                   f'最新资源图片https://static.starmakerstudios.com/production/statics/horse/{new_data[2]},'
+                   f'最新资源视频https://static.starmakerstudios.com/production/statics/horse/{new_data[12]},'
+                   f'请前往https://prod.ushow.media/internal/horse/index',
+                   )
+        pag_url = f'https://static.starmakerstudios.com/production/statics/horse/{new_data[12]}'
+        png_url = f'https://static.starmakerstudios.com/production/statics/horse/{new_data[2]}'
+        content = [new_data[0], new_data[1],
+                   pag_url,
+                   png_url]
+        execute_sql(sid=4, channel_id=1, content=content[0], name=content[1], record_pag_url=content[3],
+                    record_png_url=content[2])
+        # print('注意！！注意！！！有新增坐骑，请注意测试！！！,'
+        #       f'新增id-【 ：{content[0]},'
+        #       f'新增资源名：{content[1]}')
         return JsonResponse({"code": "200",
                              "msg": '注意！！注意！！！有新增坐骑，请注意测试！！！,'
                                     f'新增id：{content[0]},'

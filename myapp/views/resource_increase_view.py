@@ -34,14 +34,11 @@ def resource_mount_increase(request):
         return JsonResponse({"code": "200",
                              "msg": '数据相同，没有新增111'})
     else:
-        start_send('注意！！注意！！！有新增坐骑，请注意测试！！！,'
-                   f'新增{new_data[0] - Mount_data}条坐骑资源,'
-                   f'最新新增id：{new_data[0]},'
-                   f'最新新增资源名：{new_data[1]},'
-                   f'最新资源图片https://static.starmakerstudios.com/production/statics/horse/{new_data[2]},'
-                   f'最新资源视频https://static.starmakerstudios.com/production/statics/horse/{new_data[12]},'
-                   f'请前往https://prod.ushow.media/internal/horse/index',
-                   )
+        start_send(horse_count=new_data[0] - Mount_data,
+                   horse_id=new_data[0],
+                   horse_name=new_data[1],
+                   horse_png =f"https://static.starmakerstudios.com/production/statics/horse/{new_data[2]}",
+                   horse_pag= f"https://static.starmakerstudios.com/production/statics/horse/{new_data[12]}")
         pag_url = f'https://static.starmakerstudios.com/production/statics/horse/{new_data[12]}'
         png_url = f'https://static.starmakerstudios.com/production/statics/horse/{new_data[2]}'
         content = [new_data[0], new_data[1],
@@ -49,12 +46,8 @@ def resource_mount_increase(request):
                    png_url]
         execute_sql(sid=4, channel_id=1, content=content[0], name=content[1], record_pag_url=content[3],
                     record_png_url=content[2])
-        # print('注意！！注意！！！有新增坐骑，请注意测试！！！,'
-        #       f'新增id-【 ：{content[0]},'
-        #       f'新增资源名：{content[1]}')
         return JsonResponse({"code": "200",
-                             "msg": '注意！！注意！！！有新增坐骑，请注意测试！！！,'
-                                    f'新增id：{content[0]},'
+                             "msg": f'新增id：{content[0]},'
                                     f'新增资源名：{content[1]}'})
 
 

@@ -37,7 +37,11 @@ urlpatterns = [
     # ui苹果接口输入插入
     path('dashboard/ios/insert_api/', uitest_view.ui_ios_insert_data, name='ios_insert_api'),
     # 安卓饼图结果
-    path('dashboard/ui_results/', uitest_view.ui_results, name='ui_results'),
+    path('dashboard/android_ui_results/', uitest_view.android_ui_results, name='android_ui_results'),
+    # ios饼图结果
+    path('dashboard/ios_ui_results/', uitest_view.ios_ui_results, name='ios_ui_results'),
+
+    path('dashboard/ui_test_statistics/',uitest_view.ui_test_statistics,name ='ui_test_statistics'),
     # 工具
     path("inter_tools/", intertools_view.inter_tools),
     # 资源添加

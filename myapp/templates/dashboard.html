@@ -25,10 +25,10 @@
                 <a href="https://rg975ojk5z.feishu.cn/base/RGz2bX9TNagr2PsJp57c1tKlne8?table=tblI9mr4bogNeUpx&view=vewMnpNgGD">总结与分享</a>
             </li>
             <li>
-                <a href="https://rg975ojk5z.feishu.cn/base/V3OMbRyLpasVNGsdbwacONhanBd?table=tblpedovHXYyrNJp&view=vewOyZHEdg">线上反馈</a>
+                <a href="https://rg975ojk5z.feishu.cn/base/V3OMbRyLpasVNGsdbwacONhanBd?table=tblpedovHXYyrNJp&view=vewXxBNTOK">线上反馈</a>
             </li>
             <li><a href="http://10.41.3.60:8080/">安卓打包机</a></li>
-            <li><a href="http://10.41.3.223:8080/view/StarMaker/">ios打包机</a></li>
+            <li><a href="http://10.41.3.251:8080/">ios打包机</a></li>
         </ul>
         </ul>
     </div>
@@ -52,23 +52,6 @@
             <p class="fr"></p></div>
         <div class="box pbox">
             <div id="puleftboxtbott1" class="fl puleftboxtbott1"></div>
-            <!--            <div class="puleftboxtbott2 fr">-->
-            <!--                <div class="widget-inline-box text-center ">-->
-            <!--                    <p>ui自动化执行次数</p>-->
-            <!--                    <h3 class=" ceeb1fd">54</h3>-->
-            <!--                    <h4 class="text-muted ">环比<img src="/static/assets/img/iconup.png" height="16"/>2%</h4>-->
-            <!--                </div>-->
-            <!--                <div class="widget-inline-box text-center ">-->
-            <!--                    <p>接口自动化执行次数</p>-->
-            <!--                    <h3 class=" c24c9ff">54</h3>-->
-            <!--                    <h4 class="text-muted ">环比<img src="/static/assets/img/icondown.png" height="16"/>3%</h4>-->
-            <!--                </div>-->
-            <!--                <div class="widget-inline-box text-center ">-->
-            <!--                    <p>本月舆情总数</p>-->
-            <!--                    <h3 class=" cffff00">4</h3>-->
-            <!--                    <h4 class="text-muted ">环比<img src="/static/assets/img/icondown.png" height="16"/>3%</h4>-->
-            <!--                </div>-->
-            <!--            </div>-->
         </div>
     </div>
 </div>
@@ -151,22 +134,26 @@
     </div>
     <!-- amidd_bott end -->
 </div>
-<!-- mrbox_top end -->
+<!-- 右侧数据展示-->
 <div class="mr_right fl">
-    <div class="purightboxtop"><h2 class="tith2 pt12">ui自动化结果分析</h2>
-        <div class="lefttoday_tit"><p class="fl">状态：已调节</p>
-            <p class="fr">执行时间：2018-06-10</p></div>
+    <!--    安卓ui仪表盘-->
+    <div class="purightboxtop"><h2 class="tith2 pt12">安卓-UI自动化结果分析</h2>
+        <div class="lefttoday_tit"><p class="fl"></p>
+            <p class="fr">执行时间：2018-06-10 </p></div>
         <div id="purightboxtop" class="purightboxtopcont"></div>
     </div>
-    <div class="purightboxmidd"><h2 class="tith2 pt12">七日舆情走势分析</h2>
-        <div class="lefttoday_tit"><p class="fl">状态：已调节</p>
+    <!--    ui用例统计区域-->
+    <div class="purightboxmidd"><h2 class="tith2 pt12">ui自动化用例数</h2>
+        <div class="lefttoday_tit"><p class="fl"></p>
             <p class="fr">时间段：2018-06-10</p></div>
         <div id="purightboxmidd" class="purightboxmiddcont"></div>
     </div>
-    <div class="purightboxbott"><h2 class="tith2 pt12">矛盾纠纷七日数据分析</h2>
-        <div class="lefttoday_tit"><p class="fl">状态：已调节</p>
-            <p class="fr">时间段：2018-06-10 至 2018-06-14</p></div>
-        <div id="purightboxbott" class="purightboxbottcont"></div>
+    <!--    ios-ui仪表盘-->
+    <div class="purightboxbott"><h2 class="tith2 pt12">IOS-UI自动化结果分析</h2>
+        <div class="lefttoday_tit"><p class="fl"></p>
+            <p class="fr">执行时间：2018-06-10 </p></div>
+
+        <div id="purightboxbott2" class="purightboxbottcont"></div>
     </div>
 </div>
 
@@ -300,203 +287,16 @@
     };
     myChart.setOption(option);
 </script>
-<script type="text/javascript">
-    var myChart = echarts.init(document.getElementById('purightboxtop'));
-    option = {
-        color: ['#76c4bf', '#e5ffc7', '#508097', '#4d72d9'],
-        backgroundColor: 'rgba(1,202,217,.2)',
-        tooltip: {
-            trigger: 'item',
-            formatter: '{a} <br/>{b} : {c} ({d}%)'
-        },
-        legend: {
-            left: 'center',
-            top: 'bottom',
-            data: [
-                'rose1',
-                'rose2',
-                'rose3',
-                'rose4',
-                'rose5',
-                'rose6',
-                'rose7',
-                'rose8'
-            ]
-        },
-        toolbox: {
-            show: true,
-            feature: {
-                mark: {show: true},
-                dataView: {show: true, readOnly: false},
-                restore: {show: true},
-                saveAsImage: {show: true}
-            }
-        },
-        series: [
-            {
-                name: 'Radius Mode',
-                type: 'pie',
-                radius: [10, 60],
-                center: ['30%', '50%'],
-                roseType: 'radius',
-                itemStyle: {
-                    borderRadius: 5
-                },
-                label: {
-                    show: false
-                },
-                emphasis: {
-                    label: {
-                        show: true
-                    }
-                },
-                data: [
-                    {value: 10, name: 'rose 1'},
-                    {value: 33, name: 'rose 2'},
-                    {value: 28, name: 'rose 3'},
-                    {value: 22, name: 'rose 4'},
-                    {value: 20, name: 'rose 5'},
-                    {value: 15, name: 'rose 6'},
-                    {value: 12, name: 'rose 7'},
-                    {value: 10, name: 'rose 8'}
-                ]
-            },
-            {
-                name: 'Area Mode',
-                type: 'pie',
-                radius: [10, 60],
-                center: ['75%', '50%'],
-                roseType: 'area',
-                itemStyle: {
-                    borderRadius: 5
-                },
-                data: [
-                    {value: 30, name: 'rose 1'},
-                    {value: 28, name: 'rose 2'},
-                    {value: 26, name: 'rose 3'},
-                    {value: 24, name: 'rose 4'},
-                    {value: 22, name: 'rose 5'},
-                    {value: 20, name: 'rose 6'},
-                    {value: 18, name: 'rose 7'},
-                    {value: 16, name: 'rose 8'}
-                ]
-            }
-        ]
-    };
-    myChart.setOption(option);
-</script>
-<script type="text/javascript">
-    var myChart = echarts.init(document.getElementById('purightboxmidd'));
-    option = {
-        color: ['#7de494', '#7fd7b1', '#5578cf', '#5ebbeb', '#d16ad8', '#f8e19a', '#00b7ee', '#81dabe', '#5fc5ce'],
-        backgroundColor: 'rgba(1,202,217,.2)',
 
-        grid: {
-            left: 30,
-            right: 40,
-            top: 30,
-            bottom: 20,
-            containLabel: true
-        },
-        toolbox: {
-            feature: {
-                saveAsImage: {}
-            }
-        },
-        xAxis: {
-            type: 'category',
-            boundaryGap: false,
-            axisLine: {
-                lineStyle: {
-                    color: 'rgba(255,255,255,.2)'
-                }
-            },
-            splitLine: {
-                lineStyle: {
-                    color: 'rgba(255,255,255,.1)'
-                }
-            },
-            axisLabel: {
-                color: "rgba(255,255,255,.7)"
-            },
-            data: ['6-08', '6-09', '6-10', '6-11', '6-12', '6-13', '6-14']
-        },
-        yAxis: {
-            type: 'value',
-            axisLine: {
-                lineStyle: {
-                    color: 'rgba(255,255,255,.2)'
-                }
-            },
-            splitLine: {
-                lineStyle: {
-                    color: 'rgba(255,255,255,.1)'
-                }
-            },
-            axisLabel: {
-                color: "rgba(255,255,255,.7)"
-            },
-        },
-        series: [
-            {
-                name: '2014年',
-                type: 'line',
-                stack: '总量',
-                areaStyle: {normal: {}},
-                data: [120, 132, 101, 134, 90, 230, 210]
-            }
 
-        ]
-    };
-    myChart.setOption(option);
-</script>
-<script type="text/javascript">
-    var myChart = echarts.init(document.getElementById('purightboxbott'));
-    option = {
-        color: ['#00f1fc', '#00b7ee', '#5578cf', '#5ebbeb', '#d16ad8', '#f8e19a', '#00b7ee', '#81dabe', '#5fc5ce'],
-        backgroundColor: 'rgba(1,202,217,.2)',
-        grid: {
-            left: 20,
-            right: 20,
-            top: 0,
-            bottom: 20
-        },
-        legend: {
-            top: 10,
-            textStyle: {
-                fontSize: 10,
-                color: 'rgba(255,255,255,.7)'
-            },
-            data: ['境外', '境内', '外国']
-        },
-        series: [
-            {
-                name: '访问来源',
-                type: 'pie',
-                radius: '55%',
-                center: ['50%', '55%', '30%'],
-                data: [
-                    {value: 335, name: '境外'},
-                    {value: 310, name: '境内'},
-                    {value: 330, name: '境内'}
-                ],
-                itemStyle: {
-                    emphasis: {
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)'
-                    }
-                }
-            }
-        ]
-    };
-    myChart.setOption(option);
-</script>
 <script type="text/javascript">
     $(function () {
         initBar();
         initBar1();
         initBar2();
+        initBar3();
+        initBar4();
+        initBar5();
     })
 
     // 初始化折线图
@@ -527,7 +327,7 @@
                     data: [],
                     axisLabel: {
                         textStyle: {
-                            color: 'white',// 这里设置字体颜色为红色,
+                            color: 'white',
                             fontSize: 10,
                         }
                     }
@@ -552,7 +352,6 @@
             dataType: "JSON",
             success: function (res) {
                 if (res.status) {
-                    // console.log(res.data.date_list)
                     option.series = res.data.data_list;
                     option.xAxis[0].data = res.data.date_list;
                 }
@@ -571,7 +370,6 @@
         type: "get",
         dataType: "JSON",
         success: function (res) {
-            console.log(res.data.flutter)
             if (res.status) {
                 android.textContent = res.data.android;
                 ios.textContent = res.data.ios;
@@ -589,7 +387,6 @@
         dataType: "JSON",
         success: function (res) {
             if (res.status) {
-                // console.log(res.data)
                 executions_translate_total.textContent = res.data
             }
         }
@@ -667,7 +464,7 @@
     // 接口测试折线图区域
     function initBar2() {
         var myChart = echarts.init(document.getElementById('pumiddboxtbott1'));
-        option = {
+        var option = {
             backgroundColor: 'rgba(1,202,217,.2)',
             grid: {
                 left: 60,
@@ -840,6 +637,177 @@
                 myChart.setOption(option)
             }
         });
+    }
+
+    <!--安卓端自动化饼图-->
+    function initBar3() {
+        var myChart = echarts.init(document.getElementById('purightboxtop'))
+        var option = {
+            color: ['#00f1fc', '#00b7ee', '#5578cf', '#5ebbeb', '#d16ad8', '#f8e19a', '#00b7ee', '#81dabe', '#5fc5ce'],
+            backgroundColor: 'rgba(1,202,217,.2)',
+            series: [
+                {
+                    name: '安卓饼图',
+                    type: 'pie',
+                    radius: '55%',
+                    center: ['50%', '55%', '30%'],
+                    data: [],
+                    itemStyle: {
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        };
+        $.ajax({
+            url: 'android_ui_results/',
+            type: 'get',
+            dataType: "JSON",
+            success: function (res) {
+                if (res.status) {
+                    option.series[0].data = res['android_data'];
+
+
+                }
+                myChart.setOption(option)
+            }
+        })
+    }
+
+    <!--ios自动化饼图-->
+    function initBar4() {
+        var myChart = echarts.init(document.getElementById('purightboxbott2'));
+        var option = {
+            color: ['#00f1fc', '#00b7ee', '#5578cf', '#5ebbeb', '#d16ad8', '#f8e19a', '#00b7ee', '#81dabe', '#5fc5ce'],
+            backgroundColor: 'rgba(1,202,217,.2)',
+            series: [
+                {
+                    name: '访问来源',
+                    type: 'pie',
+                    radius: '55%',
+                    center: ['50%', '55%', '30%'],
+                    data: [],
+                    itemStyle: {
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        };
+        $.ajax({
+            url: 'ios_ui_results/',
+            type: 'GET',
+            dataType: 'JSON',
+            success: function (res) {
+                if (res.status) {
+                    option.series[0].data = res['ios_data']
+                }
+                myChart.setOption(option)
+            }
+        })
+    }
+
+    // ui自动化用例数与通过率
+    function initBar5() {
+        var myChart = echarts.init(document.getElementById('purightboxmidd'))
+        var option = {
+            backgroundColor: 'rgba(1,202,217,.2)',
+
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['IOS', 'ANDROID'],
+                textStyle: {
+                    color: 'yellow',
+
+                }
+
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            // toolbox: {
+            //   feature: {
+            //     saveAsImage: {}
+            //   }
+            // },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                axisLabel: {
+                    show: true,
+                    color: '#ffffff',
+                    fontSize: 16
+                }
+            },
+            yAxis: {
+                type: 'value',
+                axisLabel: {
+                    show: true,
+                    color: '#ffffff',
+                    fontSize: 16
+                }
+            },
+            series: [
+                {
+                    name: 'IOS',
+                    type: 'line',
+                    stack: 'Total',
+                    data: [],
+                    lineStyle: {
+                        color: 'red',
+                        width: 2,
+                        type: 'solid'
+                    },
+                    // 修改数据点颜色
+                    itemStyle: {
+                        color: 'white'
+                    },
+
+                },
+                {
+                    name: 'ANDROID',
+                    type: 'line',
+                    stack: 'Total',
+                    data: [],
+                    lineStyle: {
+                        color: 'yellow', // 这里设置为红色
+                        width: 2,
+                        type: 'solid'
+                    },
+                    // 修改数据点颜色
+                    itemStyle: {
+                        color: 'white' // 数据点颜色设置为蓝色
+                    }
+
+                },
+            ]
+        };
+        $.ajax({
+            url:'ui_test_statistics/',
+            type:'GET',
+            dataType:'JSON',
+            success:function (res){
+                if (res.status){
+                    option.series[1].data=res['android_statistics'];
+                    console.log(option.series[1].data)
+                    option.series[0].data = res['ios_statistics']
+                    console.log(option.series[0].data)
+                }
+                 myChart.setOption(option);
+            }
+        })
     }
 </script>
 </body>

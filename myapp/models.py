@@ -232,6 +232,7 @@ class ui_result(models.Model):
     moment_fail = models.IntegerField(verbose_name='广场模块用例总数', null=False)
     sing_fail = models.IntegerField(verbose_name='唱歌页错误用例数', null=False)
     report_url = models.CharField(max_length=300, verbose_name='报告', null=False)
+    datatime = models.DateTimeField(auto_now_add=True, verbose_name='执行时间', null=True)
 
 
 # 资源变化表
@@ -241,5 +242,3 @@ class resource_record(models.Model):
     record_name = models.CharField(verbose_name='资源名称', max_length=300, null=True)
     record_png_url = models.CharField(verbose_name='资源头图', max_length=300, null=True)
     record_pag_url = models.CharField(verbose_name='资源视频地址', max_length=300, null=True)
-
-

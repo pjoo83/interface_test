@@ -138,7 +138,7 @@
 <div class="mr_right fl">
     <!--    安卓ui仪表盘-->
     <div class="purightboxtop"><h2 class="tith2 pt12">安卓-UI自动化结果分析</h2>
-        <div class="lefttoday_tit"><p class="fl"></p>
+        <div id = 'android_passing_rate' class="lefttoday_tit"><p class="fl"></p>
             <p class="fr">执行时间：2018-06-10 </p></div>
         <div id="purightboxtop" class="purightboxtopcont"></div>
     </div>
@@ -150,7 +150,7 @@
     </div>
     <!--    ios-ui仪表盘-->
     <div class="purightboxbott"><h2 class="tith2 pt12">IOS-UI自动化结果分析</h2>
-        <div class="lefttoday_tit"><p class="fl"></p>
+        <div id ='ios_passing_rate' class="lefttoday_tit"><p class="fl"></p>
             <p class="fr">执行时间：2018-06-10 </p></div>
 
         <div id="purightboxbott2" class="purightboxbottcont"></div>
@@ -291,74 +291,15 @@
 
 <script type="text/javascript">
     $(function () {
-        initBar();
         initBar1();
         initBar2();
         initBar3();
         initBar4();
         initBar5();
+        initBar6();
     })
 
-    // 初始化折线图
-    function initBar() {
-        var myChart = echarts.init(document.getElementById('m1'))
-        var option = {
-            backgroundColor: 'rgba(1,202,217,.2)',
-            tooltip: {
-                trigger: 'axis',
-                axisPointer: {
-                    type: 'shadow'
-                }
-            },
-            legend: {
-                textStyle: {
-                    color: 'yellow'
-                }
-            },
-            grid: {
-                left: '3%',
-                right: '4%',
-                bottom: '3%',
-                containLabel: true
-            },
-            xAxis: [
-                {
-                    type: 'category',
-                    data: [],
-                    axisLabel: {
-                        textStyle: {
-                            color: 'white',
-                            fontSize: 10,
-                        }
-                    }
-                }
 
-            ],
-            yAxis: [
-                {
-                    type: 'value',
-                    axisLabel: {
-                        textStyle: {
-                            color: 'white' // 这里设置字体颜色为蓝色
-                        }
-                    }
-                }
-            ],
-            series: []
-        };
-        $.ajax({
-            url: 'dashboard_translate_bar/',
-            type: "get",
-            dataType: "JSON",
-            success: function (res) {
-                if (res.status) {
-                    option.series = res.data.data_list;
-                    option.xAxis[0].data = res.data.date_list;
-                }
-                myChart.setOption(option);
-            }
-        })
-    }
 
     <!--   顶部变量显示-->
     android = document.getElementById('android_count')
@@ -402,6 +343,7 @@
             }
         }
     })
+
 
     // 多语言饼图
     function initBar1() {
@@ -641,6 +583,7 @@
 
     <!--安卓端自动化饼图-->
     function initBar3() {
+        var  android_passing_rate = document.getElementById('android_passing_rate')
         var myChart = echarts.init(document.getElementById('purightboxtop'))
         var option = {
             color: ['#00f1fc', '#00b7ee', '#5578cf', '#5ebbeb', '#d16ad8', '#f8e19a', '#00b7ee', '#81dabe', '#5fc5ce'],
@@ -669,7 +612,7 @@
             success: function (res) {
                 if (res.status) {
                     option.series[0].data = res['android_data'];
-
+                    android_passing_rate.textContent = res['android_passing_rate']
 
                 }
                 myChart.setOption(option)
@@ -678,7 +621,8 @@
     }
 
     <!--ios自动化饼图-->
-    function initBar4() {
+    function initBar4(){
+        var ios_passing_rate = document.getElementById('ios_passing_rate')
         var myChart = echarts.init(document.getElementById('purightboxbott2'));
         var option = {
             color: ['#00f1fc', '#00b7ee', '#5578cf', '#5ebbeb', '#d16ad8', '#f8e19a', '#00b7ee', '#81dabe', '#5fc5ce'],
@@ -707,6 +651,7 @@
             success: function (res) {
                 if (res.status) {
                     option.series[0].data = res['ios_data']
+                    ios_passing_rate.textContent = res['ios_passing_rate']
                 }
                 myChart.setOption(option)
             }
@@ -806,6 +751,67 @@
                     console.log(option.series[0].data)
                 }
                  myChart.setOption(option);
+            }
+        })
+    }
+
+    // 多语言表格
+    function initBar6() {
+        var myChart = echarts.init(document.getElementById('m1'))
+        var option = {
+            backgroundColor: 'rgba(1,202,217,.2)',
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                }
+            },
+            legend: {
+                textStyle: {
+                    color: 'yellow'
+                }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    data: [],
+                    axisLabel: {
+                        textStyle: {
+                            color: 'white',
+                            fontSize: 10,
+                        }
+                    }
+                }
+
+            ],
+            yAxis: [
+                {
+                    type: 'value',
+                    axisLabel: {
+                        textStyle: {
+                            color: 'white' // 这里设置字体颜色为蓝色
+                        }
+                    }
+                }
+            ],
+            series: []
+        };
+        $.ajax({
+            url: 'dashboard_translate_bar/',
+            type: "get",
+            dataType: "JSON",
+            success: function (res) {
+                if (res.status) {
+                    option.series = res.data.data_list;
+                    option.xAxis[0].data = res.data.date_list;
+                }
+                myChart.setOption(option);
             }
         })
     }

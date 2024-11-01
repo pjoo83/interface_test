@@ -111,16 +111,17 @@ def android_ui_results(request):
     if request.method == 'GET':
         ordered_queryset = ui_result.objects.filter(channel_id=1).order_by('-id')
         android_book = ordered_queryset.values_list('live_fail', 'room_fail', 'chat_fail', 'me_fail',
-                                                    'moment_fail', 'sing_fail')[:1][0]
+                                                    'moment_fail', 'sing_fail', 'passing_rate')[:1][0]
         android_data = [{"value": android_book[0], "name": f'直播错误：{android_book[0]}'},
                         {"value": android_book[1], "name": f'语音房错误：{android_book[1]}'},
                         {"value": android_book[2], "name": f'聊天错误：{android_book[2]}'},
                         {"value": android_book[3], "name": f'个人页错误：{android_book[3]}'},
                         {"value": android_book[4], "name": f'广场页错误：{android_book[4]}'},
                         {"value": android_book[5], "name": f'sing错误：{android_book[5]}'}]
-
+        android_passing_rate = f'安卓通过率：{android_book[6]}%'
         result = {'status': True,
-                  'android_data': android_data}
+                  'android_data': android_data,
+                  'android_passing_rate': android_passing_rate}
         return JsonResponse(result)
 
 
@@ -128,16 +129,18 @@ def ios_ui_results(request):
     if request.method == 'GET':
         ordered_queryset = ui_result.objects.filter(channel_id=2).order_by('-id')
         ios_book = ordered_queryset.values_list('live_fail', 'room_fail', 'chat_fail', 'me_fail',
-                                                'moment_fail', 'sing_fail')[:1][0]
+                                                'moment_fail', 'sing_fail', 'passing_rate')[:1][0]
         Ios_data = [{"value": ios_book[0], "name": f'直播错误：{ios_book[0]}'},
                     {"value": ios_book[1], "name": f'语音房错误：{ios_book[1]}'},
                     {"value": ios_book[2], "name": f'聊天错误：{ios_book[2]}'},
                     {"value": ios_book[3], "name": f'个人页错误：{ios_book[3]}'},
                     {"value": ios_book[4], "name": f'广场页错误：{ios_book[4]}'},
                     {"value": ios_book[5], "name": f'sing错误：{ios_book[5]}'}]
+        ios_passing_rate = f'IOS通过率：{ios_book[6]}%'
         result = {
             'status': True,
             'ios_data': Ios_data,
+            'ios_passing_rate': ios_passing_rate
         }
         return JsonResponse(result)
 
@@ -147,8 +150,7 @@ def ui_test_statistics(request):
         ordered_queryset = ui_result.objects.filter(channel_id=1).order_by('-id')
         android_statistics = ordered_queryset.values_list('total_case', flat=True)
         ordered_queryset = ui_result.objects.filter(channel_id=2).order_by('-id')
-        ios_statistics = ordered_queryset.values_list('total_case',flat=True)
-        print(list(ios_statistics))
+        ios_statistics = ordered_queryset.values_list('total_case', flat=True)
         result = {
             'status': True,
             'android_statistics': list(android_statistics),

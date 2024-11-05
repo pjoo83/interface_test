@@ -81,7 +81,6 @@ def start_send(function, datas):
     :return: 进行发送
     """
     cid = get_chat_id(function)
-    print(datas)
     for i in range(len(datas)):
         send_msg(function, cid, 1, datas[i][0],
                  f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][2]}',

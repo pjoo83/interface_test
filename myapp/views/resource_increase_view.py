@@ -27,21 +27,18 @@ def resource_mount_increase(request):
         'x-requested-with': 'XMLHttpRequest'
     }
     payload = "instance_name=cdb-sg-prod-starmaker-live-r2&db_name=fb_live&schema_name=&tb_name=horse&sql_content" \
-              "=select+*+from++horse+order+by+horse_id+desc%3B&limit_num=2"
+              "=select+*+from++horse+order+by+horse_id+desc%3B&limit_num=10"
     data = requests.post(url=url, data=payload, headers=headers)
     Mount_data = resource_check(3, 1)[0][2]
-
     new_data = data.json()['data']['rows'][0]
     if Mount_data == new_data[0]:
         print('数据相同，没有新增')
         return JsonResponse({"code": "200",
                              "msg": '数据相同，没有新增111'})
     else:
-        start_send(horse_count=new_data[0] - Mount_data,
-                   horse_id=new_data[0],
-                   horse_name=new_data[1],
-                   horse_png=f"https://static.starmakerstudios.com/production/statics/horse/{new_data[2]}",
-                   horse_pag=f"https://static.starmakerstudios.com/production/statics/horse/{new_data[12]}")
+        datas = data.json()['data']['rows']
+        datas_num = new_data[0] - Mount_data
+        start_send(function='horse', datas=datas[0:datas_num])
         pag_url = f'https://static.starmakerstudios.com/production/statics/horse/{new_data[12]}'
         png_url = f'https://static.starmakerstudios.com/production/statics/horse/{new_data[2]}'
         content = [new_data[0], new_data[1],

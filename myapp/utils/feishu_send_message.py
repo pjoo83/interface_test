@@ -82,7 +82,13 @@ def start_send(function, datas):
     """
     cid = get_chat_id(function)
     for i in range(len(datas)):
-        send_msg(function, cid, 1, datas[i][0],
-                 f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][2]}',
-                 f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][12]}',
-                 datas[i][1])
+        if datas[i][12]:
+            send_msg(function, cid, 1, datas[i][0],
+                     f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][2]}',
+                     f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][12]}',
+                     datas[i][1])
+        elif datas[i][31]:
+            send_msg(function, cid, 1, datas[i][0],
+                     f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][2]}',
+                     f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][31]}',
+                     datas[i][1])

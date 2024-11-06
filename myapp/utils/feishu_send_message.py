@@ -49,7 +49,7 @@ def send_msg(function,chat_id, horse_count, horse_id, horse_png, horse_pag, hors
         data = json.dumps({
             "receive_id": f"{chat_id}",
             "content": "{\"zh_cn\":"
-                       "{\"title\":\"注意注意注意！！！\",\"content\":"
+                       "{\"title\":\"注意注意注意,坐骑更新了！！！\",\"content\":"
                        "["
                        "[{\"tag\":\"text\",\"text\":\"新增条数:\"},"
                        "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_count}" + "\"}],"
@@ -76,7 +76,7 @@ def send_msg(function,chat_id, horse_count, horse_id, horse_png, horse_pag, hors
         data = json.dumps({
             "receive_id": f"{chat_id}",
             "content": "{\"zh_cn\":"
-                       "{\"title\":\"注意注意注意！！！\",\"content\":"
+                       "{\"title\":\"注意注意注意！！！头像框更新了！！！\",\"content\":"
                        "["
                        "[{\"tag\":\"text\",\"text\":\"新增条数:\"},"
                        "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_count}" + "\"}],"
@@ -115,8 +115,13 @@ def start_send(function, datas):
                          datas[i][1])
     elif function =='pendant':
         for i in range(len(datas)):
-            send_msg(function, cid, 1, datas[i][0],
-                     f'https://gift-resource.starmakerstudios.com/pendant/{datas[i][2]}',
-                     'wu',
-                     datas[i][1])
-
+            if datas[i][4]:
+                send_msg(function, cid, 1, datas[i][0],
+                         f'https://gift-resource.starmakerstudios.com/pendant/{datas[i][4]}',
+                         'wu',
+                         datas[i][1])
+            elif datas[i][2]:
+                send_msg(function, cid, 1, datas[i][0],
+                         f'https://gift-resource.starmakerstudios.com/pendant/{datas[i][2]}',
+                         'wu',
+                         datas[i][1])

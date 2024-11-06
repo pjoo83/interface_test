@@ -73,7 +73,27 @@ def send_msg(function,chat_id, horse_count, horse_id, horse_png, horse_pag, hors
         response = requests.post(url=send_url, headers=headers, data=data)
         # print(response.json())
     elif function =='pendant':
-        print('功能未开发完')
+        data = json.dumps({
+            "receive_id": f"{chat_id}",
+            "content": "{\"zh_cn\":"
+                       "{\"title\":\"注意注意注意！！！\",\"content\":"
+                       "["
+                       "[{\"tag\":\"text\",\"text\":\"新增条数:\"},"
+                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_count}" + "\"}],"
+                       "["
+                       "{\"tag\":\"text\",\"text\":\"最新资源id:\"},"
+                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_id}" + "\"}],"
+                       "["
+                       "{\"tag\":\"text\",\"text\":\"最新资源名:\"},"
+                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_name}" + "\"}],"
+                       "["
+                       "{\"tag\":\"text\",\"text\":\"新增资源图片:\"},"
+                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_png}" + "\"}],"
+                       "[{\"tag\":\"a\"," "\"href\":\"https://prod.ushow.media/internal/money/pendant/index\",\"text\":\"点击后台查看\"}],"
+                       "[{\"tag\":\"img\",\"image_key\":\"img_v3_02g6_fe03870a-7f01-4d30-9a0c-88b6e9e893cg\"}]]}}",
+                       "msg_type": "post"
+        })
+        response = requests.post(url=send_url, headers=headers, data=data)
 
 
 def start_send(function, datas):
@@ -81,14 +101,22 @@ def start_send(function, datas):
     :return: 进行发送
     """
     cid = get_chat_id(function)
-    for i in range(len(datas)):
-        if datas[i][12]:
+    if function == 'horse':
+        for i in range(len(datas)):
+            if datas[i][12]:
+                send_msg(function, cid, 1, datas[i][0],
+                         f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][2]}',
+                         f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][12]}',
+                         datas[i][1])
+            elif datas[i][31]:
+                send_msg(function, cid, 1, datas[i][0],
+                         f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][2]}',
+                         f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][31]}',
+                         datas[i][1])
+    elif function =='pendant':
+        for i in range(len(datas)):
             send_msg(function, cid, 1, datas[i][0],
-                     f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][2]}',
-                     f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][12]}',
+                     f'https://gift-resource.starmakerstudios.com/pendant/{datas[i][2]}',
+                     'wu',
                      datas[i][1])
-        elif datas[i][31]:
-            send_msg(function, cid, 1, datas[i][0],
-                     f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][2]}',
-                     f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][31]}',
-                     datas[i][1])
+

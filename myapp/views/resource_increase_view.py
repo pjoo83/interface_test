@@ -14,9 +14,9 @@ def resource_mount_increase(request):
     Mount_data = resource_check(3, 1)[0][2]
     new_data = data.json()['data']['rows'][0]
     if Mount_data == new_data[0]:
-        print('数据相同，没有新增')
-        return JsonResponse({"code": "200",
-                             "msg": '数据相同，没有新增111'})
+        print('坐骑数据相同，没有新增')
+        return JsonResponse({"code": 200,
+                             "msg": '数据相同，没有新增'})
     else:
         datas = data.json()['data']['rows']
         datas_num = new_data[0] - Mount_data
@@ -28,7 +28,7 @@ def resource_mount_increase(request):
                    png_url]
         execute_sql(sid=4, channel_id=1, content=content[0], name=content[1], record_pag_url=content[3],
                     record_png_url=content[2])
-        return JsonResponse({"code": "200",
+        return JsonResponse({"code": 200,
                              "msg": f'新增id：{content[0]},'
                                     f'新增资源名：{content[1]}'})
 

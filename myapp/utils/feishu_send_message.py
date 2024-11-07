@@ -7,7 +7,7 @@ from myapp.utils.data import sql_data
 fei = Feishu_data()
 
 
-def get_chat_id(function):
+def get_chat_id():
     """
     :return:获取机器人所在群id
     """
@@ -17,15 +17,15 @@ def get_chat_id(function):
     response = requests.get(url=chat_id_url, headers=headers)
     item_list = response.json()['data']['items']
     for i in item_list:
-        if i['name'] == '机器人测试啊' and function == 'horse':
+        if i['name'] == '机器人测试啊':
             print(i['chat_id'])
             return i['chat_id']
-        elif i['name'] == '机器人测试啊' and function == 'pendant':
-            print(i['chat_id'])
-            return i['chat_id']
-        elif i['name'] == '机器人测试啊' and function == 'debris':
-            print(i['chat_id'])
-            return i['chat_id']
+        # elif i['name'] == '机器人测试啊' and function == 'pendant':
+        #     print(i['chat_id'])
+        #     return i['chat_id']
+        # elif i['name'] == '机器人测试啊' and function == 'debris':
+        #     print(i['chat_id'])
+        #     return i['chat_id']
 
 
 def send_msg(function,chat_id, horse_count, horse_id, horse_png, horse_pag, horse_name):
@@ -71,7 +71,7 @@ def send_msg(function,chat_id, horse_count, horse_id, horse_png, horse_pag, hors
                        "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_pag}" + "\"}],"
                        "[{\"tag\":\"a\",\"href\":\"https://prod.ushow.media/internal/horse/index\",\"text\":\"点击后台查看\"},"
                        "{\"tag\":\"at\",\"user_id\":\"ou_aedb7a9856743c147d5e1d2bb27fe486\",\"user_name\":\"tom\"}],"
-                       "[{\"tag\":\"img\",\"image_key\":\"img_v3_02g6_fe03870a-7f01-4d30-9a0c-88b6e9e893cg\"}]]}}",
+                       "[{\"tag\":\"img\",\"image_key\":\"img_v3_02gd_9f1569d4-680e-46e8-8d4c-5b958dc0773g\"}]]}}",
             "msg_type": "post"
         })
         response = requests.post(url=send_url, headers=headers, data=data)
@@ -94,7 +94,7 @@ def send_msg(function,chat_id, horse_count, horse_id, horse_png, horse_pag, hors
                        "{\"tag\":\"text\",\"text\":\"新增资源图片:\"},"
                        "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_png}" + "\"}],"
                        "[{\"tag\":\"a\"," "\"href\":\"https://prod.ushow.media/internal/money/pendant/index\",\"text\":\"点击后台查看\"}],"
-                       "[{\"tag\":\"img\",\"image_key\":\"img_v3_02g6_fe03870a-7f01-4d30-9a0c-88b6e9e893cg\"}]]}}",
+                       "[{\"tag\":\"img\",\"image_key\":\"img_v3_02gd_8b46a8eb-d38d-4bda-8b3b-3a5f5047509g\"}]]}}",
                        "msg_type": "post"
         })
         response = requests.post(url=send_url, headers=headers, data=data)
@@ -119,7 +119,7 @@ def send_msg(function,chat_id, horse_count, horse_id, horse_png, horse_pag, hors
                        "{\"tag\":\"text\",\"text\":\"道具表校验结果:\"},"
                        "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_pag}" + "\"}],"
                        "[{\"tag\":\"a\"," "\"href\":\"https://prod.ushow.media/internal/money/pendant/index\",\"text\":\"点击后台查看\"}],"
-                       "[{\"tag\":\"img\",\"image_key\":\"img_v3_02g6_fe03870a-7f01-4d30-9a0c-88b6e9e893cg\"}]]}}",
+                       "[{\"tag\":\"img\",\"image_key\":\"img_v3_02gd_c7873905-0ae5-49e1-bff8-0a374819b3dg\"}]]}}",
             "msg_type": "post"
         })
         response = requests.post(url=send_url, headers=headers, data=data)
@@ -129,7 +129,7 @@ def start_send(function, datas):
     """
     :return: 进行发送
     """
-    cid = get_chat_id(function)
+    cid = get_chat_id()
     if function == 'horse':
         for i in range(len(datas)):
             if datas[i][12]:

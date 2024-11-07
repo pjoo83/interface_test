@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import login_view, register_view, index, intertools_view, business_view, dashboard_view, interface_view, \
-    uitest_view, resource_increase_view, pendant_increase_view
+    uitest_view, resource_increase_view, pendant_increase_view, debris_increase_view
 
 urlpatterns = [
     # 登录注册
@@ -47,7 +47,9 @@ urlpatterns = [
     # 坐骑资源添加
     path('resource_mount_increase/', resource_increase_view.resource_mount_increase, name='resource_mount_increase'),
     # 挂件资源添加检测
-    path('pendant_mount_increase/', pendant_increase_view.pendant_mount_increase,name ='pendant_mount_increase'),
+    path('pendant_mount_increase/', pendant_increase_view.pendant_mount_increase, name='pendant_mount_increase'),
+    # 碎片新增检测
+    path('debris_mount_increase/', debris_increase_view.debris_mount_increase, name='debris_mount_increase'),
     # 业务管理
     path("business/", business_view.business_list),
     path("business/del/", business_view.business_del),

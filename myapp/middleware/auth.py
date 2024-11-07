@@ -31,7 +31,7 @@ class LoginRequiredMiddleware:
         exclude_urls = ['/autotest/login/', '/autotest/register/',
                         '/autotest/dashboard/interface/insert_api/', '/autotest/dashboard/android/insert_api/',
                         '/autotest/dashboard/ios/insert_api/', '/autotest/resource_mount_increase/',
-                        '/autotest/pendant_mount_increase/']
+                        '/autotest/pendant_mount_increase/', '/autotest/debris_mount_increase/']
         if request.path_info in exclude_urls:
             # 如果请求的URL在排除列表中，则直接跳过验证
             response = self.get_response(request)

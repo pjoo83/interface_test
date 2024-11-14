@@ -66,6 +66,7 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
                        "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_name}" + "\"}],"
                        "["
                        "{\"tag\":\"text\",\"text\":\"新增资源图片:\"},"
+                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_png}" + "\"}],"  
                        "["
                        "{\"tag\":\"text\",\"text\":\"新增资源视频:\"},"
                        "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_pag}" + "\"}],"

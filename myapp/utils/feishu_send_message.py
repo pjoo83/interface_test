@@ -151,6 +151,9 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
                        "{\"tag\":\"text\",\"text\":\"实验关联需求  :\"},"                                                                       
                        "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_pag[2]}" + "\"}],"
                        "["
+                       "{\"tag\":\"text\",\"text\":\"实验版本控制:\"},"
+                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_pag[3]}" + "\"}],"
+                       "["
                        "{\"tag\":\"text\",\"text\":\"实验分组占比:\"},"
                        "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_pag[4]}" + "\"}],"
                        "[{\"tag\":\"a\"," "\"href\":\"https://ab.ushow.media/experiments\",\"text\":\"点击后台查看\"}],"
@@ -223,9 +226,10 @@ def start_send(function, datas):
                 test_group.append(f"实验分组：{test_date[z][8]}，放量占比：{test_date[z][9]}")
             if test_date[0][5] == 0:
                 test_date[0][5] = "实验中"
-                print("实验开始中")
             elif test_date[0][5] == 3:
                 test_date[0][5] = "实验未开始"
+            if "=" in test_date[0][7] and ">" not in test_date[0][7]:
+                test_date[0][7] =f"控制仅为当前版本{test_date[0][7]}，需注意！！！！！！！！"
             send_msg(function=function, chat_id=cid, horse_count=1,
                      horse_id=test_date[0][0],
                      horse_name=test_date[0][1],

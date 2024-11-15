@@ -8,7 +8,7 @@ import datetime
 fei = Feishu_data()
 
 
-def get_chat_id():
+def get_chat_id(function):
     """
     :return:获取机器人所在群id
     """
@@ -18,12 +18,12 @@ def get_chat_id():
     response = requests.get(url=chat_id_url, headers=headers)
     item_list = response.json()['data']['items']
     for i in item_list:
-        if i['name'] == '机器人测试啊':
+        if i['name'] == '机器人测试啊' and function != 'ab-test':
             print(i['chat_id'])
             return i['chat_id']
-        # elif i['name'] == '机器人测试啊' and function == 'pendant':
-        #     print(i['chat_id'])
-        #     return i['chat_id']
+        elif i['name'] == '机器人测试啊' and function == 'ab-test':
+            print(i['chat_id'])
+            return i['chat_id']
         # elif i['name'] == '机器人测试啊' and function == 'debris':
         #     print(i['chat_id'])
         #     return i['chat_id']
@@ -162,11 +162,12 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
         })
         response = requests.post(url=send_url, headers=headers, data=data)
 
+
 def start_send(function, datas):
     """
     :return: 进行发送
     """
-    cid = get_chat_id()
+    cid = get_chat_id(function)
     if function == 'horse':
         for i in range(len(datas)):
             if datas[i][12]:

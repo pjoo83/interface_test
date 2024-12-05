@@ -28,7 +28,7 @@ def dashboard_translate_bar(request):
             'emphasis': {
                 'focus': 'series'
             },
-            'data': android_new_list[::-1]
+            'data': android_new_list[-6:][::-1]
         }, {
             'name': 'android修改',
             'type': 'bar',
@@ -36,7 +36,7 @@ def dashboard_translate_bar(request):
             'emphasis': {
                 'focus': 'series'
             },
-            'data': android_modify_list[::-1]
+            'data': android_modify_list[-6:][::-1]
         },
         {
             'name': 'ios新增',
@@ -45,7 +45,7 @@ def dashboard_translate_bar(request):
             'emphasis': {
                 'focus': 'series'
             },
-            'data': ios_new_list[::-1]
+            'data': ios_new_list[-6:][::-1]
         },
         {
             'name': 'ios修改',
@@ -54,7 +54,7 @@ def dashboard_translate_bar(request):
             'emphasis': {
                 'focus': 'series'
             },
-            'data': ios_modify_list[::-1]
+            'data': ios_modify_list[-6:][::-1]
         },
         {
             'name': 'server新增',
@@ -63,7 +63,7 @@ def dashboard_translate_bar(request):
             'emphasis': {
                 'focus': 'series'
             },
-            'data': server_new_list[::-1]
+            'data': server_new_list[-6:][::-1]
         },
         {
             'name': 'flutter新增',
@@ -72,7 +72,7 @@ def dashboard_translate_bar(request):
             'emphasis': {
                 'focus': 'series'
             },
-            'data': flutter_new_list[::-1]
+            'data': flutter_new_list[-6:][::-1]
         },
     ]
     date_list = []

@@ -5,12 +5,12 @@ def execute_sql(sid=None, channel_id=None, content=None, name=None, record_pag_u
     db = pymysql.connect(
         host='127.0.0.1',
         user='root',
-        password='123456',
+        password='zxcv1234',
         database='localhost_interface'
     )
     if sid in (1, 2, 3):
         if sid == 1:
-            filter_execute_statistics = f"select {content} from  translate_statistics where channel_id ={channel_id} order by time desc limit 6;"
+            filter_execute_statistics = f"select {content} from  translate_statistics where channel_id ={channel_id} order by time desc;"
             cursor = db.cursor()
             try:
                 cursor.execute(filter_execute_statistics)

@@ -20,6 +20,7 @@ def dashboard_translate_bar(request):
     package_execute(server_new_list, 1, 3, 'newly_quantity')
     flutter_new_list = []
     package_execute(flutter_new_list, 1, 5, 'newly_quantity')
+    print(ios_new_list)
     series = [
         {
             'name': 'android新增',
@@ -28,7 +29,7 @@ def dashboard_translate_bar(request):
             'emphasis': {
                 'focus': 'series'
             },
-            'data': android_new_list[-6:][::-1]
+            'data': android_new_list[:6]
         }, {
             'name': 'android修改',
             'type': 'bar',
@@ -36,7 +37,7 @@ def dashboard_translate_bar(request):
             'emphasis': {
                 'focus': 'series'
             },
-            'data': android_modify_list[-6:][::-1]
+            'data': android_modify_list[:6]
         },
         {
             'name': 'ios新增',
@@ -45,7 +46,7 @@ def dashboard_translate_bar(request):
             'emphasis': {
                 'focus': 'series'
             },
-            'data': ios_new_list[-6:][::-1]
+            'data': ios_new_list[:6]
         },
         {
             'name': 'ios修改',
@@ -54,7 +55,7 @@ def dashboard_translate_bar(request):
             'emphasis': {
                 'focus': 'series'
             },
-            'data': ios_modify_list[-6:][::-1]
+            'data': ios_modify_list[:6]
         },
         {
             'name': 'server新增',
@@ -63,7 +64,7 @@ def dashboard_translate_bar(request):
             'emphasis': {
                 'focus': 'series'
             },
-            'data': server_new_list[-6:][::-1]
+            'data': server_new_list[:6]
         },
         {
             'name': 'flutter新增',
@@ -72,7 +73,7 @@ def dashboard_translate_bar(request):
             'emphasis': {
                 'focus': 'series'
             },
-            'data': flutter_new_list[-6:][::-1]
+            'data': flutter_new_list[:6]
         },
     ]
     date_list = []
@@ -117,7 +118,7 @@ def dashboard_executions_translate_total(request):
     :param request:
     :return: 返回脚本执行次数
     """
-    total = len(execute_sql(1, 2, 'quantity'))
+    total = len(execute_sql(1, 2, 'newly_quantity'))
     data = {
         "status": True,
         'data': total

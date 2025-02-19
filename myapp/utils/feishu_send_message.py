@@ -4,6 +4,7 @@ from myapp.utils.feishu_data import Feishu_data
 import json
 from myapp.utils.data import sql_data
 import datetime
+from myapp.utils.feishu_picture_upload import download_img
 
 fei = Feishu_data()
 
@@ -17,6 +18,7 @@ def get_chat_id(function):
     headers = fei.content_type1
     response = requests.get(url=chat_id_url, headers=headers)
     item_list = response.json()['data']['items']
+    print(item_list)
     for i in item_list:
         if i['name'] == '机器人测试啊' and function != 'ab-test':
             print(i['chat_id'])
@@ -27,6 +29,38 @@ def get_chat_id(function):
         # elif i['name'] == '机器人测试啊' and function == 'debris':
         #     print(i['chat_id'])
         #     return i['chat_id']
+
+
+def atest_send(chat_id):
+    image_key = download_img(
+        'https://static.starmakerstudios.com/production/statics/horse/horse_client_side_pag_source_20250214105432.pag')
+    content = {
+        "zh_cn": {
+            "title": f"注意注意注意,坐骑更新了！！！",
+            "content": [
+                [
+                    {
+                        "tag": "text",
+                        "text": "下面是图片:",
+                        "style": ["bold", "underline"]
+                    },
+                ],
+                [{"tag": "img", "image_key": image_key}],
+            ]
+        },
+    }
+
+    data = {
+        "receive_id": chat_id,
+        "msg_type": "post",
+        "content": json.dumps(content)  # ✅ 这里必须转换成字符串
+    }
+    fei.content_type1['Authorization'] = "Bearer " + f"{get_tenant_access_token()}"
+    headers = fei.content_type1
+    url = "https://open.feishu.cn/open-apis/im/v1/messages?receive_id_type=chat_id"
+    response = requests.post(url, headers=headers, json=data)
+
+    print(response.json())  # 确保返回成功
 
 
 def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, horse_name):
@@ -43,124 +77,210 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
     send_url = fei.send_msg_url
     fei.content_type1['Authorization'] = "Bearer " + f"{get_tenant_access_token()}"
     headers = fei.content_type1
-    # data = json.dumps({
-    #     "receive_id": f"{chat_id}",
-    #     "msg_type": "text",
-    #     # "content": "{\"text\":" + "\" " + f"{translate_url}" + "\"}",
-    #     "content": "{\"text\":\"<at user_id=\\\"ou_aedb7a9856743c147d5e1d2bb27fe486\\\">Tom</at> text  content\"}",
-    #
-    # })
     if function == 'horse':
-        data = json.dumps({
-            "receive_id": f"{chat_id}",
-            "content": "{\"zh_cn\":"
-                       "{\"title\":\"注意注意注意,坐骑更新了！！！\",\"content\":"
-                       "["
-                       "[{\"tag\":\"text\",\"text\":\"新增条数:\"},"
-                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_count}" + "\"}],"
-                       "["
-                       "{\"tag\":\"text\",\"text\":\"最新资源id:\"},"
-                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_id}" + "\"}],"
-                       "["
-                       "{\"tag\":\"text\",\"text\":\"最新资源名:\"},"
-                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_name}" + "\"}],"
-                       "["
-                       "{\"tag\":\"text\",\"text\":\"新增资源图片:\"},"
-                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_png}" + "\"}],"  
-                       "["
-                       "{\"tag\":\"text\",\"text\":\"新增资源视频:\"},"
-                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_pag}" + "\"}],"
-                       "[{\"tag\":\"a\",\"href\":\"https://prod.ushow.media/internal/horse/index\","
-                       "\"text\":\"点击后台查看\"},"
-                       "{\"tag\":\"at\",\"user_id\":\"ou_aedb7a9856743c147d5e1d2bb27fe486\",\"user_name\":\"tom\"}],"
-                       "[{\"tag\":\"img\",\"image_key\":\"img_v3_02gd_9f1569d4-680e-46e8-8d4c-5b958dc0773g\"}]]}}",
-            "msg_type": "post"
-        })
-        response = requests.post(url=send_url, headers=headers, data=data)
+        content = {
+            "zh_cn": {
+                "title": f"注意注意注意！！！坐骑更新了！！！",
+                "content": [
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"资源名称 : {horse_name}",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"资源id : {horse_id}",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"资源链接 : {horse_png}",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"资源链接 : {horse_pag}",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"资源详情 : ",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [{"tag": "img", "image_key": f'{download_img(horse_png)}'}],
+                ]
+            },
+        }
+
+        data = {
+            "receive_id": chat_id,
+            "msg_type": "post",
+            "content": json.dumps(content)  # ✅ 这里必须转换成字符串
+        }
+        response = requests.post(url=send_url, headers=headers, json=data)
         # print(response.json())
     elif function == 'pendant':
-        data = json.dumps({
-            "receive_id": f"{chat_id}",
-            "content": "{\"zh_cn\":"
-                       "{\"title\":\"注意注意注意！！！头像框更新了！！！\",\"content\":"
-                       "["
-                       "[{\"tag\":\"text\",\"text\":\"新增条数:\"},"
-                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_count}" + "\"}],"
-                       "["
-                       "{\"tag\":\"text\",\"text\":\"最新资源id:\"},"
-                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_id}" + "\"}],"
-                       "["
-                       "{\"tag\":\"text\",\"text\":\"最新资源名:\"},"
-                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_name}" + "\"}],"
-                       "["
-                       "{\"tag\":\"text\",\"text\":\"新增资源图片:\"},"
-                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_png}" + "\"}],"
-                       "[{\"tag\":\"a\"," "\"href\":\"https://prod.ushow.media/internal/money/pendant/index\",\"text\":\"点击后台查看\"}],"
-                       "[{\"tag\":\"img\",\"image_key\":\"img_v3_02gd_8b46a8eb-d38d-4bda-8b3b-3a5f5047509g\"}]]}}",
-            "msg_type": "post"
-        })
-        response = requests.post(url=send_url, headers=headers, data=data)
+        content = {
+            "zh_cn": {
+                "title": f"注意注意注意！！！头像框更新了！！！",
+                "content": [
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"资源名称 : {horse_name}",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"资源id : {horse_id}",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"资源图片 : {horse_png}",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"资源详情 : ",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [{"tag": "img", "image_key": f'{download_img(horse_png)}'}],
+                ]
+            },
+        }
+
+        data = {
+            "receive_id": chat_id,
+            "msg_type": "post",
+            "content": json.dumps(content)  # ✅ 这里必须转换成字符串
+        }
+        response = requests.post(url=send_url, headers=headers, json=data)
     elif function == 'debris':
-        data = json.dumps({
-            "receive_id": f"{chat_id}",
-            "content": "{\"zh_cn\":"
-                       "{\"title\":\"注意注意注意！！！有新的碎片更新了！！！\",\"content\":"
-                       "["
-                       "[{\"tag\":\"text\",\"text\":\"新增条数:\"},"
-                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_count}" + "\"}],"
-                       "["
-                       "{\"tag\":\"text\",\"text\":\"最新资源id:\"},"
-                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_id}" + "\"}],"
-                       "["
-                       "{\"tag\":\"text\",\"text\":\"最新资源名:\"},"
-                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_name}" + "\"}],"
-                       "["
-                       "{\"tag\":\"text\",\"text\":\"新增资源图片:\"},"
-                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_png}" + "\"}],"
-                       "["
-                       "{\"tag\":\"text\",\"text\":\"道具表校验结果:\"},"
-                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_pag}" + "\"}],"
-                       "[{\"tag\":\"a\"," "\"href\":\"https://prod.ushow.media/internal/money/pendant/index\",\"text\":\"点击后台查看\"}],"
-                       "[{\"tag\":\"img\",\"image_key\":\"img_v3_02gd_c7873905-0ae5-49e1-bff8-0a374819b3dg\"}]]}}",
-            "msg_type": "post"
-        })
-        response = requests.post(url=send_url, headers=headers, data=data)
+        content = {
+            "zh_cn": {
+                "title": f"注意注意注意！！！有新的碎片更新了！！！",
+                "content": [
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"资源名称 : {horse_name}",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"资源id : {horse_id}",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"资源图片 : {horse_png}",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"资源详情 : ",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [{"tag": "img", "image_key": f'{download_img(horse_png)}'}],
+                ]
+            },
+        }
+
+        data = {
+            "receive_id": chat_id,
+            "msg_type": "post",
+            "content": json.dumps(content)  # ✅ 这里必须转换成字符串
+        }
+        response = requests.post(url=send_url, headers=headers, json=data)
     elif function == 'ab-test':
-        data = json.dumps({
-            "receive_id": f"{chat_id}",
-            "content": "{\"zh_cn\":"
-                       "{\"title\":\"注意注意注意！！！有新ab实验！！！\",\"content\":"
-                       "["
-                       "[{\"tag\":\"text\",\"text\":\"新增实验条数:\"},"
-                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_count}" + "\"}],"
-                       "["
-                       "{\"tag\":\"text\",\"text\":\"实验id: \"},"
-                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_id}    " + "\"},"
-                       "{\"tag\":\"text\",\"text\":\"实验名称: \"},"
-                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_name}   " + "\"}," 
-                       "{\"tag\":\"text\",\"text\":\"实验作者:  \"},"
-                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_pag[0]}" + "\"}],"                                                                                  
-                       "["
-                       "{\"tag\":\"text\",\"text\":\"实验时间:\"},"
-                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_png[0]}" + "\"},"
-                       "{\"tag\":\"text\",\"text\":\"至\"},"
-                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_png[1]}" + "\"}],"
-                       "["
-                       "{\"tag\":\"text\",\"text\":\"实验状态  :\"},"
-                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_pag[1]}  " + "\"},"
-                       "{\"tag\":\"text\",\"text\":\"实验关联需求  :\"},"                                                                       
-                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_pag[2]}" + "\"}],"
-                       "["
-                       "{\"tag\":\"text\",\"text\":\"实验版本控制:\"},"
-                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_pag[3]}" + "\"}],"
-                       "["
-                       "{\"tag\":\"text\",\"text\":\"实验分组占比:\"},"
-                       "{\"tag\":\"text\",\"text\":" + "\" " + f"{horse_pag[4]}" + "\"}],"
-                       "[{\"tag\":\"a\"," "\"href\":\"https://ab.ushow.media/experiments\",\"text\":\"点击后台查看\"}],"
-                       "[{\"tag\":\"img\",\"image_key\":\"img_v3_02gk_af511a4a-e825-48f4-83d0-29be1e56ea2g\"}]]}}",
-            "msg_type": "post"
-        })
-        response = requests.post(url=send_url, headers=headers, data=data)
+        content = {
+            "zh_cn": {
+                "title": f"注意注意注意！！！有新ab实验！！！",
+                "content": [
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"实验名称 : {horse_name}",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"实验id : {horse_id},  实验作者 : {horse_pag[0]}",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"实验时间 : {horse_png[0]} 至 {horse_png[1]}",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"实验状态 : {horse_pag[1]}",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"实验关联需求 : {horse_pag[2]}",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"实验版本控制 : {horse_pag[3]} ",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"实验分组占比 : {horse_pag[4]} ",
+                            # "style": ["bold", "underline"]
+                        },
+                    ],
+                    [{"tag": "img", "image_key": 'img_v3_02gk_af511a4a-e825-48f4-83d0-29be1e56ea2g'}],
+                ]
+            },
+        }
+        data = {
+            "receive_id": chat_id,
+            "msg_type": "post",
+            "content": json.dumps(content)  # ✅ 这里必须转换成字符串
+        }
+        response = requests.post(url=send_url, headers=headers, json=data)
 
 
 def start_send(function, datas):
@@ -230,7 +350,7 @@ def start_send(function, datas):
             elif test_date[0][5] == 3:
                 test_date[0][5] = "实验未开始"
             if "=" in test_date[0][7] and ">" not in test_date[0][7]:
-                test_date[0][7] =f"控制仅为当前版本{test_date[0][7]}，需注意！！！！！！！！"
+                test_date[0][7] = f"控制仅为当前版本{test_date[0][7]}，需注意！！！！！！！！"
             send_msg(function=function, chat_id=cid, horse_count=1,
                      horse_id=test_date[0][0],
                      horse_name=test_date[0][1],

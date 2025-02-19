@@ -18,7 +18,6 @@ def get_chat_id(function):
     headers = fei.content_type1
     response = requests.get(url=chat_id_url, headers=headers)
     item_list = response.json()['data']['items']
-    print(item_list)
     for i in item_list:
         if i['name'] == '机器人测试啊' and function != 'ab-test':
             print(i['chat_id'])

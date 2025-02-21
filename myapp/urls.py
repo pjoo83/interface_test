@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import login_view, register_view, index, intertools_view, business_view, dashboard_view, interface_view, \
-    uitest_view, resource_increase_view, pendant_increase_view, debris_increase_view, ab_experiment_view
+    uitest_view, resource_increase_view, pendant_increase_view, debris_increase_view, ab_experiment_view,bubble_increase_view
 
 urlpatterns = [
     # 登录注册
@@ -52,6 +52,8 @@ urlpatterns = [
     path('debris_mount_increase/', debris_increase_view.debris_mount_increase, name='debris_mount_increase'),
     # ab实验检测
     path('ab_experiment_increase/', ab_experiment_view.ab_experiment_increase, name='ab_experiment_increase'),
+    # 特权增加
+    path('bubble_mount_increase/',bubble_increase_view.bubble_mount_increase, name = 'bubble_mount_increase'),
     # 业务管理
     path("business/", business_view.business_list),
     path("business/del/", business_view.business_del),

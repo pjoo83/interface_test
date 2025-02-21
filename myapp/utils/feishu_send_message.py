@@ -281,6 +281,50 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
         }
         response = requests.post(url=send_url, headers=headers, json=data)
 
+    elif function == 'bubble':
+        content = {
+            "zh_cn": {
+                "title": f"注意注意注意！！！有新的特权资源片更新了！！！",
+                "content": [
+                    [
+                        {
+                            "tag": "text",
+                            "text": f'{horse_name}',
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"资源id : {horse_id}",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"资源图片 : {horse_png}",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"资源详情 :{horse_pag} ",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [{"tag": "img", "image_key": f'{download_img(horse_png)}'}],
+                ]
+            },
+        }
+
+        data = {
+            "receive_id": chat_id,
+            "msg_type": "post",
+            "content": json.dumps(content)  # ✅ 这里必须转换成字符串
+        }
+        response = requests.post(url=send_url, headers=headers, json=data)
 
 def start_send(function, datas):
     """
@@ -357,6 +401,30 @@ def start_send(function, datas):
                      horse_pag=(test_date[0][4], test_date[0][5],
                                 test_date[0][6], test_date[0][7], test_group)
                      )
+
+    elif function == 'bubble':
+        for i in range(len(datas)):
+            if datas[i][2] == 3:
+                datas[i][1]=f'类型：专属勋章       名称：{datas[i][1]}'
+            elif datas[i][2] == 5:
+                datas[i][1] = f'类型：个人卡片     名称：{datas[i][1]}'
+            elif datas[i][2] == 7:
+                datas[i][1] = f'类型：弹幕特效     名称：{datas[i][1]}'
+            elif datas[i][2] == 6:
+                datas[i][1] = f'类型：发言气泡      名称：{datas[i][1]}'
+            print(datas[i][1])
+            if 'png' in datas[i][4]:
+                send_msg(function, cid, 1, datas[i][0],
+                         f'https://gift-resource.starmakerstudios.com/privilege/{datas[i][4]}',
+                         'wu',
+                         datas[i][1])
+                print(datas[i][1])
+
+            elif 'zip' in datas[i][4]:
+                send_msg(function, cid, 1, datas[i][0],
+                         f'https://gift-resource.starmakerstudios.com/privilege/{datas[i][11]}',
+                         f'https://gift-resource.starmakerstudios.com/privilege/{datas[i][4]}',
+                         datas[i][1])
 
 
 def stamp_to_time(time):

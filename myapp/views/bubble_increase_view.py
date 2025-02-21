@@ -24,8 +24,8 @@ def bubble_mount_increase(request):
         datas_num = new_data[0] - Mount_data
         start_send(function='bubble', datas=datas[0:datas_num])
         content = [new_data[0], new_data[1], pag_url]
-        # execute_sql(sid=4, channel_id=5, content=content[0], name=content[1], record_pag_url=new_data[7],
-        #             record_png_url=content[2])
+        execute_sql(sid=4, channel_id=5, content=content[0], name=content[1], record_pag_url=new_data[7],
+                    record_png_url=content[2])
         return JsonResponse({
             'code': 200,
             'msg': '有更新，有更新'

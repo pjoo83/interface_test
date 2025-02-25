@@ -258,6 +258,13 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
                     [
                         {
                             "tag": "text",
+                            "text": f"图片检查结果 : {check_image('image.png')}",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
                             "text": f"道具表检测结果 : {horse_pag}",
                             "style": ["bold", "underline"]
                         },

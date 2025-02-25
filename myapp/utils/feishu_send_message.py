@@ -150,7 +150,7 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
                     [
                         {
                             "tag": "text",
-                            "text": f"资源图片 : {horse_png}",
+                            "text": f"资源链接 : {horse_png}",
                             "style": ["bold", "underline"]
                         },
                     ],
@@ -194,7 +194,14 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
                     [
                         {
                             "tag": "text",
-                            "text": f"资源图片 : {horse_png}",
+                            "text": f"资源链接 : {horse_png}",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"道具表检测结果 : {horse_pag}",
                             "style": ["bold", "underline"]
                         },
                     ],
@@ -303,14 +310,14 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
                     [
                         {
                             "tag": "text",
-                            "text": f"资源图片 : {horse_png}",
+                            "text": f"资源链接 : {horse_png}",
                             "style": ["bold", "underline"]
                         },
                     ],
                     [
                         {
                             "tag": "text",
-                            "text": f"资源详情 :{horse_pag} ",
+                            "text": f"资源链接 :{horse_pag} ",
                             "style": ["bold", "underline"]
                         },
                     ],
@@ -325,6 +332,7 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
             "content": json.dumps(content)  # ✅ 这里必须转换成字符串
         }
         response = requests.post(url=send_url, headers=headers, json=data)
+
 
 def start_send(function, datas):
     """
@@ -405,7 +413,7 @@ def start_send(function, datas):
     elif function == 'bubble':
         for i in range(len(datas)):
             if datas[i][2] == 3:
-                datas[i][1]=f'类型：专属勋章       名称：{datas[i][1]}'
+                datas[i][1] = f'类型：专属勋章       名称：{datas[i][1]}'
             elif datas[i][2] == 5:
                 datas[i][1] = f'类型：个人卡片     名称：{datas[i][1]}'
             elif datas[i][2] == 7:

@@ -5,7 +5,7 @@ import json
 from myapp.utils.data import sql_data
 import datetime
 from myapp.utils.feishu_picture_upload import download_img
-
+from myapp.utils.feishu_picture_upload import check_webp,check_image
 fei = Feishu_data()
 
 
@@ -129,49 +129,106 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
         response = requests.post(url=send_url, headers=headers, json=data)
         # print(response.json())
     elif function == 'pendant':
-        content = {
-            "zh_cn": {
-                "title": f"注意注意注意！！！头像框更新了！！！",
-                "content": [
-                    [
-                        {
-                            "tag": "text",
-                            "text": f"资源名称 : {horse_name}",
-                            "style": ["bold", "underline"]
-                        },
-                    ],
-                    [
-                        {
-                            "tag": "text",
-                            "text": f"资源id : {horse_id}",
-                            "style": ["bold", "underline"]
-                        },
-                    ],
-                    [
-                        {
-                            "tag": "text",
-                            "text": f"资源链接 : {horse_png}",
-                            "style": ["bold", "underline"]
-                        },
-                    ],
-                    [
-                        {
-                            "tag": "text",
-                            "text": f"资源详情 : ",
-                            "style": ["bold", "underline"]
-                        },
-                    ],
-                    [{"tag": "img", "image_key": f'{download_img(horse_png)}'}],
-                ]
-            },
-        }
-
-        data = {
-            "receive_id": chat_id,
-            "msg_type": "post",
-            "content": json.dumps(content)  # ✅ 这里必须转换成字符串
-        }
-        response = requests.post(url=send_url, headers=headers, json=data)
+        if 'png' in horse_png:
+            content = {
+                "zh_cn": {
+                    "title": f"注意注意注意！！！头像框更新了！！！",
+                    "content": [
+                        [
+                            {
+                                "tag": "text",
+                                "text": f"资源名称 : {horse_name}",
+                                "style": ["bold", "underline"]
+                            },
+                        ],
+                        [
+                            {
+                                "tag": "text",
+                                "text": f"资源id : {horse_id}",
+                                "style": ["bold", "underline"]
+                            },
+                        ],
+                        [
+                            {
+                                "tag": "text",
+                                "text": f"资源链接 : {horse_png}",
+                                "style": ["bold", "underline"]
+                            },
+                        ],
+                        [
+                            {
+                                "tag": "text",
+                                "text": f"文件检查结果 : {check_image('image.png')}",
+                                "style": ["bold", "underline"]
+                            },
+                        ],
+                        [
+                            {
+                                "tag": "text",
+                                "text": f"资源详情 : ",
+                                "style": ["bold", "underline"]
+                            },
+                        ],
+                        [{"tag": "img", "image_key": f'{download_img(horse_png)}'}],
+                    ]
+                },
+            }
+            data = {
+                "receive_id": chat_id,
+                "msg_type": "post",
+                "content": json.dumps(content)  # ✅ 这里必须转换成字符串
+            }
+            response = requests.post(url=send_url, headers=headers, json=data)
+        elif 'webp' in horse_png:
+            content = {
+                "zh_cn": {
+                    "title": f"注意注意注意！！！头像框更新了！！！",
+                    "content": [
+                        [
+                            {
+                                "tag": "text",
+                                "text": f"资源名称 : {horse_name}",
+                                "style": ["bold", "underline"]
+                            },
+                        ],
+                        [
+                            {
+                                "tag": "text",
+                                "text": f"资源id : {horse_id}",
+                                "style": ["bold", "underline"]
+                            },
+                        ],
+                        [
+                            {
+                                "tag": "text",
+                                "text": f"资源链接 : {horse_png}",
+                                "style": ["bold", "underline"]
+                            },
+                        ],
+                        [
+                            {
+                                "tag": "text",
+                                "text": f"文件检查结果 : {check_webp('image.webp')}",
+                                "style": ["bold", "underline"]
+                            },
+                        ],
+                        [
+                            {
+                                "tag": "text",
+                                "text": f"资源详情 : ",
+                                "style": ["bold", "underline"]
+                            },
+                        ],
+                        [{"tag": "img", "image_key": f'{download_img(horse_png)}'}],
+                    ]
+                },
+            }
+            data = {
+                "receive_id": chat_id,
+                "msg_type": "post",
+                "content": json.dumps(content)  # ✅ 这里必须转换成字符串
+            }
+            response = requests.post(url=send_url, headers=headers, json=data)
     elif function == 'debris':
         content = {
             "zh_cn": {
@@ -291,7 +348,7 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
     elif function == 'bubble':
         content = {
             "zh_cn": {
-                "title": f"注意注意注意！！！有新的特权资源片更新了！！！",
+                "title": f"注意注意注意！！！有新的特权资源更新了！！！",
                 "content": [
                     [
                         {
@@ -318,6 +375,13 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
                         {
                             "tag": "text",
                             "text": f"资源链接 :{horse_pag} ",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"文件检查结果 :{check_image('image.png')} ",
                             "style": ["bold", "underline"]
                         },
                     ],

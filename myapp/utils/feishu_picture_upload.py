@@ -3,7 +3,7 @@ from myapp.utils.feishu_get_token import get_tenant_access_token
 from myapp.utils.feishu_data import Feishu_data
 import requests
 from requests_toolbelt import MultipartEncoder
-from PIL import Image
+from PIL import Image, ImageSequence
 
 fei = Feishu_data()
 
@@ -102,6 +102,36 @@ def uploadImage(img):
     return upload_response.json()['data']['image_key']
 
 
+def check_png_transparency(file_path):
+    """
+    :param file_path:
+    :return: png头像框透明度检测
+    """
+    try:
+        with Image.open(file_path) as img:
+            if img.mode in ("RGBA", "LA") or (img.mode == "P" and "transparency" in img.info):
+                return True, "PNG 包含透明通道"
+            else:
+                return False, "PNG 不含透明通道"
+    except Exception as e:
+        return False, f"无法检测透明度: {e}"
+
+
+def check_webp_animation_alpha(file_path):
+    """
+    :param file_path:
+    :return: web头像框是否包含透明度检测
+    """
+    try:
+        with Image.open(file_path) as img:
+            for i, frame in enumerate(ImageSequence.Iterator(img)):
+                if frame.mode in ("RGBA", "LA"):
+                    return True, f"WebP 动图第 {i + 1} 帧包含透明通道"
+        return False, "WebP 动图无透明通道"
+    except Exception as e:
+        return False, f"无法检测透明度: {e}"
+
+
 def check_image(img):
     """
     :param img: 文件地址
@@ -123,7 +153,9 @@ def check_webp(img):
     load = check_png_fully_load(img)
     return pillow, header, load
 
+
 if __name__ == '__main__':
     # download_img("https://gift-resource.starmakerstudios.com/pendant/pendant_webp_file_20250218083245.webp")
     print(check_image('image.png'))
     print(check_webp("image.webp"))
+    print(check_webp_animation_alpha('image.webp'))

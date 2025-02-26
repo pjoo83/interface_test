@@ -5,7 +5,9 @@ import json
 from myapp.utils.data import sql_data
 import datetime
 from myapp.utils.feishu_picture_upload import download_img
-from myapp.utils.feishu_picture_upload import check_webp,check_image,check_png_transparency,check_webp_animation_alpha
+from myapp.utils.feishu_picture_upload import check_webp, check_image, check_png_transparency, \
+    check_webp_animation_alpha
+
 fei = Feishu_data()
 
 
@@ -105,7 +107,14 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
                     [
                         {
                             "tag": "text",
-                            "text": f"资源链接 : {horse_pag}",
+                            "text": f"资源链接 : {horse_pag[0]}",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"操作人 : {horse_pag[1]}",
                             "style": ["bold", "underline"]
                         },
                     ],
@@ -145,6 +154,13 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
                             {
                                 "tag": "text",
                                 "text": f"资源id : {horse_id}",
+                                "style": ["bold", "underline"]
+                            },
+                        ],
+                        [
+                            {
+                                "tag": "text",
+                                "text": f"操作人 : {horse_pag}",
                                 "style": ["bold", "underline"]
                             },
                         ],
@@ -202,6 +218,13 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
                             {
                                 "tag": "text",
                                 "text": f"资源id : {horse_id}",
+                                "style": ["bold", "underline"]
+                            },
+                        ],
+                        [
+                            {
+                                "tag": "text",
+                                "text": f"操作人 : {horse_pag}",
                                 "style": ["bold", "underline"]
                             },
                         ],
@@ -426,27 +449,29 @@ def start_send(function, datas):
     cid = get_chat_id(function)
     if function == 'horse':
         for i in range(len(datas)):
+            print(datas[i][24])
             if datas[i][12]:
                 send_msg(function, cid, 1, datas[i][0],
                          f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][2]}',
-                         f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][12]}',
+                         [f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][12]}', datas[i][24]],
                          datas[i][1])
             elif datas[i][31]:
                 send_msg(function, cid, 1, datas[i][0],
                          f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][2]}',
-                         f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][31]}',
+                         [f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][31]}',datas[i][24]],
                          datas[i][1])
     elif function == 'pendant':
         for i in range(len(datas)):
+            print(datas[i][13])
             if datas[i][4]:
                 send_msg(function, cid, 1, datas[i][0],
                          f'https://gift-resource.starmakerstudios.com/pendant/{datas[i][4]}',
-                         'wu',
+                         datas[i][13],
                          datas[i][1])
             elif datas[i][2]:
                 send_msg(function, cid, 1, datas[i][0],
                          f'https://gift-resource.starmakerstudios.com/pendant/{datas[i][2]}',
-                         'wu',
+                         datas[i][13],
                          datas[i][1])
     elif function == 'debris':
         for i in range(len(datas)):

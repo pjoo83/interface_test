@@ -203,6 +203,8 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
             }
             response = requests.post(url=send_url, headers=headers, json=data)
         elif 'webp' in horse_png:
+            if '.gif' in horse_png:
+                horse_png = f"文件格式存在问题：！！！！！！！！！{horse_png}"
             content = {
                 "zh_cn": {
                     "title": f"注意注意注意！！！头像框更新了！！！",
@@ -458,7 +460,7 @@ def start_send(function, datas):
             elif datas[i][31]:
                 send_msg(function, cid, 1, datas[i][0],
                          f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][2]}',
-                         [f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][31]}',datas[i][24]],
+                         [f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][31]}', datas[i][24]],
                          datas[i][1])
     elif function == 'pendant':
         for i in range(len(datas)):

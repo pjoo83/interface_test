@@ -532,13 +532,13 @@ def start_send(function, datas):
                 datas[i][1] = f'类型：弹幕特效     名称：{datas[i][1]}'
             elif datas[i][2] == 6:
                 datas[i][1] = f'类型：发言气泡      名称：{datas[i][1]}'
-            print(datas[i][1])
+            # print(datas[i][1])
             if 'png' in datas[i][4]:
                 send_msg(function, cid, 1, datas[i][0],
                          f'https://gift-resource.starmakerstudios.com/privilege/{datas[i][4]}',
-                         'wu',
+                         'png格式无zip包',
                          datas[i][1])
-                print(datas[i][1])
+                # print(datas[i][1])
 
             elif 'zip' in datas[i][4]:
                 send_msg(function, cid, 1, datas[i][0],

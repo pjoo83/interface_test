@@ -135,7 +135,7 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
             "msg_type": "post",
             "content": json.dumps(content)  # ✅ 这里必须转换成字符串
         }
-        response = requests.post(url=send_url, headers=headers, json=data)
+        response = requests.post(url=send_url, headers=headers, json=data,verify=False)
         # print(response.json())
     elif function == 'pendant':
         if 'png' in horse_png:
@@ -201,7 +201,7 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
                 "msg_type": "post",
                 "content": json.dumps(content)  # ✅ 这里必须转换成字符串
             }
-            response = requests.post(url=send_url, headers=headers, json=data)
+            response = requests.post(url=send_url, headers=headers, json=data,verify=False)
         elif 'webp' in horse_png:
             if '.gif' in horse_png:
                 horse_png = f"文件格式存在问题：！！！！！！！！！{horse_png}"
@@ -267,7 +267,7 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
                 "msg_type": "post",
                 "content": json.dumps(content)  # ✅ 这里必须转换成字符串
             }
-            response = requests.post(url=send_url, headers=headers, json=data)
+            response = requests.post(url=send_url, headers=headers, json=data,verify=False)
     elif function == 'debris':
         content = {
             "zh_cn": {
@@ -325,7 +325,7 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
             "msg_type": "post",
             "content": json.dumps(content)  # ✅ 这里必须转换成字符串
         }
-        response = requests.post(url=send_url, headers=headers, json=data)
+        response = requests.post(url=send_url, headers=headers, json=data,verify=False)
     elif function == 'ab-test':
         content = {
             "zh_cn": {
@@ -389,7 +389,7 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
             "msg_type": "post",
             "content": json.dumps(content)  # ✅ 这里必须转换成字符串
         }
-        response = requests.post(url=send_url, headers=headers, json=data)
+        response = requests.post(url=send_url, headers=headers, json=data,verify=False)
 
     elif function == 'bubble':
         content = {
@@ -441,7 +441,7 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
             "msg_type": "post",
             "content": json.dumps(content)  # ✅ 这里必须转换成字符串
         }
-        response = requests.post(url=send_url, headers=headers, json=data)
+        response = requests.post(url=send_url, headers=headers, json=data,verify=False)
 
 
 def start_send(function, datas):
@@ -453,15 +453,25 @@ def start_send(function, datas):
         for i in range(len(datas)):
             print(datas[i][24])
             if datas[i][12]:
+                # print(function, cid, 1, datas[i][0],
+                #          f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][2]}',
+                #          [f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][12]}', datas[i][24]],
+                #          datas[i][1])
                 send_msg(function, cid, 1, datas[i][0],
                          f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][2]}',
                          [f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][12]}', datas[i][24]],
                          datas[i][1])
+
             elif datas[i][31]:
+                # print(function, cid, 1, datas[i][0],
+                #       f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][2]}',
+                #       [f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][31]}', datas[i][24]],
+                #       datas[i][1])
                 send_msg(function, cid, 1, datas[i][0],
                          f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][2]}',
                          [f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][31]}', datas[i][24]],
                          datas[i][1])
+
     elif function == 'pendant':
         for i in range(len(datas)):
             print(datas[i][13])
@@ -477,23 +487,43 @@ def start_send(function, datas):
                          datas[i][1])
     elif function == 'debris':
         for i in range(len(datas)):
-            props_id = datas[i][7].split(',')[0].split(':')[1]
-            url = sql_data()[0]
-            headers = sql_data()[1]
-            payload = "instance_name=cdb-sg-prod-starmaker-live-r2&db_name=fb_live&schema_name=&tb_name=&sql_content" \
-                      f"=select+*+from++static_props+where+props_id+%3D\'{props_id}\'"
-            data = requests.post(url=url, headers=headers, data=payload)
-            props_result = data.json()['data']['affected_rows']
-            if props_result == 1:
-                send_msg(function, cid, 1, datas[i][0],
-                         f'https://static.starmakerstudios.com/production/gift/debris/{datas[i][3]}',
-                         '道具表中有此配置的id',
-                         datas[i][1])
-            elif props_result == 0:
-                send_msg(function, cid, 1, datas[i][0],
-                         f'https://static.starmakerstudios.com/production/gift/debris/{datas[i][3]}',
-                         '注意注意！！！！！碎片表中配错道具id',
-                         datas[i][1])
+            data_type = datas[i][4]
+            if data_type == 2:
+                props_id = datas[i][7].split(',')[0].split(':')[1]
+                url = sql_data()[0]
+                headers = sql_data()[1]
+                payload = "instance_name=cdb-sg-prod-starmaker-live-r2&db_name=fb_live&schema_name=&tb_name=&sql_content" \
+                          f"=select+*+from++static_props+where+props_id+%3D\'{props_id}\'"
+                data = requests.post(url=url, headers=headers, data=payload)
+                props_result = data.json()['data']['affected_rows']
+                if props_result == 1:
+                    send_msg(function, cid, 1, datas[i][0],
+                             f'https://static.starmakerstudios.com/production/gift/debris/{datas[i][3]}',
+                             '道具表中有此配置的id',
+                             datas[i][1])
+                elif props_result == 0:
+                    send_msg(function, cid, 1, datas[i][0],
+                             f'https://static.starmakerstudios.com/production/gift/debris/{datas[i][3]}',
+                             '注意注意！！！！！碎片表中配错道具id',
+                             datas[i][1])
+            elif data_type == 1:
+                props_id = datas[i][7].split(',')[0].split(':')[1]
+                url = sql_data()[0]
+                headers = sql_data()[1]
+                payload = "instance_name=cdb-sg-prod-starmaker-live-r2&db_name=fb_live&schema_name=&tb_name=&sql_content" \
+                          f"=select+*+from++gift+where+gift_id+%3D\'{props_id}\'"
+                data = requests.post(url=url, headers=headers, data=payload)
+                props_result = data.json()['data']['affected_rows']
+                if props_result == 1:
+                    send_msg(function, cid, 1, datas[i][0],
+                             f'https://static.starmakerstudios.com/production/gift/debris/{datas[i][3]}',
+                             '礼物表中有此配置的id',
+                             datas[i][1])
+                elif props_result == 0:
+                    send_msg(function, cid, 1, datas[i][0],
+                             f'https://static.starmakerstudios.com/production/gift/debris/{datas[i][3]}',
+                             '注意注意！！！！！碎片表中配错礼物表id',
+                             datas[i][1])
     elif function == 'ab-test':
         test_group = []
         for i in range(len(datas)):

@@ -135,7 +135,7 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
             "msg_type": "post",
             "content": json.dumps(content)  # ✅ 这里必须转换成字符串
         }
-        response = requests.post(url=send_url, headers=headers, json=data,verify=False)
+        response = requests.post(url=send_url, headers=headers, json=data, verify=True)
         # print(response.json())
     elif function == 'pendant':
         if 'png' in horse_png:
@@ -201,7 +201,7 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
                 "msg_type": "post",
                 "content": json.dumps(content)  # ✅ 这里必须转换成字符串
             }
-            response = requests.post(url=send_url, headers=headers, json=data,verify=False)
+            response = requests.post(url=send_url, headers=headers, json=data, verify=True)
         elif 'webp' in horse_png:
             if '.gif' in horse_png:
                 horse_png = f"文件格式存在问题：！！！！！！！！！{horse_png}"
@@ -267,7 +267,7 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
                 "msg_type": "post",
                 "content": json.dumps(content)  # ✅ 这里必须转换成字符串
             }
-            response = requests.post(url=send_url, headers=headers, json=data,verify=False)
+            response = requests.post(url=send_url, headers=headers, json=data, verify=True)
     elif function == 'debris':
         content = {
             "zh_cn": {
@@ -325,7 +325,7 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
             "msg_type": "post",
             "content": json.dumps(content)  # ✅ 这里必须转换成字符串
         }
-        response = requests.post(url=send_url, headers=headers, json=data,verify=False)
+        response = requests.post(url=send_url, headers=headers, json=data, verify=True)
     elif function == 'ab-test':
         content = {
             "zh_cn": {
@@ -389,7 +389,7 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
             "msg_type": "post",
             "content": json.dumps(content)  # ✅ 这里必须转换成字符串
         }
-        response = requests.post(url=send_url, headers=headers, json=data,verify=False)
+        response = requests.post(url=send_url, headers=headers, json=data, verify=True)
 
     elif function == 'bubble':
         content = {
@@ -441,7 +441,7 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
             "msg_type": "post",
             "content": json.dumps(content)  # ✅ 这里必须转换成字符串
         }
-        response = requests.post(url=send_url, headers=headers, json=data,verify=False)
+        response = requests.post(url=send_url, headers=headers, json=data, verify=True)
 
 
 def start_send(function, datas):
@@ -454,9 +454,9 @@ def start_send(function, datas):
             print(datas[i][24])
             if datas[i][12]:
                 # print(function, cid, 1, datas[i][0],
-                #          f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][2]}',
-                #          [f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][12]}', datas[i][24]],
-                #          datas[i][1])
+                # f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][2]}',
+                # [f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][12]}', datas[i][24]],
+                # datas[i][1])
                 send_msg(function, cid, 1, datas[i][0],
                          f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][2]}',
                          [f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][12]}', datas[i][24]],

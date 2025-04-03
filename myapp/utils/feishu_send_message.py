@@ -21,15 +21,15 @@ def get_chat_id(function):
     response = requests.get(url=chat_id_url, headers=headers)
     item_list = response.json()['data']['items']
     for i in item_list:
-        if i['name'] == '机器人测试啊' and function != 'ab-test':
+        if i['name'] == '机器人测试啊' and function != 'ab-test' and function !='crazy_monster':
             print(i['chat_id'])
             return i['chat_id']
         elif i['name'] == '机器人测试啊' and function == 'ab-test':
             print(i['chat_id'])
             return i['chat_id']
-        # elif i['name'] == '机器人测试啊' and function == 'debris':
-        #     print(i['chat_id'])
-        #     return i['chat_id']
+        elif i['name'] == '热血怪兽新增配置检查' and function == 'crazy_monster':
+            print(i['chat_id'])
+            return i['chat_id']
 
 
 def atest_send(chat_id):
@@ -64,8 +64,9 @@ def atest_send(chat_id):
     print(response.json())  # 确保返回成功
 
 
-def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, horse_name):
+def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, horse_name, data):
     """
+    :param data: 总数据列
     :param function: 消息类别
     :param horse_pag: 坐骑pag
     :param horse_png: 坐骑图片
@@ -280,6 +281,7 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
                             "style": ["bold", "underline"]
                         },
                     ],
+
                     [
                         {
                             "tag": "text",
@@ -443,6 +445,60 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
         }
         response = requests.post(url=send_url, headers=headers, json=data, verify=True)
 
+    elif function == 'crazy_monster':
+        content = {
+            "zh_cn": {
+                "title": f"注意注意注意！！！热血怪兽有新的装备资源更新了！！！",
+                "content": [
+                    [
+                        {
+                            "tag": "text",
+                            "text": f'装备名称:{data[3]}',
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"装备自增id : {data[0]}，装备装备唯一key：{data[1]}，装备id：{data[2]}",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"0级提供经验：{data[5]}  装备等级：{data[6]}  装备最高/低经验：{data[7],data[8]}  "
+                                    f"品质：{data[9]}   星级：{data[10]}  ",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"属性加成类型:{data[11]}  属性值：{data[12]} "
+                                    f"装备类别：{data[13]}  装备元素：{data[14]}  装备战力：{data[15]}",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    # [
+                    #     {
+                    #         "tag": "text",
+                    #         "text": f"文件检查结果 :{check_image('image.png')} ",
+                    #         "style": ["bold", "underline"]
+                    #     },
+                    # ],
+                    [{"tag": "img", "image_key": f'{download_img(data[4])}'}],
+                ]
+            },
+        }
+
+        data = {
+            "receive_id": chat_id,
+            "msg_type": "post",
+            "content": json.dumps(content)  # ✅ 这里必须转换成字符串
+        }
+        response = requests.post(url=send_url, headers=headers, json=data, verify=True)
+
 
 def start_send(function, datas):
     """
@@ -453,24 +509,16 @@ def start_send(function, datas):
         for i in range(len(datas)):
             print(datas[i][24])
             if datas[i][12]:
-                # print(function, cid, 1, datas[i][0],
-                # f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][2]}',
-                # [f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][12]}', datas[i][24]],
-                # datas[i][1])
                 send_msg(function, cid, 1, datas[i][0],
                          f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][2]}',
                          [f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][12]}', datas[i][24]],
-                         datas[i][1])
+                         datas[i][1], '')
 
             elif datas[i][31]:
-                # print(function, cid, 1, datas[i][0],
-                #       f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][2]}',
-                #       [f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][31]}', datas[i][24]],
-                #       datas[i][1])
                 send_msg(function, cid, 1, datas[i][0],
                          f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][2]}',
                          [f'https://static.starmakerstudios.com/production/statics/horse/{datas[i][31]}', datas[i][24]],
-                         datas[i][1])
+                         datas[i][1], '')
 
     elif function == 'pendant':
         for i in range(len(datas)):
@@ -479,12 +527,12 @@ def start_send(function, datas):
                 send_msg(function, cid, 1, datas[i][0],
                          f'https://gift-resource.starmakerstudios.com/pendant/{datas[i][4]}',
                          datas[i][13],
-                         datas[i][1])
+                         datas[i][1], '')
             elif datas[i][2]:
                 send_msg(function, cid, 1, datas[i][0],
                          f'https://gift-resource.starmakerstudios.com/pendant/{datas[i][2]}',
                          datas[i][13],
-                         datas[i][1])
+                         datas[i][1], '')
     elif function == 'debris':
         for i in range(len(datas)):
             data_type = datas[i][4]
@@ -500,12 +548,12 @@ def start_send(function, datas):
                     send_msg(function, cid, 1, datas[i][0],
                              f'https://static.starmakerstudios.com/production/gift/debris/{datas[i][3]}',
                              '道具表中有此配置的id',
-                             datas[i][1])
+                             datas[i][1], '')
                 elif props_result == 0:
                     send_msg(function, cid, 1, datas[i][0],
                              f'https://static.starmakerstudios.com/production/gift/debris/{datas[i][3]}',
                              '注意注意！！！！！碎片表中配错道具id',
-                             datas[i][1])
+                             datas[i][1], '')
             elif data_type == 1:
                 props_id = datas[i][7].split(',')[0].split(':')[1]
                 url = sql_data()[0]
@@ -518,12 +566,12 @@ def start_send(function, datas):
                     send_msg(function, cid, 1, datas[i][0],
                              f'https://static.starmakerstudios.com/production/gift/debris/{datas[i][3]}',
                              '礼物表中有此配置的id',
-                             datas[i][1])
+                             datas[i][1], '')
                 elif props_result == 0:
                     send_msg(function, cid, 1, datas[i][0],
                              f'https://static.starmakerstudios.com/production/gift/debris/{datas[i][3]}',
                              '注意注意！！！！！碎片表中配错礼物表id',
-                             datas[i][1])
+                             datas[i][1], '')
     elif function == 'ab-test':
         test_group = []
         for i in range(len(datas)):
@@ -549,7 +597,8 @@ def start_send(function, datas):
                      horse_name=test_date[0][1],
                      horse_png=(stamp_to_time(test_date[0][2]), stamp_to_time(test_date[0][3])),
                      horse_pag=(test_date[0][4], test_date[0][5],
-                                test_date[0][6], test_date[0][7], test_group)
+                                test_date[0][6], test_date[0][7], test_group),
+                     data=''
                      )
 
     elif function == 'bubble':
@@ -567,14 +616,18 @@ def start_send(function, datas):
                 send_msg(function, cid, 1, datas[i][0],
                          f'https://gift-resource.starmakerstudios.com/privilege/{datas[i][4]}',
                          'png格式无zip包',
-                         datas[i][1])
+                         datas[i][1], '')
                 # print(datas[i][1])
 
             elif 'zip' in datas[i][4]:
                 send_msg(function, cid, 1, datas[i][0],
                          f'https://gift-resource.starmakerstudios.com/privilege/{datas[i][11]}',
                          f'https://gift-resource.starmakerstudios.com/privilege/{datas[i][4]}',
-                         datas[i][1])
+                         datas[i][1], '')
+    elif function == 'crazy_monster':
+        for i in range(len(datas)):
+            print(datas[i])
+            send_msg('crazy_monster', cid, 1, datas[i][0], datas[i][2], datas[i][3], datas[i][4], datas[i])
 
 
 def stamp_to_time(time):

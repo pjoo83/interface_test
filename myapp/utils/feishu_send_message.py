@@ -1,3 +1,4 @@
+import time
 from myapp.utils.feishu_get_token import get_tenant_access_token
 import requests
 from myapp.utils.feishu_data import Feishu_data
@@ -446,58 +447,111 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
         response = requests.post(url=send_url, headers=headers, json=data, verify=True)
 
     elif function == 'crazy_monster':
-        content = {
-            "zh_cn": {
-                "title": f"注意注意注意！！！热血怪兽有新的装备资源更新了！！！",
-                "content": [
-                    [
-                        {
-                            "tag": "text",
-                            "text": f'装备名称:{data[3]}',
-                            "style": ["bold", "underline"]
-                        },
-                    ],
-                    [
-                        {
-                            "tag": "text",
-                            "text": f"装备自增id : {data[0]}，装备装备唯一key：{data[1]}，装备id：{data[2]}",
-                            "style": ["bold", "underline"]
-                        },
-                    ],
-                    [
-                        {
-                            "tag": "text",
-                            "text": f"0级提供经验：{data[5]}  装备等级：{data[6]}  装备最高/低经验：{data[7],data[8]}  "
-                                    f"品质：{data[9]}   星级：{data[10]}  ",
-                            "style": ["bold", "underline"]
-                        },
-                    ],
-                    [
-                        {
-                            "tag": "text",
-                            "text": f"属性加成类型:{data[11]}  属性值：{data[12]} "
-                                    f"装备类别：{data[13]}  装备元素：{data[14]}  装备战力：{data[15]}",
-                            "style": ["bold", "underline"]
-                        },
-                    ],
-                    # [
-                    #     {
-                    #         "tag": "text",
-                    #         "text": f"文件检查结果 :{check_image('image.png')} ",
-                    #         "style": ["bold", "underline"]
-                    #     },
-                    # ],
-                    [{"tag": "img", "image_key": f'{download_img(data[4])}'}],
-                ]
-            },
-        }
+        if len(data) >= 17:
+            content = {
+                "zh_cn": {
+                    "title": f"注意注意注意！！！热血怪兽有新的装备资源更新了！！！",
+                    "content": [
+                        [
+                            {
+                                "tag": "text",
+                                "text": f'装备名称:{data[3]}',
+                                "style": ["bold", "underline"]
+                            },
+                        ],
+                        [
+                            {
+                                "tag": "text",
+                                "text": f"装备自增id : {data[0]}，装备装备唯一key：{data[1]}，装备id：{data[2]}",
+                                "style": ["bold", "underline"]
+                            },
+                        ],
+                        [
+                            {
+                                "tag": "text",
+                                "text": f"0级提供经验：{data[5]}  装备等级：{data[6]}  装备最高/低经验：{data[7], data[8]}  "
+                                        f"品质：{data[9]}   星级：{data[10]}  ",
+                                "style": ["bold", "underline"]
+                            },
+                        ],
+                        [
+                            {
+                                "tag": "text",
+                                "text": f"属性加成类型:{data[11]}  属性值：{data[12]} "
+                                        f"装备类别：{data[13]}  装备元素：{data[14]}  装备战力：{data[15]}",
+                                "style": ["bold", "underline"]
+                            },
+                        ],
+                        [{"tag": "img", "image_key": f'{download_img(data[4])}'}],
+                    ]
+                },
+            }
 
-        data = {
-            "receive_id": chat_id,
-            "msg_type": "post",
-            "content": json.dumps(content)  # ✅ 这里必须转换成字符串
-        }
-        response = requests.post(url=send_url, headers=headers, json=data, verify=True)
+            data = {
+                "receive_id": chat_id,
+                "msg_type": "post",
+                "content": json.dumps(content)  # ✅ 这里必须转换成字符串
+            }
+            response = requests.post(url=send_url, headers=headers, json=data, verify=True)
+        else:
+            zb = ''
+            url = sql_data()[0]
+            equip_key = data[2]
+            headers1 = sql_data()[1]
+            payload = "instance_name=cdb-sg-prod-starmaker-live-2-r2&db_name=monster&schema_name=&tb_name=&sql_content" \
+                      f"=select+*+from++equip+where+equip_key+%3D\'{equip_key}\'"
+            datas1 = requests.post(url=url, headers=headers1, data=payload)
+            props_result = datas1.json()['data']['affected_rows']
+            if props_result == 1:
+                zb = f"装备表有对应合成的装备key：{data[2]}"
+                time.sleep(3)
+            else:
+                zb = f"注意注意！！！装备表没有对应合成的装备key：{data[2]}"
+                time.sleep(3)
+            content = {
+                "zh_cn": {
+                    "title": f"注意注意注意！！！热血怪兽有新的碎片更新了！！！",
+                    "content": [
+                        [
+                            {
+                                "tag": "text",
+                                "text": f'碎片名称:{data[1]}，碎片id:{data[0]}',
+                                "style": ["bold", "underline"]
+                            },
+                        ],
+                        [
+                            {
+                                "tag": "text",
+                                "text": f"合成装备的key : {zb}，",
+                                "style": ["bold", "underline"]
+                            },
+                        ],
+                        [
+                            {
+                                "tag": "text",
+                                "text": f"0级提供经验 : {data[4]}，品质：{data[5]}，合成整件需要数量'：{data[6]}，合成消耗元宝数"
+                                        f"：{data[7]}",
+                                "style": ["bold", "underline"]
+                            },
+                        ],
+                        [
+                            {
+                                "tag": "text",
+                                "text": f"碎片说明1：{data[8]} 碎片说明2：{data[9]}  碎片说明3：{data[10]}",
+                                "style": ["bold", "underline"]
+                            },
+                        ],
+                        [{"tag": "img", "image_key": f'{download_img(data[3])}'}],
+                    ]
+                },
+            }
+
+            data1 = {
+                "receive_id": chat_id,
+                "msg_type": "post",
+                "content": json.dumps(content)  # ✅ 这里必须转换成字符串
+            }
+            response = requests.post(url=send_url, headers=headers, json=data1, verify=True)
 
 
 def start_send(function, datas):
@@ -626,11 +680,10 @@ def start_send(function, datas):
                          datas[i][1], '')
     elif function == 'crazy_monster':
         for i in range(len(datas)):
-            print(datas[i])
             send_msg('crazy_monster', cid, 1, datas[i][0], datas[i][2], datas[i][3], datas[i][4], datas[i])
 
 
-def stamp_to_time(time):
-    dt = datetime.datetime.fromtimestamp(time)
+def stamp_to_time(times):
+    dt = datetime.datetime.fromtimestamp(times)
     date_str = dt.strftime('%Y-%m-%d %H:%M:%S')
     return date_str

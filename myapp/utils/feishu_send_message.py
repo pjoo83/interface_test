@@ -22,7 +22,7 @@ def get_chat_id(function):
     response = requests.get(url=chat_id_url, headers=headers)
     item_list = response.json()['data']['items']
     for i in item_list:
-        if i['name'] == '机器人测试啊' and function != 'ab-test' and function !='crazy_monster':
+        if i['name'] == '机器人测试啊' and function != 'ab-test' and function != 'crazy_monster':
             print(i['chat_id'])
             return i['chat_id']
         elif i['name'] == '机器人测试啊' and function == 'ab-test':
@@ -132,144 +132,88 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
             },
         }
 
-        data = {
+        data1 = {
             "receive_id": chat_id,
             "msg_type": "post",
             "content": json.dumps(content)  # ✅ 这里必须转换成字符串
         }
-        response = requests.post(url=send_url, headers=headers, json=data, verify=True)
-        # print(response.json())
+        response = requests.post(url=send_url, headers=headers, json=data1, verify=True)
     elif function == 'pendant':
-        if 'png' in horse_png:
-            content = {
-                "zh_cn": {
-                    "title": f"注意注意注意！！！头像框更新了！！！",
-                    "content": [
-                        [
-                            {
-                                "tag": "text",
-                                "text": f"资源名称 : {horse_name}",
-                                "style": ["bold", "underline"]
-                            },
-                        ],
-                        [
-                            {
-                                "tag": "text",
-                                "text": f"资源id : {horse_id}",
-                                "style": ["bold", "underline"]
-                            },
-                        ],
-                        [
-                            {
-                                "tag": "text",
-                                "text": f"操作人 : {horse_pag}",
-                                "style": ["bold", "underline"]
-                            },
-                        ],
-                        [
-                            {
-                                "tag": "text",
-                                "text": f"资源链接 : {horse_png}",
-                                "style": ["bold", "underline"]
-                            },
-                        ],
-                        [
-                            {
-                                "tag": "text",
-                                "text": f"文件检查结果 : {check_image('image.png')}",
-                                "style": ["bold", "underline"]
-                            },
-                        ],
-                        [
-                            {
-                                "tag": "text",
-                                "text": f"透明度检测 : {check_png_transparency('image.png')}",
-                                "style": ["bold", "underline"]
-                            },
-                        ],
-                        [
-                            {
-                                "tag": "text",
-                                "text": f"资源详情 : ",
-                                "style": ["bold", "underline"]
-                            },
-                        ],
-                        [{"tag": "img", "image_key": f'{download_img(horse_png)}'}],
-                    ]
-                },
-            }
-            data = {
-                "receive_id": chat_id,
-                "msg_type": "post",
-                "content": json.dumps(content)  # ✅ 这里必须转换成字符串
-            }
-            response = requests.post(url=send_url, headers=headers, json=data, verify=True)
-        elif 'webp' in horse_png:
-            if '.gif' in horse_png:
-                horse_png = f"文件格式存在问题：！！！！！！！！！{horse_png}"
-            content = {
-                "zh_cn": {
-                    "title": f"注意注意注意！！！头像框更新了！！！",
-                    "content": [
-                        [
-                            {
-                                "tag": "text",
-                                "text": f"资源名称 : {horse_name}",
-                                "style": ["bold", "underline"]
-                            },
-                        ],
-                        [
-                            {
-                                "tag": "text",
-                                "text": f"资源id : {horse_id}",
-                                "style": ["bold", "underline"]
-                            },
-                        ],
-                        [
-                            {
-                                "tag": "text",
-                                "text": f"操作人 : {horse_pag}",
-                                "style": ["bold", "underline"]
-                            },
-                        ],
-                        [
-                            {
-                                "tag": "text",
-                                "text": f"资源链接 : {horse_png}",
-                                "style": ["bold", "underline"]
-                            },
-                        ],
-                        [
-                            {
-                                "tag": "text",
-                                "text": f"文件检查结果 : {check_webp('image.webp')}",
-                                "style": ["bold", "underline"]
-                            },
-                        ],
-                        [
-                            {
-                                "tag": "text",
-                                "text": f"透明度检测 : {check_webp_animation_alpha('image.webp')}",
-                                "style": ["bold", "underline"]
-                            },
-                        ],
-                        [
-                            {
-                                "tag": "text",
-                                "text": f"资源详情 : ",
-                                "style": ["bold", "underline"]
-                            },
-                        ],
-                        [{"tag": "img", "image_key": f'{download_img(horse_png)}'}],
-                    ]
-                },
-            }
-            data = {
-                "receive_id": chat_id,
-                "msg_type": "post",
-                "content": json.dumps(content)  # ✅ 这里必须转换成字符串
-            }
-            response = requests.post(url=send_url, headers=headers, json=data, verify=True)
+        if data[4]:
+            data_resources1 = f"https://gift-resource.starmakerstudios.com/pendant/{data[4]}"
+            if ".webp" not in data_resources1:
+                data_resources = f"文件格式存在问题{data[4]}"
+            else:
+                data_resources = f"文件格式正常:{data[4]}"
+        else:
+            data_resources1 = f"https://gift-resource.starmakerstudios.com/pendant/{data[2]}"
+            if ".png" not in data_resources1:
+                data_resources = f"文件格式存在问题{data[2]}"
+            else:
+                data_resources = f"文件格式正常:{data[2]}"
+        content = {
+            "zh_cn": {
+                "title": f"注意注意注意！！！头像框更新了！！！",
+                "content": [
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"资源名称 : {data[1]}",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"资源id : {data[0]}",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"操作人 : {data[13]}",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"资源链接 : {data_resources}",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"文件检查结果 : {check_image('image.png')}",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"透明度检测 : {check_png_transparency('image.png')}",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"资源详情 : ",
+                            "style": ["bold", "underline"]
+                        },
+                    ],
+                    [{"tag": "img", "image_key": f'{download_img(data_resources1)}'}],
+                ]
+            },
+        }
+        data1 = {
+            "receive_id": chat_id,
+            "msg_type": "post",
+            "content": json.dumps(content)  # ✅ 这里必须转换成字符串
+        }
+        response = requests.post(url=send_url, headers=headers, json=data1, verify=True)
     elif function == 'debris':
         content = {
             "zh_cn": {
@@ -323,12 +267,12 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
             },
         }
 
-        data = {
+        data1 = {
             "receive_id": chat_id,
             "msg_type": "post",
             "content": json.dumps(content)  # ✅ 这里必须转换成字符串
         }
-        response = requests.post(url=send_url, headers=headers, json=data, verify=True)
+        response = requests.post(url=send_url, headers=headers, json=data1, verify=True)
     elif function == 'ab-test':
         content = {
             "zh_cn": {
@@ -387,13 +331,12 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
                 ]
             },
         }
-        data = {
+        data1 = {
             "receive_id": chat_id,
             "msg_type": "post",
             "content": json.dumps(content)  # ✅ 这里必须转换成字符串
         }
-        response = requests.post(url=send_url, headers=headers, json=data, verify=True)
-
+        response = requests.post(url=send_url, headers=headers, json=data1, verify=True)
     elif function == 'bubble':
         content = {
             "zh_cn": {
@@ -439,12 +382,12 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
             },
         }
 
-        data = {
+        data1 = {
             "receive_id": chat_id,
             "msg_type": "post",
             "content": json.dumps(content)  # ✅ 这里必须转换成字符串
         }
-        response = requests.post(url=send_url, headers=headers, json=data, verify=True)
+        response = requests.post(url=send_url, headers=headers, json=data1, verify=True)
 
     elif function == 'crazy_monster':
         if len(data) >= 17:
@@ -487,12 +430,12 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
                 },
             }
 
-            data = {
+            data1 = {
                 "receive_id": chat_id,
                 "msg_type": "post",
                 "content": json.dumps(content)  # ✅ 这里必须转换成字符串
             }
-            response = requests.post(url=send_url, headers=headers, json=data, verify=True)
+            response = requests.post(url=send_url, headers=headers, json=data1, verify=True)
         else:
             zb = ''
             url = sql_data()[0]
@@ -576,17 +519,10 @@ def start_send(function, datas):
 
     elif function == 'pendant':
         for i in range(len(datas)):
-            print(datas[i][13])
-            if datas[i][4]:
-                send_msg(function, cid, 1, datas[i][0],
-                         f'https://gift-resource.starmakerstudios.com/pendant/{datas[i][4]}',
-                         datas[i][13],
-                         datas[i][1], '')
-            elif datas[i][2]:
-                send_msg(function, cid, 1, datas[i][0],
-                         f'https://gift-resource.starmakerstudios.com/pendant/{datas[i][2]}',
-                         datas[i][13],
-                         datas[i][1], '')
+            send_msg(function, cid, 1, datas[i][0],
+                     f'https://gift-resource.starmakerstudios.com/pendant/{datas[i][4]}',
+                     datas[i][13],
+                     datas[i][1], datas[i])
     elif function == 'debris':
         for i in range(len(datas)):
             data_type = datas[i][4]

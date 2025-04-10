@@ -142,15 +142,15 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
         if data[4]:
             data_resources1 = f"https://gift-resource.starmakerstudios.com/pendant/{data[4]}"
             if ".webp" not in data_resources1:
-                data_resources = f"文件格式存在问题{data[4]}"
+                data_resources = f"文件格式存在问题{data_resources1}"
             else:
-                data_resources = f"文件格式正常:{data[4]}"
+                data_resources = f"文件格式正常:{data_resources1}"
         else:
             data_resources1 = f"https://gift-resource.starmakerstudios.com/pendant/{data[2]}"
             if ".png" not in data_resources1:
-                data_resources = f"文件格式存在问题{data[2]}"
+                data_resources = f"文件格式存在问题{data_resources1}"
             else:
-                data_resources = f"文件格式正常:{data[2]}"
+                data_resources = f"文件格式正常:{data_resources1}"
         content = {
             "zh_cn": {
                 "title": f"注意注意注意！！！头像框更新了！！！",
@@ -179,7 +179,7 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
                     [
                         {
                             "tag": "text",
-                            "text": f"资源链接 : {data_resources}",
+                            "text": data_resources,
                             "style": ["bold", "underline"]
                         },
                     ],

@@ -1,13 +1,11 @@
 import json
-import random
-
 import requests
 import plotly.graph_objects as go
-import time
 
 
-def generate_charts(bonus_list, free_game, cname):
+def generate_charts(bonus_list, free_game, cname, money):
     """
+    :param money: 下注金额
     :param free_game: free的金额
     :param cname: 名称
     :param bonus_list:表格数据
@@ -25,7 +23,7 @@ def generate_charts(bonus_list, free_game, cname):
         name='free'
     ))
     fig.update_layout(
-        title=f"下注金额{len(bonus_list) * 10}:反奖金额{sum(bonus_list)}",
+        title=f"下注金额：{len(bonus_list) * money}，反奖金币{sum(bonus_list)}，免费金币:{sum(free_game)}",
         xaxis_title=f"下注次数:{len(bonus_list)}",
         yaxis_title="反奖金额",
         template="plotly_white"
@@ -91,7 +89,7 @@ def candy_party(times, cname):
             bonus_list.append(response.json()['data']['gold'])
             b += 1
             print(f'第{b}次执行{bonus_list}')
-    generate_charts(bonus_list, ganshe, cname)
+    generate_charts(bonus_list, free_game, cname)
 
 
 def candy_party_sugar(times, cname):
@@ -186,24 +184,24 @@ def coin_volcano(times, cname):
     }
     free_game = []
     a = 0
-    b =0
+    b = 0
     for i in range(times):
         response = requests.request("POST", url, headers=headers, data=payload)
         if response.json()['code'] == -4:
             payload1 = json.dumps({
             })
-            url1= "https://m-test.starmakerstudios.com/go-v1/coin-volcano/5676/play-free-game"
+            url1 = "https://m-test.starmakerstudios.com/go-v1/coin-volcano/5676/play-free-game"
             response = requests.request("POST", url1, headers=headers, data=payload1)
             free_game.append(response.json()['data']['total_reward_gold'])
             print(f"第{a}次下注时，free了{free_game}")
-            b+=1
-            a+=1
+            b += 1
+            a += 1
         else:
             bonus_list.append(response.json()['data']['total_reward_gold'])
             print(f"第{a}次下注时{bonus_list}")
             b += 1
             a += 1
-    generate_charts(bonus_list, free_game, cname)
+    generate_charts(bonus_list, free_game, cname, 100)
 
 
 # candy_party_sugar(1000,'candy_party_sugar')
@@ -211,4 +209,4 @@ def coin_volcano(times, cname):
 # candy_party(100, 'candy_party')
 
 
-coin_volcano(10, 'coin_volcano')
+coin_volcano(1000, 'coin_volcano')

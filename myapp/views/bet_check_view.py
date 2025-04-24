@@ -1,10 +1,19 @@
 import json
+import os
+
 import requests
 import plotly.graph_objects as go
+from django.http import HttpResponse
+from django.shortcuts import render
+from django.utils.safestring import mark_safe
+
+from Interface_Test.settings import BASE_DIR
 
 
-def generate_charts(bonus_list, free_game, cname, money):
+def generate_charts(bonus_list, free_game, cname, money, user_gold, user_last_gold):
     """
+    :param user_last_gold: 结束时金币
+    :param user_gold: 用户初始金币
     :param money: 下注金额
     :param free_game: free的金额
     :param cname: 名称
@@ -23,7 +32,8 @@ def generate_charts(bonus_list, free_game, cname, money):
         name='free'
     ))
     fig.update_layout(
-        title=f"下注金额：{len(bonus_list) * money}，反奖金币{sum(bonus_list)}，免费金币:{sum(free_game)}",
+        title=f"用户初始金币:{user_gold}，结束时间金币：{user_last_gold}，"
+              f"下注金额：{len(bonus_list) * money}，反奖金币{sum(bonus_list)}，free_game金币:{sum(free_game)}",
         xaxis_title=f"下注次数:{len(bonus_list)}",
         yaxis_title="反奖金额",
         template="plotly_white"
@@ -93,10 +103,15 @@ def candy_party(times, cname):
 
 
 def candy_party_sugar(times, cname):
+    """
+    :param times:
+    :param cname:
+    :return: 新糖果派对下注结果
+    """
     url = 'https://m-test.starmakerstudios.com/go-v1/candy-party-sugar/6113/play-game'
     bonus_list = []
     payload = json.dumps({
-        "gold": 20,
+        "gold": 100,
         "IsFree": False
     })
     b = 0
@@ -132,18 +147,45 @@ def candy_party_sugar(times, cname):
         'accept-language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en-GB;q=0.7,en;q=0.6,ko-KR;q=0.5,ko;q=0.4',
         'priority': 'u=1, i'
     }
+    b = 0
     free_game = []
+    error = []
+    url1 = 'https://m-test.starmakerstudios.com/go-v1/candy-party-sugar/6113/index?'
+    response = requests.request("GET", url1, headers=headers)
+    user_gold = response.json()['data']['user_gold']
+    print(f'用户金币{user_gold}')
     for i in range(times):
-        response = requests.request("POST", url, headers=headers, data=payload)
-        bonus_list.append(response.json()['data']['gold'])
-        if response.json()['data']['has_free_game'] is False:
-            print(f'第{b}次执行{bonus_list}')
-        else:
-            free_game.append(response.json()['data']['gold'])
-    generate_charts(bonus_list, cname, free_game)
+        try:
+            response = requests.request("POST", url, headers=headers, data=payload)
+            if response.json()['data']['has_free_game'] is False:
+                a = response.json()['data']['gold']
+                bonus_list.append(a)
+                print(f'第{b}次执行中奖{a}')
+                free_game.append(0)
+            else:
+                a = response.json()['data']['gold']
+                bonus_list.append(a)
+                print(f'第{b}次执行FREE{a}')
+                bonus_list.append(0)
+            b += 1
+        except Exception as e:
+            print(f'第{b}次执行异常{e},{response.json()}')
+            error.append(f'第{b}次执行异常{response.json()}')
+            continue
+    response = requests.request("GET", url1, headers=headers)
+    user_last_gold = response.json()['data']['user_gold']
+    generate_charts(bonus_list, free_game, cname, 100, user_gold, user_last_gold)
+    print(bonus_list)
+    print(free_game)
+    print(error)
 
 
 def coin_volcano(times, cname):
+    """
+    :param times: 次数
+    :param cname: 游戏名称
+    :return: 返回结果
+    """
     url = 'https://m-test.starmakerstudios.com/go-v1/coin-volcano/5676/play'
     payload = json.dumps({
         "bet_gold": 100,
@@ -184,29 +226,40 @@ def coin_volcano(times, cname):
     }
     free_game = []
     a = 0
-    b = 0
+    url1 = 'https://m-test.starmakerstudios.com/go-v1/coin-volcano/5676/index?'
+    response = requests.request("GET", url1, headers=headers)
+    user_gold = response.json()['data']['user_gold']
     for i in range(times):
-        response = requests.request("POST", url, headers=headers, data=payload)
-        if response.json()['code'] == -4:
-            payload1 = json.dumps({
-            })
-            url1 = "https://m-test.starmakerstudios.com/go-v1/coin-volcano/5676/play-free-game"
-            response = requests.request("POST", url1, headers=headers, data=payload1)
-            free_game.append(response.json()['data']['total_reward_gold'])
-            print(f"第{a}次下注时，free了{free_game}")
-            b += 1
+        try:
+            response = requests.request("POST", url, headers=headers, data=payload)
+            if response.json()['code'] == -4:
+                payload1 = json.dumps({
+                })
+                url2 = "https://m-test.starmakerstudios.com/go-v1/coin-volcano/5676/play-free-game"
+                response = requests.request("POST", url2, headers=headers, data=payload1)
+                print(response.json())
+                free_game.append(response.json()['data']['total_reward_gold'])
+                bonus_list.append(0)
+                print(f"第{a}次下注时，free了{free_game}")
+            else:
+                bonus_list.append(response.json()['data']['total_reward_gold'])
+                free_game.append(0)
+                print(response.json())
+                print(f"第{a}次下注时{bonus_list}")
             a += 1
-        else:
-            bonus_list.append(response.json()['data']['total_reward_gold'])
-            print(f"第{a}次下注时{bonus_list}")
-            b += 1
-            a += 1
-    generate_charts(bonus_list, free_game, cname, 100)
+        except Exception as e:
+            print("请求异常", e, response.json())
+            continue
+    response = requests.request("GET", url1, headers=headers)
+    user_last_gold = response.json()['data']['user_gold']
+    generate_charts(bonus_list, free_game, cname, 100, user_gold, user_last_gold)
 
 
-# candy_party_sugar(1000,'candy_party_sugar')
+def check_candy_party_sugar(request):
+    return render(request, 'candy_party_sugar.html')
 
-# candy_party(100, 'candy_party')
 
-
-coin_volcano(1000, 'coin_volcano')
+if __name__ == '__main__':
+    candy_party_sugar(20000, 'candy_party_sugar')
+    # candy_party(100, 'candy_party')
+    # coin_volcano(10000, 'coin_volcano')

@@ -8,6 +8,7 @@ from django.shortcuts import render
 from django.utils.safestring import mark_safe
 
 from Interface_Test.settings import BASE_DIR
+from collections import Counter
 
 
 def generate_charts(bonus_list, free_game, cname, money, user_gold, user_last_gold):
@@ -259,7 +260,52 @@ def check_candy_party_sugar(request):
     return render(request, 'candy_party_sugar.html')
 
 
+def new_fish(times):
+    """
+    :return: 返回钓鱼次数
+    """
+    headers = {
+        'Accept': 'application/json, text/plain, */*',
+        'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
+        'Content-Type': 'application/json',
+        'Origin': 'http://wanghaobin.box.ushow.media:84',
+        'Proxy-Connection': 'keep-alive',
+        'Referer': 'http://wanghaobin.box.ushow.media:84/a-vue3/fantasy-fishing?promotion_id=6198&showBar=0&showNavigation=false&_sxiq_open_origin=banner_officialevent',
+        'User-Agent': 'sm/8.86.0/Android/10/google play/74A40EF7E711D3F2B20B6081AAF5E2B7/wifi/zh-CN/V1924A/12666376951981700///China',
+        'X-Requested-With': 'com.starmakerinteractive.starmaker',
+        'token': 'bGW6i7835P3qwHIFI3zEVnAAfAEDV3i3',
+        'Cookie': 'PHPSESSID=gleim5bu8s11lic4u4bjai3jj1; _ga=GA1.1.2132221105.1747016566; oauth_token=bGW6i7835P3qwHIFI3zEVnAAfAEDV3i3; oauth_token_secret=66TuuTbpcFNTiHFVfDJ1ojBhlFRusj6G; SM_GOLBAL_device_token=v2:ixoGX+uNId0YEY3d3NNw194VOqF5jlwDIFM7kSYTzRYFOtpfihKIPfy9QCFwdPveBfsUVKuLxq6Rgu30/wZYS6nsP4qPdwZIZvckO5HeodOYLzjWh6tkOhkBHnlNC0uNPK6XqSgKu0R1oqPnsviGwq8K/BFsQ+0AVQvu2frtW1CmQ+Kw5CBBXfVsH5+OHNM5phj2P0eU76g8MTofqCZLJPMdjotvh2XotkJrqRNji2TS+tu1uMBmNfuuNlxg2xNwLmVg5UqDvCMe4uHPHxoKy+wemqTEgIKxiCPhZmNqC3CX1gNWKb77T6NuaQ==; _ga_Y5QLWEHNZ4=GS2.1.s1747030633$o3$g1$t1747031147$j8$l0$h0'
+    }
+    fish_URL = 'http://wanghaobin.box.ushow.media:84/go-v1/fantasy-fishing/6198/fish'
+    payload = json.dumps({
+        "fish_count": 1, "bait_id": 1
+    })
+    fish_list = []
+    prices = []
+    a = 0
+    ticket_url = 'http://wanghaobin.box.ushow.media:9923/go-v1/fantasy-fishing/gm/ticket/add?test_user_id=12666376951981700&promotion_id=6198&count=1000'
+    for i in range(times):
+        response = requests.request("POST", fish_URL, headers=headers, data=payload)
+        if response.json()['data']['code'] == 0:
+            data = response.json()['data']['fishes'][0]
+            fish = data['fish_id']
+            fish_list.append(fish)
+            price = data['price']
+            prices.append(price)
+            print(f'第{a}次上鱼{fish}，价格{price}')
+            a += 1
+        else:
+            response = requests.request("GET", ticket_url)
+            print(response.json())
+    print(fish_list)
+    count = Counter(fish_list)
+    total = len(fish_list)
+    for num, freq in count.items():
+        probability = freq / total*100
+        print(f"鱼 {num} 出现了 {freq} 次，概率为 {probability:.2f}")
+
 if __name__ == '__main__':
-    candy_party_sugar(20000, 'candy_party_sugar')
+    new_fish(10000)
+    # candy_party_sugar(20000, 'candy_party_sugar')
     # candy_party(100, 'candy_party')
     # coin_volcano(10000, 'coin_volcano')

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>手机接口捕获工具</title>
+    <style>
+        body { font-family: Arial; padding: 20px; max-width: 1000px; margin: auto; }
+        .tab { display: inline-block; padding: 10px; background: #eee; margin-right: 5px; cursor: pointer; }
+        .tab.active { background: #fff; border-bottom: 2px solid #fff; }
+        .log-entry { font-family: monospace; border-bottom: 1px solid #ddd; padding: 5px; }
+        .controls { margin-bottom: 20px; }
+        .refresh-button { margin-left: 10px; }
+    </style>
+</head>
+<body>
+    <h2>手机接口捕获工具</h2>
+    <div class="controls">
+        <button id="refreshDevices">刷新设备</button>
+        <select id="deviceList"></select>
+        <input type="number" id="duration" value="10" min="1" max="60"> 秒
+        <button id="startCapture">开始捕获</button>
+        <button id="manualRefresh" class="refresh-button">刷新数据</button>
+    </div>
+
+    <div id="tabs"></div>
+    <div id="contents"></div>
+
+    <script>
+        let currentTab = '';
+
+        async function refreshDevices() {
+            const res = await fetch('/autotest/phone-capture/check_devices/');
+            const data = await res.json();
+            const list = document.getElementById('deviceList');
+            list.innerHTML = '';
+            if (data.success) {
+                data.devices.forEach(d => {
+                    const option = document.createElement('option');
+                    option.value = d;
+                    option.textContent = d;
+                    list.appendChild(option);
+                });
+            }
+        }
+
+        async function startCapture() {
+            const deviceId = document.getElementById('deviceList').value;
+            const duration = document.getElementById('duration').value;
+
+            const res = await fetch('/autotest/phone-capture/capture_traffic/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+                body: JSON.stringify({ device_id: deviceId, duration: duration })
+            });
+
+            const result = await res.json();
+            alert(result.success ? '开始捕获' : `失败: ${result.error}`);
+        }
+
+        async function loadCapturedData() {
+            const res = await fetch('/autotest/phone-capture/get_captured_data/');
+            const data = await res.json();
+            if (data.success) {
+                renderTabs(data.data);
+                renderContent(data.data);
+            }
+        }
+
+        function renderTabs(data) {
+            const tabs = document.getElementById('tabs');
+            tabs.innerHTML = '';
+            const domains = Object.keys(data).sort();
+            domains.forEach((domain, i) => {
+                const tab = document.createElement('div');
+                tab.className = 'tab' + (i === 0 ? ' active' : '');
+                tab.textContent = `${domain} (${data[domain].length})`;
+                tab.dataset.domain = domain;
+                tab.onclick = () => {
+                    currentTab = domain;
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    renderContent(data);
+                };
+                tabs.appendChild(tab);
+            });
+            if (!currentTab && domains.length) currentTab = domains[0];
+        }
+
+        function renderContent(data) {
+            const container = document.getElementById('contents');
+            container.innerHTML = '';
+            if (!currentTab || !data[currentTab]) return;
+            data[currentTab].forEach(entry => {
+                const div = document.createElement('div');
+                div.className = 'log-entry';
+                div.textContent = `[${entry.timestamp}] ${entry.data}`;
+                container.appendChild(div);
+            });
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                document.cookie.split(';').forEach(c => {
+                    c = c.trim();
+                    if (c.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(c.substring(name.length + 1));
+                    }
+                });
+            }
+            return cookieValue;
+        }
+
+        document.getElementById('refreshDevices').onclick = refreshDevices;
+        document.getElementById('startCapture').onclick = startCapture;
+        document.getElementById('manualRefresh').onclick = loadCapturedData;
+
+        window.onload = refreshDevices;
+
+    </script>
+</body>
+</html>

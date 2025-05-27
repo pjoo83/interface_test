@@ -155,12 +155,18 @@ def check_webp_animation_alpha(file_path):
     """
     try:
         with Image.open(file_path) as img:
-            for i, frame in enumerate(ImageSequence.Iterator(img)):
-                if frame.mode in ("RGBA", "LA"):
-                    return True, f"WebP 动图第 {i + 1} 帧包含透明通道"
-        return False, "WebP 动图无透明通道"
+            if img.mode == 'RGBA':
+                alpha = img.getchannel('A')
+                # 检查是否有任何像素 alpha < 255
+                return alpha.getextrema()[0] < 255
+            elif 'transparency' in img.info:
+                return "webp 图像包含透明通道"
+            else:
+                return "webp 图像背景可能不是透明，请注意！！！！！！！！！"
     except Exception as e:
-        return False, f"无法检测透明度: {e}"
+        print(f"出错: {e}")
+        return False
+
 
 
 def check_image(img):
@@ -188,7 +194,7 @@ def check_webp(img):
 if __name__ == '__main__':
     # download_img("https://gift-resource.starmakerstudios.com/pendant/pendant_webp_file_20250218083245.webp")
     # print(check_image('image.png'))
-    print(check_png_transparency("pendant_file_20250527035139.png"))
-    print(check_png_transparency("pendant_file_20250527064112.png"))
+    # print(check_png_transparency("pendant_file_20250527035139.png"))
+    # print(check_png_transparency("pendant_file_20250527064112.png"))
 
-    # print(check_webp_animation_alpha('image.webp'))
+    print(check_webp_animation_alpha('image.webp'))

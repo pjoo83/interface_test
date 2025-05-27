@@ -4,7 +4,8 @@ from myapp.utils.feishu_data import Feishu_data
 import requests
 from requests_toolbelt import MultipartEncoder
 from PIL import Image, ImageSequence
-
+import subprocess
+import pag
 fei = Feishu_data()
 
 
@@ -29,6 +30,31 @@ def download_img(img_url):
             file.write(response.content)
             return uploadImage('image.webp')
 
+
+def convert_pag_to_mp4(pag_path, output_path):
+    try:
+        pag_file = pag.PAGFile.load("animation.pag")
+
+        # 2. 创建渲染器
+        renderer = pag.Renderer()
+        renderer.setComposition(pag_file)
+
+        # 3. 设置导出参数
+        output_file = "output.mp4"
+        width, height = pag_file.width(), pag_file.height()
+        fps = 30  # 帧率
+        duration = pag_file.duration()  # 获取动画时长
+
+        # 4. 进行渲染并保存
+        renderer.renderToFile(output_file, width, height, fps, duration)
+
+        print(f"PAG 文件已成功转换为 {output_file}")
+    except subprocess.CalledProcessError as e:
+        print("转换失败：")
+        print(e.stderr)
+
+
+# 示例调用
 
 def check_png_with_pillow(img):
     """
@@ -109,10 +135,15 @@ def check_png_transparency(file_path):
     """
     try:
         with Image.open(file_path) as img:
-            if img.mode in ("RGBA", "LA") or (img.mode == "P" and "transparency" in img.info):
-                return True, "PNG 包含透明通道"
-            else:
-                return False, "PNG 不含透明通道"
+            if img.mode in ("RGBA", "LA"):  # 有 alpha 通道
+                alpha = img.getchannel("A")
+                # 检查是否存在透明像素（alpha < 255）
+                if alpha.getextrema()[0] < 255:
+                    return "PNG 图像包含透明通道"
+            elif img.info.get("transparency", None) is not None:
+                # GIF 图像可能用 transparency index 表示透明
+                return "PNG 图像包含透明通道"
+        return "PNG 图像背景可能不是透明，请注意！！！！！！！！！"
     except Exception as e:
         return False, f"无法检测透明度: {e}"
 
@@ -156,6 +187,8 @@ def check_webp(img):
 
 if __name__ == '__main__':
     # download_img("https://gift-resource.starmakerstudios.com/pendant/pendant_webp_file_20250218083245.webp")
-    print(check_image('image.png'))
-    print(check_webp("image.webp"))
-    print(check_webp_animation_alpha('image.webp'))
+    # print(check_image('image.png'))
+    print(check_png_transparency("pendant_file_20250527035139.png"))
+    print(check_png_transparency("pendant_file_20250527064112.png"))
+
+    # print(check_webp_animation_alpha('image.webp'))

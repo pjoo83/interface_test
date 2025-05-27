@@ -145,7 +145,7 @@ def check_png_transparency(file_path):
                 return "PNG 图像包含透明通道"
         return "PNG 图像背景可能不是透明，请注意！！！！！！！！！"
     except Exception as e:
-        return False, f"无法检测透明度: {e}"
+        return f"False,无法检测透明度: {e}"
 
 
 def check_webp_animation_alpha(file_path):

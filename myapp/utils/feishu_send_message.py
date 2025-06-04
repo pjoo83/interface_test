@@ -22,10 +22,10 @@ def get_chat_id(function):
     response = requests.get(url=chat_id_url, headers=headers)
     item_list = response.json()['data']['items']
     for i in item_list:
-        if i['name'] == '机器人测试啊' and function != 'ab-test' and function != 'crazy_monster':
+        if i['name'] == '资源测试群' and function != 'ab-test' and function != 'crazy_monster':
             print(i['chat_id'])
             return i['chat_id']
-        elif i['name'] == '机器人测试啊' and function == 'ab-test':
+        elif i['name'] == '客户端测试' and function == 'ab-test':
             print(i['chat_id'])
             return i['chat_id']
         elif i['name'] == '热血怪兽新增配置检查' and function == 'crazy_monster':
@@ -145,12 +145,17 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
                 data_resources = f"文件格式存在问题{data_resources1}"
             else:
                 data_resources = f"文件格式正常:{data_resources1}"
+                check_result = check_webp_animation_alpha('image.webp')
+                file_checks = check_webp('image.webp')
+
         else:
             data_resources1 = f"https://gift-resource.starmakerstudios.com/pendant/{data[2]}"
             if ".png" not in data_resources1:
                 data_resources = f"文件格式存在问题{data_resources1}"
             else:
                 data_resources = f"文件格式正常:{data_resources1}"
+                check_result = check_png_transparency('image.png')
+                file_checks = check_image('image.png')
         content = {
             "zh_cn": {
                 "title": f"注意注意注意！！！头像框更新了！！！",
@@ -186,14 +191,14 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
                     [
                         {
                             "tag": "text",
-                            "text": f"文件检查结果 : {check_image('image.png')}",
+                            "text": f"文件检查结果 : {file_checks}",
                             "style": ["bold", "underline"]
                         },
                     ],
                     [
                         {
                             "tag": "text",
-                            "text": f"透明度检测 : {check_png_transparency('image.png')}",
+                            "text": f"透明度检测 : {check_result}",
                             "style": ["bold", "underline"]
                         },
                     ],
@@ -532,7 +537,7 @@ def start_send(function, datas):
                 headers = sql_data()[1]
                 payload = "instance_name=cdb-sg-prod-starmaker-live-r2&db_name=fb_live&schema_name=&tb_name=&sql_content" \
                           f"=select+*+from++static_props+where+props_id+%3D\'{props_id}\'"
-                data = requests.post(url=url, headers=headers, data=payload)
+                data = requests.post(url=url, headers=headers, data=payload, cookies=sql_data()[2])
                 props_result = data.json()['data']['affected_rows']
                 if props_result == 1:
                     send_msg(function, cid, 1, datas[i][0],
@@ -550,7 +555,7 @@ def start_send(function, datas):
                 headers = sql_data()[1]
                 payload = "instance_name=cdb-sg-prod-starmaker-live-r2&db_name=fb_live&schema_name=&tb_name=&sql_content" \
                           f"=select+*+from++gift+where+gift_id+%3D\'{props_id}\'"
-                data = requests.post(url=url, headers=headers, data=payload)
+                data = requests.post(url=url, headers=headers, data=payload, cookies=sql_data()[2])
                 props_result = data.json()['data']['affected_rows']
                 if props_result == 1:
                     send_msg(function, cid, 1, datas[i][0],
@@ -572,7 +577,7 @@ def start_send(function, datas):
                       '.description+%2Cc.description++%2Cd.name+%2Cd.probability++from+experiment+a+inner+join+audien' \
                       'ce_experiment+b+inner+join+audience+c++inner+join+variant+d+on+a.id+%3D+b.experiment_id+and+b.' \
                       f'audience_id+%3D+c.id+and+a.id+%3Dd.experiment_id+where+a.id+%3D+{datas[i][0]}'
-            data = requests.post(url=url, headers=headers, data=payload)
+            data = requests.post(url=url, headers=headers, data=payload, cookies=sql_data()[2])
             test_date = data.json()['data']['rows']
             for z in range(len(test_date)):
                 test_group.append(f"实验分组：{test_date[z][8]}，放量占比：{test_date[z][9]}")

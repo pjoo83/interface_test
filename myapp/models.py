@@ -254,6 +254,6 @@ class test_user(models.Model):
 
 # 测试比记录表
 class test_record(models.Model):
-    id = models.IntegerField(max_length=30, verbose_name='顺序Id', primary_key=True)
+    id = models.IntegerField(verbose_name='顺序Id', primary_key=True)
     user_id = models.ForeignKey(test_user, on_delete=models.CASCADE, verbose_name='用户ID')
     record = models.TextField()

@@ -448,7 +448,7 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
             headers1 = sql_data()[1]
             payload = "instance_name=cdb-sg-prod-starmaker-live-2-r2&db_name=monster&schema_name=&tb_name=&sql_content" \
                       f"=select+*+from++equip+where+equip_key+%3D\'{equip_key}\'"
-            datas1 = requests.post(url=url, headers=headers1, data=payload)
+            datas1 = requests.post(url=url, headers=headers1, data=payload,cookies=sql_data()[2])
             props_result = datas1.json()['data']['affected_rows']
             if props_result == 1:
                 zb = f"装备表有对应合成的装备key：{data[2]}"

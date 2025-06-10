@@ -1,4 +1,4 @@
-from ..utils.feishu_data import Feishu_data
+from myapp.utils.feishu_data import Feishu_data
 import requests
 import json
 
@@ -43,3 +43,22 @@ def get_user_access_token():
     response = requests.post(url=fei.user_access_token, headers=headers, data=payload)
     body = response.text
     return response.json()
+
+
+def get_plugin_access_token():
+    """
+    :return: 返回访问plugin_access_token
+    """
+    url = "https://project.feishu.cn/open_api/authen/plugin_token"
+
+    payload = json.dumps({
+        "plugin_id": "MII_6784DC70B348001C",
+        "plugin_secret": "25443C13FA76DD659237D60164AD4869",
+        "type": 0
+    })
+    headers = {
+        'Content-Type': 'application/json'
+    }
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+    return response.json()['data']['token']

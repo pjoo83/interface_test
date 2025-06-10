@@ -33,7 +33,7 @@ class LoginRequiredMiddleware:
                         '/autotest/dashboard/ios/insert_api/', '/autotest/resource_mount_increase/',
                         '/autotest/pendant_mount_increase/', '/autotest/debris_mount_increase/',
                         '/autotest/ab_experiment_increase/', '/autotest/bubble_mount_increase/',
-                        '/autotest/check_crazy_monster_all/']
+                        '/autotest/check_crazy_monster_all/', '/autotest/td_testing_calculations/']
         if request.path_info in exclude_urls:
             # 如果请求的URL在排除列表中，则直接跳过验证
             response = self.get_response(request)

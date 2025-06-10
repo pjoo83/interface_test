@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import login_view, register_view, index, intertools_view, business_view, dashboard_view, interface_view, \
     uitest_view, resource_increase_view, pendant_increase_view, debris_increase_view, ab_experiment_view, \
-    bubble_increase_view, crazy_monster_check, phone_capture_view
+    bubble_increase_view, crazy_monster_check, phone_capture_view,rd_testing_calculations
 
 urlpatterns = [
     # 登录注册
@@ -64,6 +64,9 @@ urlpatterns = [
     path('phone-capture/capture_traffic/', phone_capture_view.capture_traffic, name='capture_traffic'),
     path('phone-capture/get_captured_data/', phone_capture_view.get_captured_data, name='get_captured_data'),
     # path('phone-capture/clear_domain_data/', phone_capture_view.clear_domain_data, name='clear_domain_data'),
+
+    # 研发测试比
+    path("td_testing_calculations/", rd_testing_calculations.td_testing_calculations, name='rd_testing_calculations'),
 
     path("business/", business_view.business_list),
     path("business/del/", business_view.business_del),

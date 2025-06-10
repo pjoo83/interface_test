@@ -133,7 +133,7 @@ def get_working_version_list():
     return testing_list
 
 
-def get_demand_list():
+def get_demand_list(year, month, day, uid):
     """
     :return: 复杂传参获取需求列表，按照时间戳取时间段的需求
     state_ket:doing 产品内审、end：需求结束
@@ -149,7 +149,7 @@ def get_demand_list():
             "search_params": [
                 {
                     "param_key": "created_at",
-                    "value": get_zero_timestamp_ms(2025, 1, 1),
+                    "value": get_zero_timestamp_ms(year, month, day),
                     "operator": ">="
                 },
                 # {
@@ -165,7 +165,7 @@ def get_demand_list():
                 {
                     "param_key": "role_owners",
                     "value": [{"role": "qa",
-                               "owners": ['7117238460611624964']}],
+                               "owners": [f'{uid}']}],
                     "operator": "HAS ANY OF"
                 }
 
@@ -304,11 +304,11 @@ def calculate_points_if_has_test_stage(data):
 
 # get_version_time()
 # 获取每个项目的节点
-def get_items_node():
+def get_items_node(year, month, day, uid):
     """
     :return:工作的所有需求的节点工作时间
     """
-    node_list = get_demand_list()
+    node_list = get_demand_list(year, month, day, uid)
     node_id_list = []
     for story_id in node_list:
         data_detail = calculate_points_if_has_test_stage(get_workflow(story_id['id']))
@@ -374,6 +374,9 @@ def analyze_workload_by_version(data_list):
     }
 
 
-result = analyze_workload_by_version(get_items_node())
-print(result)
-# kehuduan= 0.5+0.5+3+2+2+1.5+1+2
+def get_check(year, month, day, uid):
+    result = analyze_workload_by_version(get_items_node(year, month, day, uid))
+    return result
+
+if __name__ == '__main__':
+    print(get_check(2025, 1, 1, 7117238460611624964))

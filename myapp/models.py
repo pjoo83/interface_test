@@ -247,7 +247,7 @@ class resource_record(models.Model):
 
 # 测试用户表
 class test_user(models.Model):
-    id = models.IntegerField(max_length=30, verbose_name='顺序Id', primary_key=True)
+    id = models.IntegerField(verbose_name='顺序Id', primary_key=True)
     user_name = models.CharField(max_length=30, verbose_name='用户名', null=False)
     user_id = models.CharField(max_length=30, verbose_name='用户ID', null=False)
 

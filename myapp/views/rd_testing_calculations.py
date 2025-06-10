@@ -5,7 +5,7 @@ from myapp.utils.database_tools import execute_sql
 from myapp.utils.feishu_send_message import start_send
 from myapp.utils.feishu_project import get_check
 from django.views.decorators.csrf import csrf_exempt
-
+import json
 
 @csrf_exempt
 def td_testing_calculations(request):
@@ -19,5 +19,4 @@ def td_testing_calculations(request):
         month = request.GET.get("month")
         print(uid, year, day, month)
         data = get_check(uid=int(uid), year=int(year), day=int(day), month=int(month))
-
-        return JsonResponse({"status": 0, "msg": data})
+        return JsonResponse(data, json_dumps_params={'ensure_ascii': False})

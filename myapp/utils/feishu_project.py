@@ -148,15 +148,10 @@ def get_demand_list(year, month, day, uid):
             "conjunction": "AND",
             "search_params": [
                 {
-                    "param_key": "created_at",
+                    "param_key": "finish_time",
                     "value": get_zero_timestamp_ms(year, month, day),
                     "operator": ">="
                 },
-                # {
-                #     "param_key": "created_at",
-                #     "value": get_zero_timestamp_ms(2025, 6, 9),
-                #     "operator": "<="
-                # },
                 {
                     "param_key": "work_item_status",
                     "value": ["end"],
@@ -378,5 +373,6 @@ def get_check(year, month, day, uid):
     result = analyze_workload_by_version(get_items_node(year, month, day, uid))
     return result
 
+
 if __name__ == '__main__':
-    print(get_check(2025, 1, 1, 7117238460611624964))
+    print(get_check(2025, 5, 1, 7117238460611624964))

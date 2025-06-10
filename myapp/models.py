@@ -242,3 +242,18 @@ class resource_record(models.Model):
     record_name = models.CharField(verbose_name='资源名称', max_length=300, null=True)
     record_png_url = models.CharField(verbose_name='资源头图', max_length=300, null=True)
     record_pag_url = models.CharField(verbose_name='资源视频地址', max_length=300, null=True)
+    record_data = models.IntegerField(verbose_name='资源数据', null=True)
+
+
+# 测试用户表
+class test_user(models.Model):
+    id = models.IntegerField(max_length=30, verbose_name='顺序Id', primary_key=True)
+    user_name = models.CharField(max_length=30, verbose_name='用户名', null=False)
+    user_id = models.CharField(max_length=30, verbose_name='用户ID', null=False)
+
+
+# 测试比记录表
+class test_record(models.Model):
+    id = models.IntegerField(max_length=30, verbose_name='顺序Id', primary_key=True)
+    user_id = models.ForeignKey(test_user, on_delete=models.CASCADE, verbose_name='用户ID')
+    record = models.TextField()

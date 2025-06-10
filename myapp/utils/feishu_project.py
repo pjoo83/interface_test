@@ -345,7 +345,7 @@ def analyze_workload_by_version(data_list):
                     test_total += value
                 else:
                     dev_total += value
-        ratio = round(test_total / dev_total, 3) if dev_total != 0 else "N/A"
+        ratio = round(dev_total/test_total, 3) if dev_total != 0 else "N/A"
         return test_total, dev_total, ratio
 
     # 计算数据
@@ -358,20 +358,20 @@ def analyze_workload_by_version(data_list):
             "数量": len(version_demands),
             "测试总时间": v_test,
             "研发总时间": v_dev,
-            "测试/研发比值": v_ratio,
+            "研发/测试比值": v_ratio,
         },
         "非版本需求": {
             "数量": len(non_version_demands),
             "测试总时间": nv_test,
             "研发总时间": nv_dev,
-            "测试/研发比值": nv_ratio,
+            "研发/测试比值": nv_ratio,
         },
 
         "总需求数": {
             "数量": len(version_demands) + len(non_version_demands),
             "测试总时间": v_test + nv_test,
             "研发总时间": v_dev + nv_dev,
-            "测试/研发比值": round((v_test + nv_test) / (v_dev + nv_dev), 3) if (v_dev + nv_dev) != 0 else "N/A"
+            "研发/测试比值": round((v_dev + nv_dev) / (v_test + nv_test), 3) if (v_dev + nv_dev) != 0 else "N/A"
         }
 
     }

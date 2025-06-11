@@ -133,9 +133,70 @@ def get_working_version_list():
     return testing_list
 
 
-def get_demand_list(year, month, day, uid):
+def get_demand_finished_list(year, month, day, uid=None):
     """
     :return: 复杂传参获取需求列表，按照时间戳取时间段的需求
+    state_ket:doing 产品内审、end：需求结束
+    """
+    headers = feishu_project_head
+    project_key = get_business_key()
+    url = f"{fei.feishu_project_url}{project_key}/work_item/story/search/params"
+    if uid is None:
+        search_params = [
+            {
+                "param_key": "finish_time",
+                "value": get_zero_timestamp_ms(year, month, day),
+                "operator": ">="
+            },
+            {
+                "param_key": "work_item_status",
+                "value": ["end"],
+                "operator": "="
+            }
+        ]
+    else:
+        search_params = [
+            {
+                "param_key": "finish_time",
+                "value": get_zero_timestamp_ms(year, month, day),
+                "operator": ">="
+            },
+            {
+                "param_key": "work_item_status",
+                "value": ["end"],
+                "operator": "="
+            },
+            {
+                "param_key": "role_owners",
+                "value": [{"role": "qa",
+                           "owners": [f'{uid}']}],
+                "operator": "HAS ANY OF"
+            }
+        ]
+
+    payload = json.dumps({
+        "page_size": 50,
+        "page_num": 1,
+        "search_group": {
+            "conjunction": "AND",
+            "search_params": search_params
+
+        },
+        "expand": {
+            "need_workflow": True,
+            # "need_multi_text": True,
+            # "relation_fields_detail": True
+        }
+    })
+    response = requests.post(url=url, headers=headers, data=payload)
+    testing_list = response.json()['data']
+    # print(testing_list)
+    return testing_list
+
+
+def get_demand_progress_list(uid):
+    """
+    :return: 复杂传参获取需求列表，查询没有结束的需求
     state_ket:doing 产品内审、end：需求结束
     """
     headers = feishu_project_head
@@ -148,14 +209,9 @@ def get_demand_list(year, month, day, uid):
             "conjunction": "AND",
             "search_params": [
                 {
-                    "param_key": "finish_time",
-                    "value": get_zero_timestamp_ms(year, month, day),
-                    "operator": ">="
-                },
-                {
                     "param_key": "work_item_status",
                     "value": ["end"],
-                    "operator": "="
+                    "operator": "!="
                 },
                 {
                     "param_key": "role_owners",
@@ -177,9 +233,6 @@ def get_demand_list(year, month, day, uid):
     testing_list = response.json()['data']
     # print(testing_list)
     return testing_list
-
-
-# get_demand_list()
 
 
 def get_demand_story_list():
@@ -299,11 +352,15 @@ def calculate_points_if_has_test_stage(data):
 
 # get_version_time()
 # 获取每个项目的节点
-def get_items_node(year, month, day, uid):
+def get_items_node(year, month, day, uid, date_type):
     """
     :return:工作的所有需求的节点工作时间
     """
-    node_list = get_demand_list(year, month, day, uid)
+    node_list = []
+    if date_type == "person_finished_data":
+        node_list = get_demand_finished_list(year, month, day, uid)
+    elif date_type == "person_incomplete_data":
+        node_list = get_demand_progress_list(uid)
     node_id_list = []
     for story_id in node_list:
         data_detail = calculate_points_if_has_test_stage(get_workflow(story_id['id']))
@@ -345,7 +402,7 @@ def analyze_workload_by_version(data_list):
                     test_total += value
                 else:
                     dev_total += value
-        ratio = round(dev_total/test_total, 3) if dev_total != 0 else "N/A"
+        ratio = round(dev_total / test_total, 3) if dev_total != 0 else "N/A"
         return test_total, dev_total, ratio
 
     # 计算数据
@@ -377,10 +434,12 @@ def analyze_workload_by_version(data_list):
     }
 
 
-def get_check(year, month, day, uid):
-    result = analyze_workload_by_version(get_items_node(year, month, day, uid))
+def get_check(year, month, day, uid, date_type):
+    result = analyze_workload_by_version(get_items_node(year, month, day, uid, date_type))
     return result
 
 
 if __name__ == '__main__':
-    print(get_check(2025, 5, 1, 7117238460611624964))
+    print(get_check(2025, 5, 1, uid=None, date_type='person_finished_data'))
+    # print(get_check(2025, 5, 1, 7117238460611624964, 'person_finished_data'))
+    # print(get_check(2025, 5, 1, 7117238460611624964, 'person_incomplete_data'))

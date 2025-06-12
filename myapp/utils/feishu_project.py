@@ -21,6 +21,18 @@ def get_zero_timestamp_ms(year: int, month: int, day: int) -> int:
     return timestamp_ms
 
 
+def get_zero_timestamp_ms_from_int(date_int: int) -> int:
+    """
+    将形如 20250601 的整数日期转换为该日期零点的时间戳（毫秒）。
+
+    :param date_int: 日期，如 20250601
+    :return: 该日期零点的时间戳（毫秒）
+    """
+    date_str = str(date_int)
+    dt = datetime.strptime(date_str, "%Y%m%d")
+    timestamp_ms = int(dt.timestamp() * 1000)
+    return timestamp_ms
+
 # 示例
 
 feishu_project_head = {
@@ -133,7 +145,7 @@ def get_working_version_list():
     return testing_list
 
 
-def get_demand_finished_list(year, month, day, uid=None):
+def get_demand_finished_list(date, uid=None):
     """
     :return: 复杂传参获取需求列表，按照时间戳取时间段的需求
     state_ket:doing 产品内审、end：需求结束
@@ -145,7 +157,7 @@ def get_demand_finished_list(year, month, day, uid=None):
         search_params = [
             {
                 "param_key": "finish_time",
-                "value": get_zero_timestamp_ms(year, month, day),
+                "value": get_zero_timestamp_ms_from_int(date),
                 "operator": ">="
             },
             {
@@ -158,7 +170,7 @@ def get_demand_finished_list(year, month, day, uid=None):
         search_params = [
             {
                 "param_key": "finish_time",
-                "value": get_zero_timestamp_ms(year, month, day),
+                "value": get_zero_timestamp_ms_from_int(date),
                 "operator": ">="
             },
             {
@@ -194,7 +206,7 @@ def get_demand_finished_list(year, month, day, uid=None):
     return testing_list
 
 
-def get_demand_progress_list(uid):
+def get_demand_progress_list(uid=None):
     """
     :return: 复杂传参获取需求列表，查询没有结束的需求
     state_ket:doing 产品内审、end：需求结束
@@ -202,25 +214,34 @@ def get_demand_progress_list(uid):
     headers = feishu_project_head
     project_key = get_business_key()
     url = f"{fei.feishu_project_url}{project_key}/work_item/story/search/params"
+    if uid is None:
+        search_params = [
+            {
+                "param_key": "work_item_status",
+                "value": ["end"],
+                "operator": "!="
+            }
+        ]
+    else:
+        search_params = [
+            {
+                "param_key": "work_item_status",
+                "value": ["end"],
+                "operator": "!="
+            },
+            {
+                "param_key": "role_owners",
+                "value": [{"role": "qa",
+                           "owners": [f'{uid}']}],
+                "operator": "HAS ANY OF"
+            }
+        ]
     payload = json.dumps({
         "page_size": 50,
         "page_num": 1,
         "search_group": {
             "conjunction": "AND",
-            "search_params": [
-                {
-                    "param_key": "work_item_status",
-                    "value": ["end"],
-                    "operator": "!="
-                },
-                {
-                    "param_key": "role_owners",
-                    "value": [{"role": "qa",
-                               "owners": [f'{uid}']}],
-                    "operator": "HAS ANY OF"
-                }
-
-            ]
+            "search_params": search_params
 
         },
         "expand": {
@@ -352,13 +373,13 @@ def calculate_points_if_has_test_stage(data):
 
 # get_version_time()
 # 获取每个项目的节点
-def get_items_node(year, month, day, uid, date_type):
+def get_items_node(date, uid, date_type):
     """
     :return:工作的所有需求的节点工作时间
     """
     node_list = []
     if date_type == "person_finished_data":
-        node_list = get_demand_finished_list(year, month, day, uid)
+        node_list = get_demand_finished_list(date, uid)
     elif date_type == "person_incomplete_data":
         node_list = get_demand_progress_list(uid)
     node_id_list = []
@@ -434,12 +455,14 @@ def analyze_workload_by_version(data_list):
     }
 
 
-def get_check(year, month, day, uid, date_type):
-    result = analyze_workload_by_version(get_items_node(year, month, day, uid, date_type))
+def get_check(date, uid, date_type):
+    result = analyze_workload_by_version(get_items_node(date, uid, date_type))
     return result
 
 
 if __name__ == '__main__':
-    print(get_check(2025, 5, 1, uid=None, date_type='person_finished_data'))
-    # print(get_check(2025, 5, 1, 7117238460611624964, 'person_finished_data'))
-    # print(get_check(2025, 5, 1, 7117238460611624964, 'person_incomplete_data'))
+    # print(get_check(20250501, uid=None, date_type='person_finished_data'))
+    # print(get_check(20250501, 7117238460611624964, 'person_finished_data'))
+    # print(get_check(20250501, 7117238460611624964, 'person_incomplete_data'))
+    print(get_check(20250501, uid=None, date_type='person_incomplete_data'))
+

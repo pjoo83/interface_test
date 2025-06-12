@@ -7,16 +7,25 @@ from myapp.utils.feishu_project import get_check
 from django.views.decorators.csrf import csrf_exempt
 import json
 
+
 @csrf_exempt
 def td_testing_calculations(request):
     """
     研发测试比
     """
     if request.method == "GET":
-        uid = request.GET.get("uid")
-        year = request.GET.get("year")
-        day = request.GET.get("day")
-        month = request.GET.get("month")
-        print(uid, year, day, month)
-        data = get_check(uid=int(uid), year=int(year), day=int(day), month=int(month))
+        date = request.GET.get("date")
+        date_type = request.GET.get("date_type")
+        data = ""
+        if request.GET.get("uid"):
+            uid = request.GET.get("uid")
+            if date_type == 'person_finished_data':
+                data = get_check(date=date, uid=int(uid), date_type=date_type)
+            elif date_type == 'person_incomplete_data':
+                data = get_check(date=date, uid=int(uid), date_type=date_type)
+        else:
+            if date_type == 'person_finished_data':
+                data = get_check(date=date, uid=None, date_type=date_type)
+            elif date_type == 'person_incomplete_data':
+                data = get_check(date=date, uid=None, date_type=date_type)
         return JsonResponse(data, json_dumps_params={'ensure_ascii': False})

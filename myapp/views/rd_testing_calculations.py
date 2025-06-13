@@ -29,3 +29,4 @@ def td_testing_calculations(request):
             elif date_type == 'person_incomplete_data':
                 data = get_check(date=date, uid=None, date_type=date_type)
         return JsonResponse(data, json_dumps_params={'ensure_ascii': False})
+

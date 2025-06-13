@@ -24,7 +24,7 @@ def td_testing_calculations(request):
             elif date_type == 'person_incomplete_data':
                 data = get_check(date=date, uid=int(uid), date_type=date_type)
         else:
-            if date_type == 'person_incomplete_data':
+            if date_type == 'person_finished_data':
                 data = get_check(date=date, uid=None, date_type=date_type)
             elif date_type == 'person_incomplete_data':
                 data = get_check(date=date, uid=None, date_type=date_type)

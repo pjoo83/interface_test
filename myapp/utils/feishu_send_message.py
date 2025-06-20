@@ -22,13 +22,13 @@ def get_chat_id(function):
     response = requests.get(url=chat_id_url, headers=headers)
     item_list = response.json()['data']['items']
     for i in item_list:
-        if i['name'] == '资源测试群' and function != 'ab-test' and function != 'crazy_monster':
+        if i['name'] == '机器人测试啊' and function != 'ab-test' and function != 'crazy_monster':
             print(i['chat_id'])
             return i['chat_id']
-        elif i['name'] == '客户端测试' and function == 'ab-test':
+        elif i['name'] == '机器人测试啊' and function == 'ab-test':
             print(i['chat_id'])
             return i['chat_id']
-        elif i['name'] == '热血怪兽新增配置检查' and function == 'crazy_monster':
+        elif i['name'] == '机器人测试啊' and function == 'crazy_monster':
             print(i['chat_id'])
             return i['chat_id']
 
@@ -568,8 +568,8 @@ def start_send(function, datas):
                              '注意注意！！！！！碎片表中配错礼物表id',
                              datas[i][1], '')
     elif function == 'ab-test':
-        test_group = []
         for i in range(len(datas)):
+            test_group = []
             url = sql_data()[0]
             headers = sql_data()[1]
             payload = 'instance_name=cdb-sg-prod-abookserver-abtest&db_name=abtest&schema_name=&tb_name=&sql_content' \
@@ -579,8 +579,8 @@ def start_send(function, datas):
                       f'audience_id+%3D+c.id+and+a.id+%3Dd.experiment_id+where+a.id+%3D+{datas[i][0]}'
             data = requests.post(url=url, headers=headers, data=payload, cookies=sql_data()[2])
             test_date = data.json()['data']['rows']
-            for z in range(len(test_date)):
-                test_group.append(f"实验分组：{test_date[z][8]}，放量占比：{test_date[z][9]}")
+            for z in test_date:
+                test_group.append(f"实验分组：{z[8]}，放量占比：{z[9]}")
             if test_date[0][5] == 0:
                 test_date[0][5] = "实验中"
             elif test_date[0][5] == 3:

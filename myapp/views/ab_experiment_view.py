@@ -11,7 +11,7 @@ def ab_experiment_increase(request):
     payload = "instance_name=cdb-sg-prod-abookserver-abtest&db_name=abtest&schema_name" \
               "=&tb_name=&sql_content=select+distinct+id+from+experiment++order+by+id+desc+limit+5%3B%0A&limit_num=0"
 
-    data = requests.post(url=url, headers=headers, data=payload)
+    data = requests.post(url=url, headers=headers, data=payload, cookies=sql_data()[2])
     new_data = data.json()['data']['rows'][0]
     Mount_data = resource_check(3, 4)[0][2]
     if Mount_data == new_data[0]:

@@ -448,7 +448,7 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
             headers1 = sql_data()[1]
             payload = "instance_name=cdb-sg-prod-starmaker-live-2-r2&db_name=monster&schema_name=&tb_name=&sql_content" \
                       f"=select+*+from++equip+where+equip_key+%3D\'{equip_key}\'"
-            datas1 = requests.post(url=url, headers=headers1, data=payload,cookies=sql_data()[2])
+            datas1 = requests.post(url=url, headers=headers1, data=payload, cookies=sql_data()[2])
             props_result = datas1.json()['data']['affected_rows']
             if props_result == 1:
                 zb = f"装备表有对应合成的装备key：{data[2]}"
@@ -500,6 +500,29 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
                 "content": json.dumps(content)  # ✅ 这里必须转换成字符串
             }
             response = requests.post(url=send_url, headers=headers, json=data1, verify=True)
+
+    elif function == 'Testing_and_Development':
+        content = {
+            "zh_cn": {
+                "title": "注意注意注意！！！！",
+                "content": [
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"测试数据：{line}",
+                            "style": ["bold"]
+                        }
+                    ] for line in data
+                ]
+            }
+        }
+
+        data1 = {
+            "receive_id": chat_id,
+            "msg_type": "post",
+            "content": json.dumps(content)  # ✅ 这里必须转换成字符串
+        }
+        response = requests.post(url=send_url, headers=headers, json=data1, verify=True)
 
 
 def start_send(function, datas):
@@ -622,6 +645,9 @@ def start_send(function, datas):
     elif function == 'crazy_monster':
         for i in range(len(datas)):
             send_msg('crazy_monster', cid, 1, datas[i][0], datas[i][2], datas[i][3], datas[i][4], datas[i])
+
+    elif function == 'Testing_and_Development':
+        send_msg('Testing_and_Development', cid, 1, datas, datas, datas, datas, datas)
 
 
 def stamp_to_time(times):

@@ -35,12 +35,13 @@ def get_business_key():
         "order": [""]
     })
     business = requests.post(url, headers=feishu_project_head, data=payload)
+    print(business.json())
     return business.json()['data'][0]
 
 
 def get_demand_finished_list(date, uid=None):
     headers = feishu_project_head
-    project_key = get_business_key()
+    project_key = '62a6fce5ed2541be7bf5c2d3'
     url = f"{fei.feishu_project_url}{project_key}/work_item/story/search/params"
     search_params = [
         {"param_key": "finish_time", "value": get_zero_timestamp_ms_from_int(date), "operator": ">="},
@@ -57,7 +58,7 @@ def get_demand_finished_list(date, uid=None):
 
 def get_demand_progress_list(uid=None):
     headers = feishu_project_head
-    project_key = get_business_key()
+    project_key = '62a6fce5ed2541be7bf5c2d3'
     url = f"{fei.feishu_project_url}{project_key}/work_item/story/search/params"
     search_params = [
         {"param_key": "work_item_status", "value": ["end"], "operator": "!="},
@@ -100,7 +101,7 @@ def _paged_post(url, headers, search_params):
 
 
 def get_workflow_with_retry(story_id, project_key, headers):
-    url = f"https://project.feishu.cn/open_api/{project_key}/work_item/story/{story_id}/workflow/query"
+    url = f"https://project.feishu.cn/open_api/62a6fce5ed2541be7bf5c2d3/work_item/story/{story_id}/workflow/query"
     payload = json.dumps({"flow_type": 0})
     retries, backoff = 0, 1
     while retries < MAX_RETRIES:
@@ -143,16 +144,22 @@ def calculate_points_if_has_test_stage(data):
         "Web后端开发", "主服务端开发", "互娱端开发", "游戏后端", "游戏前端", "曲库开发", "音视频开发"
     ]
     points_result = {}
+
     for node in data.get("workflow_nodes", []):
         name = node.get("name", "")
         if name in target_names:
             total_points = sum(s.get("points", 0) for s in node.get("schedules", []))
             points_result[name] = total_points
+
+            if name == "测试阶段":
+                # 插入测试阶段的 owners 到 qa 字段
+                points_result["qa"] = node.get("owners", [])
+
     return points_result
 
 
 def get_items_node(date, uid, date_type):
-    project_key = get_business_key()
+    project_key = '62a6fce5ed2541be7bf5c2d3'
     if date_type == "person_finished_data":
         node_list = get_demand_finished_list(date, uid)
         node_list = filter_data_list2(node_list, str(date))
@@ -164,9 +171,17 @@ def get_items_node(date, uid, date_type):
     result = []
     for sid, data in workflow_data_list:
         points = calculate_points_if_has_test_stage(data)
+        # if points:
+        #     name = next((item['name'] for item in node_list if item['id'] == sid), "")
+        #     result.append({"需求id": sid, "需求名称name": name, "单个需求数据data": points})
+
         if points:
             name = next((item['name'] for item in node_list if item['id'] == sid), "")
-            result.append({"需求id": sid, "需求名称name": name, "单个需求数据data": points})
+            result.append({
+                "需求id": sid,
+                "需求名称name": name,
+                "单个需求数据data": points,
+            })
     return result
 
 
@@ -231,7 +246,7 @@ def analyze_workload_by_version(data_list):
             continue
 
         test = stages.get(test_key, 0)
-        develop = sum(v for k, v in stages.items() if k != test_key)
+        develop = sum(v for k, v in stages.items() if k != test_key and k != 'qa')
 
         if any(k in stages for k in version_keys):
             version_demands.append(item)
@@ -242,17 +257,22 @@ def analyze_workload_by_version(data_list):
             continue
         elif test == 0:
             Lack_of_time.append(
-                f"需求ID: {item['需求id']}，需求名称: {item['需求名称name']} 测试时间为0，请注意填写！！！"
+                f"负责人{item['单个需求数据data']['qa']}需求名称: {item['需求名称name']} 测试时间为0，请注意填写！！！"
+                f"需求链接：https://project.feishu.cn/wangmao12345678/story/detail/{item['id']}?"
+                f"parentUrl=%2Fwangmao12345678%2Fstory%2Fhomepage&openScene=4"
             )
         else:
             ratio = round(develop / test, 3)
             if ratio < 3:
                 attention_records.append({
+                    '负责人': item['单个需求数据data']['qa'],
                     "需求id": item['需求id'],
                     "需求名称": item['需求名称name'],
                     "测试": test,
                     "研发": develop,
-                    "比": ratio
+                    "比": ratio,
+                    "需求链接": f"https://project.feishu.cn/wangmao12345678/story/detail/{item['需求id']}?parentUrl"
+                            f"=%2Fwangmao12345678%2Fstory%2Fhomepage&openScene=4"
                 })
 
     # 排序 attention_records 按比值从大到小
@@ -260,19 +280,22 @@ def analyze_workload_by_version(data_list):
 
     # 构造传给接口的消息列表
     attention_messages = [
-        f"需求ID: {rec['需求id']} 需求名称: {rec['需求名称']} 测试/研发比过高，需优化！测试: {rec['测试']}, 研发: {rec['研发']}, 比: {rec['比']}"
+        f" 负责人:{rec['负责人']} 需求名称: {rec['需求名称']} 测试/研发比过高，需优化！测试: {rec['测试']}, 研发: {rec['研发']}," \
+        f" 比: {rec['比']},需求链接: {rec['需求链接']}"
         for rec in sorted_attention
     ]
 
     # 调用接口，传排序好的数据
-    start_send(function='Testing_and_Development', datas=Lack_of_time)
-    start_send(function='Testing_and_Development', datas=attention_messages)
+    if len(Lack_of_time) > 0:
+        start_send(function='Testing_and_Development', datas=Lack_of_time)
+    if len(attention_messages) > 0:
+        start_send(function='Testing_and_Development', datas=attention_messages)
 
     # 聚合统计
     def compute_totals(demands):
         test_total = sum(item["单个需求数据data"].get(test_key, 0) for item in demands)
         dev_total = sum(
-            sum(v for k, v in item["单个需求数据data"].items() if k != test_key) for item in demands
+            sum(v for k, v in item["单个需求数据data"].items() if k != test_key and k != 'qa') for item in demands
         )
         ratio = round(dev_total / test_total, 3) if test_total else "N/A"
         return test_total, dev_total, ratio
@@ -298,8 +321,8 @@ def get_check(date, uid, date_type):
 
 
 if __name__ == '__main__':
-    result = get_check(20250601, uid=None, date_type='person_incomplete_data')
-    # print(get_check(20250501, uid=None, date_type='person_finished_data'))
+    # result = get_check(20250601, uid=None, date_type='person_incomplete_data')
+    print(get_check(20250601, uid=None, date_type='person_finished_data'))
     # print(get_check(20250601, 7117238460611624964, 'person_finished_data'))
     # print(get_check(20250601, 7117238460611624964, 'person_incomplete_data'))
-    print(json.dumps(result, indent=2, ensure_ascii=False))
+    # print(json.dumps(result, indent=2, ensure_ascii=False))

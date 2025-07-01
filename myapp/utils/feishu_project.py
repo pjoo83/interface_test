@@ -1,10 +1,9 @@
 import requests
-import json
 from myapp.utils.feishu_data import Feishu_data
 from myapp.utils.feishu_get_token import get_plugin_access_token
-from datetime import datetime
-import time
+from datetime import datetime, timezone
 import json
+from dateutil.parser import parse
 
 fei = Feishu_data()
 
@@ -32,6 +31,7 @@ def get_zero_timestamp_ms_from_int(date_int: int) -> int:
     dt = datetime.strptime(date_str, "%Y%m%d")
     timestamp_ms = int(dt.timestamp() * 1000)
     return timestamp_ms
+
 
 # 示例
 
@@ -185,25 +185,42 @@ def get_demand_finished_list(date, uid=None):
                 "operator": "HAS ANY OF"
             }
         ]
+    page_num = 1
+    page_size = 50
+    all_items = []
+    while True:
+        payload = json.dumps({
+            "page_size": page_size,
+            "page_num": page_num,
+            "search_group": {
+                "conjunction": "AND",
+                "search_params": search_params
+            },
+            "expand": {
+                "need_workflow": True,
+                # "need_multi_text": True,
+                # "relation_fields_detail": True
+            }
+        })
 
-    payload = json.dumps({
-        "page_size": 50,
-        "page_num": 1,
-        "search_group": {
-            "conjunction": "AND",
-            "search_params": search_params
+        response = requests.post(url=url, headers=headers, data=payload)
+        if response.status_code != 200:
+            print(f"请求失败: {response.status_code}, {response.text}")
+            break
 
-        },
-        "expand": {
-            "need_workflow": True,
-            # "need_multi_text": True,
-            # "relation_fields_detail": True
-        }
-    })
-    response = requests.post(url=url, headers=headers, data=payload)
-    testing_list = response.json()['data']
-    # print(testing_list)
-    return testing_list
+        resp_data = response.json()
+        data_list = resp_data.get('data', [])
+
+        if not data_list:
+            break
+
+        all_items.extend(data_list)
+
+        if len(data_list) < page_size:
+            # 当前页返回不足page_size，说明已到最后一页
+            break
+        page_num += 1
+    return all_items
 
 
 def get_demand_progress_list(uid=None):
@@ -220,7 +237,17 @@ def get_demand_progress_list(uid=None):
                 "param_key": "work_item_status",
                 "value": ["end"],
                 "operator": "!="
-            }
+            },
+            {
+                "param_key": "work_item_status",
+                "value": ["end"],
+                "operator": "!="
+            },
+            {
+                "param_key": "created_at",
+                "value": 1735660800000,
+                "operator": ">"
+            },
         ]
     else:
         search_params = [
@@ -234,26 +261,52 @@ def get_demand_progress_list(uid=None):
                 "value": [{"role": "qa",
                            "owners": [f'{uid}']}],
                 "operator": "HAS ANY OF"
-            }
+            },
+            {
+                "param_key": "created_at",
+                "value": 1735660800000,
+                "operator": ">"
+            },
         ]
-    payload = json.dumps({
-        "page_size": 50,
-        "page_num": 1,
-        "search_group": {
-            "conjunction": "AND",
-            "search_params": search_params
+    page_num = 1
+    page_size = 50
+    all_items = []
 
-        },
-        "expand": {
-            "need_workflow": True,
-            # "need_multi_text": True,
-            # "relation_fields_detail": True
-        }
-    })
-    response = requests.post(url=url, headers=headers, data=payload)
-    testing_list = response.json()['data']
-    # print(testing_list)
-    return testing_list
+    while True:
+        payload = json.dumps({
+            "page_size": page_size,
+            "page_num": page_num,
+            "search_group": {
+                "conjunction": "AND",
+                "search_params": search_params
+            },
+            "expand": {
+                "need_workflow": True,
+                # "need_multi_text": True,
+                # "relation_fields_detail": True
+            }
+        })
+
+        response = requests.post(url=url, headers=headers, data=payload)
+        if response.status_code != 200:
+            print(f"请求失败: {response.status_code}, {response.text}")
+            break
+
+        resp_data = response.json()
+        data_list = resp_data.get('data', [])
+
+        if not data_list:
+            break
+
+        all_items.extend(data_list)
+
+        if len(data_list) < page_size:
+            # 当前页不足page_size，说明最后一页
+            break
+
+        page_num += 1
+
+    return all_items
 
 
 def get_demand_story_list():
@@ -323,7 +376,6 @@ def get_workflow(story_id):
     })
     response = requests.post(url=url, headers=headers, data=payload)
     return response.json()['data']
-    # print(response.json()['data'])
 
 
 # get_workflow(6156738065)
@@ -336,7 +388,12 @@ def calculate_points_if_has_test_stage(data):
         "测试阶段",
         "Web前端开发",
         "Web后端开发",
-        "主服务端开发"
+        "主服务端开发",
+        "互娱端开发",
+        "游戏后端",
+        "游戏前端",
+        "曲库开发",
+        "音视频开发"
     ]
 
     workflow_nodes = data.get("workflow_nodes", [])
@@ -349,7 +406,6 @@ def calculate_points_if_has_test_stage(data):
         if name in target_names:
             total_points = sum(schedule.get("points", 0) for schedule in node.get("schedules", []))
             points_result[name] = total_points
-    # print(points_result)
     return points_result
 
 
@@ -380,8 +436,10 @@ def get_items_node(date, uid, date_type):
     node_list = []
     if date_type == "person_finished_data":
         node_list = get_demand_finished_list(date, uid)
+        node_list = filter_data_list2(node_list, str(date))
     elif date_type == "person_incomplete_data":
-        node_list = get_demand_progress_list(uid)
+        date_list = get_demand_progress_list(uid)
+        node_list = filter_data_list(date_list)
     node_id_list = []
     for story_id in node_list:
         data_detail = calculate_points_if_has_test_stage(get_workflow(story_id['id']))
@@ -390,7 +448,51 @@ def get_items_node(date, uid, date_type):
         else:
             node_id_list.append({"需求id": story_id['id'], '需求名称name': story_id['name'],
                                  "单个需求数据data": data_detail})
+
     return node_id_list
+
+
+def filter_data_list(data_list):
+    """
+    遍历数据列表，保留那些 '测试阶段' 节点 actual_finish_time 为空的数据。
+    :param data_list: work item 数据的列表
+    :return: 过滤后的列表
+    """
+    filtered_list = []
+    for item in data_list:
+        nodes = item.get("workflow_infos", {}).get("workflow_nodes", [])
+        # 找到名字是“测试阶段”的节点
+        test_stage_node = next((node for node in nodes if node.get("name") == "测试阶段"), None)
+        # 如果没有该节点，或该节点 actual_finish_time 为空，保留
+        if test_stage_node is None or not test_stage_node.get("actual_finish_time"):
+            filtered_list.append(item)
+    return filtered_list
+
+
+def filter_data_list2(data_list, cutoff_str):
+    cutoff = datetime.strptime(cutoff_str, "%Y%m%d").replace(tzinfo=timezone.utc)
+    filtered_list = []
+
+    for item in data_list:
+        nodes = item.get("workflow_infos", {}).get("workflow_nodes", [])
+        test_stage_node = next((node for node in nodes if node.get("name") == "测试阶段"), None)
+
+        if test_stage_node:
+            actual_finish_time = test_stage_node.get("actual_finish_time")
+            if actual_finish_time:
+                try:
+                    finish_dt = parse(actual_finish_time)
+                    if finish_dt >= cutoff:
+                        filtered_list.append(item)
+                except Exception as e:
+                    print(f"解析时间失败: {actual_finish_time}, 错误: {e}")
+                    # 可选择忽略或保留
+            else:
+                filtered_list.append(item)
+        else:
+            filtered_list.append(item)
+
+    return filtered_list
 
 
 def analyze_workload_by_version(data_list):
@@ -398,7 +500,11 @@ def analyze_workload_by_version(data_list):
     :param data_list: 传入测试研发数据
     :return: 返回测试研发比
     """
-    version_keys = {"Android端开发", "iOS端开发", "流媒体开发"}
+    version_keys = {
+        "Android端开发", "iOS端开发", "流媒体开发", "测试阶段",
+        "Web前端开发", "Web后端开发", "主服务端开发",
+        "互娱端开发", "游戏后端", "游戏前端", '曲库开发', '音视频开发'
+    }
     test_key = "测试阶段"
 
     # 分类存储
@@ -408,10 +514,35 @@ def analyze_workload_by_version(data_list):
     # 分类
     for item in data_list:
         stages = item["单个需求数据data"]
+
+        # 判断是否包含“测试阶段”，如果没有则跳过
+        if test_key not in stages:
+            continue
+
+        test = 0
+        develop = 0
+
         if any(k in stages for k in version_keys):
             version_demands.append(item)
         else:
             non_version_demands.append(item)
+
+        for k, v in stages.items():
+            if k == test_key:
+                test += v
+            else:
+                develop += v
+
+        if develop == 0:
+            continue
+        elif test == 0:
+            print(f"需求ID: {item['需求id']}，需求名称: {item['需求名称name']} 的测试时间为0，请注意填写！！！")
+        elif round(develop / test, 3) < 3:
+            print(
+                f"需求ID: {item['需求id']} 的测试/研发比过高，可能需要优化！",
+                f"需求名称: {item['需求名称name']}, 测试时间: {stages.get(test_key, 0)}, "
+                f"研发时间: {develop}, 测试/研发比: {round(develop / test, 3)}"
+            )
 
     # 定义统计函数
     def compute_totals(demands):
@@ -462,7 +593,6 @@ def get_check(date, uid, date_type):
 
 if __name__ == '__main__':
     # print(get_check(20250501, uid=None, date_type='person_finished_data'))
-    # print(get_check(20250501, 7117238460611624964, 'person_finished_data'))
-    # print(get_check(20250501, 7117238460611624964, 'person_incomplete_data'))
-    print(get_check(20250501, uid=None, date_type='person_incomplete_data'))
-
+    # print(get_check(20250601, 7117238460611624964, 'person_finished_data'))
+    # print(get_check(20250601, 7117238460611624964, 'person_incomplete_data'))
+    print(get_check(20250601, uid=None, date_type='person_incomplete_data'))

@@ -71,5 +71,46 @@ class Feishu_data:
                              'NI79co8koxoWR1DrRllH8OB5CMzP6B8Vob3jek5lRwhPtsDO4DGIvog; sub_nav_width=3; meego_csrf_to' \
                              'ken=1UHWDVlD-wc4r-JbRg-TOdF-yplZbQkTblTb; meego_csrf_token=1UHWDVlD-wc4r-JbRg-TOdF-yplZ' \
                              'bQkTblTb; sl_session=eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Mzc1NTkxMDQsInVua' \
-                             'XQiOiJldV9uYyIsInJhdyI6eyJtZXRhIjoiQVdLTmxDL093NEFjWDdVT2l6RUFnQUpsMFoxU1ZvR0FCR1hSblZKV2dZQUVaclY0N1VIRkFBUUNLZ0VBUVVGQlFVRkJRVUZCUVVKdGRHUnZhM2hLVDBGQmR6MDkiLCJzdW0iOiI5MjcxZTgyZGZhYWRjMGMyYzI0NmM5MWY4ZTQzZjJiMDBiZGQzZjI5YWI5NTdmMzA5MTRiZGNmNDI2MGRhZTk4IiwibG9jIjoiemhfY24iLCJhcGMiOiJSZWxlYXNlIiwiaWF0IjoxNzM3NTE1OTA0LCJzYWMiOnsiVXNlclN0YWZmU3RhdHVzIjoiMSIsIlVzZXJUeXBlIjoiNDIifSwibG9kIjpudWxsLCJucyI6ImxhcmsiLCJuc191aWQiOiI3MTAxNDk1MTIwNDg2NDMyNzk2IiwibnNfdGlkIjoiNjg5NjQzNDM5NTM3MzE0MjAxOCIsIm90IjozLCJjdCI6MTcyMzE5Mzg5MywicnQiOjE3Mzc0NzU2MDV9fQ.QWhAOCd-LGdPfjwx0iLNqXq2QxEuwCv2k2r4tiX995QqL281bum4xjndUHLFC3gDx3dFQ4V0F-8GH5K7NXMIRQ; swp_csrf_token=79f10560-3274-46fa-ac6f-797342e6f556; t_beda37=cebb602d4a5402fdbc52cdf0ec3dec5c0b8a677fe2c102a311dd2eaad3eb0174'
+                             'XQiOiJldV9uYyIsInJhdyI6eyJtZXRhIjoiQVdLTmxDL093NEFjWDdVT2l6RUFnQUpsMFoxU1ZvR0FCR1hSblZ' \
+                             'KV2dZQUVaclY0N1VIRkFBUUNLZ0VBUVVGQlFVRkJRVUZCUVVKdGRHUnZhM2hLVDBGQmR6MDkiLCJzdW0iOiI5' \
+                             'MjcxZTgyZGZhYWRjMGMyYzI0NmM5MWY4ZTQzZjJiMDBiZGQzZjI5YWI5NTdmMzA5MTRiZGNmNDI2MGRhZTk4Ii' \
+                             'wibG9jIjoiemhfY24iLCJhcGMiOiJSZWxlYXNlIiwiaWF0IjoxNzM3NTE1OTA0LCJzYWMiOnsiVXNlclN0YWZ' \
+                             'mU3RhdHVzIjoiMSIsIlVzZXJUeXBlIjoiNDIifSwibG9kIjpudWxsLCJucyI6ImxhcmsiLCJuc191aWQiOiI3' \
+                             'MTAxNDk1MTIwNDg2NDMyNzk2IiwibnNfdGlkIjoiNjg5NjQzNDM5NTM3MzE0MjAxOCIsIm90IjozLCJjdCI6MT' \
+                             'cyMzE5Mzg5MywicnQiOjE3Mzc0NzU2MDV9fQ.QWhAOCd-LGdPfjwx0iLNqXq2QxEuwCv2k2r4tiX995QqL281b' \
+                             'um4xjndUHLFC3gDx3dFQ4V0F-8GH5K7NXMIRQ; swp_csrf_token=79f10560-3274-46fa-ac6f-797342e' \
+                             '6f556; t_beda37=cebb602d4a5402fdbc52cdf0ec3dec5c0b8a677fe2c102a311dd2eaad3eb0174'
         self.feishu_project_url = 'https://project.feishu.cn/open_api/'
+        self.qa_list = [{7114600958063067138: "李洁",
+                        7114959719063764995: "韩远霖",
+                        7128198138946420739: "崔美娜",
+                        7111559780421943297: "丁双",
+                        7116367759658762242: "宋凯",
+                        7117821729350696961: "于胜晖",
+                        7078857838898020355: "王子钊",
+                        7122034866186633218: "王进国",
+                        7257084699514765315: "张菁",
+                        7258552016815865884: "蒋帅",
+                        7258584511972245505: "李佳",
+                        7272925387020173313: "张浩宇",
+                        7313662830786461699: "崔晓杭",
+                        7117463163087372289: "于洋洋",
+                        7116367759658778626: "宋海林",
+                        7201394377279750145: "陈奎",
+                        7205168573025697794: "杨红军",
+                        7212971331053240348: "赵孟珠",
+                        7214331666096046081: "王卫涛",
+                        7108600627386662914: "汪明",
+                        7114962694473531395: "薛晋琦",
+                        7394541931872747522: "于若宇",
+                        7394917046393241602: "郭一鑫",
+                        7470710967471472659: "卢纯斐",
+                        7117512832005980161: "风后",
+                        7428387478676996124: "卡比兽",
+                        7117238460611624964: "常浩",
+                        7432028714528964612: "王泽宇"}]
+        self.feishu_record_cloud_document = "https://open.feishu.cn/open-apis/bitable/v1/apps/Xl3EbBH6daKFdYsL5Eac6" \
+                                            "l8rnDc/tables/tble4vqz6RqVWndL/records"
+        self.feishu_record_finished_cloud_document = "https://open.feishu.cn/open-apis/bitable/v1/apps/Xl3EbBH6daKF" \
+                                                     "dYsL5Eac6l8rnDc/tables/tblub91U25WmQaaN/records"
+

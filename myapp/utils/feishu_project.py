@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from dateutil.parser import parse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from myapp.utils.feishu_data import Feishu_data
-from myapp.utils.feishu_get_token import get_plugin_access_token
+from myapp.utils.feishu_get_token import get_plugin_access_token, get_tenant_access_token
 from myapp.utils.feishu_send_message import start_send
 
 fei = Feishu_data()
@@ -16,6 +16,9 @@ feishu_project_head = {
     'X-USER-KEY': '7117238460611624964',
     "plugin_token": f"{get_plugin_access_token()}"
 }
+
+feishu_backend_head = fei.content_type1
+feishu_backend_head['Authorization'] = f"Bearer {get_tenant_access_token()}"
 
 THREADS = 3  # 控制并发线程数
 MAX_RETRIES = 5  # 最大重试次数
@@ -35,7 +38,7 @@ def get_business_key():
         "order": [""]
     })
     business = requests.post(url, headers=feishu_project_head, data=payload)
-    print(business.json())
+    # print(business.json())
     return business.json()['data'][0]
 
 
@@ -228,7 +231,7 @@ def filter_data_list2(data_list, cutoff_str):
     return filtered_list
 
 
-def analyze_workload_by_version(data_list):
+def analyze_workload_by_version(data_list, types):
     test_key = "测试阶段"
     version_keys = {
         "Android端开发", "iOS端开发", "流媒体开发", "测试阶段", "Web前端开发",
@@ -257,8 +260,8 @@ def analyze_workload_by_version(data_list):
             continue
         elif test == 0:
             Lack_of_time.append(
-                f"负责人{item['单个需求数据data']['qa']}需求名称: {item['需求名称name']} 测试时间为0，请注意填写！！！"
-                f"需求链接：https://project.feishu.cn/wangmao12345678/story/detail/{item['id']}?"
+                f"负责人{get_user_name(item['单个需求数据data']['qa'])},需求名称: {item['需求名称name']} 测试时间为0，请注意填写！！！"
+                f"https://project.feishu.cn/wangmao12345678/story/detail/{item['需求id']}?"
                 f"parentUrl=%2Fwangmao12345678%2Fstory%2Fhomepage&openScene=4"
             )
         else:
@@ -272,7 +275,7 @@ def analyze_workload_by_version(data_list):
                     "研发": develop,
                     "比": ratio,
                     "需求链接": f"https://project.feishu.cn/wangmao12345678/story/detail/{item['需求id']}?parentUrl"
-                            f"=%2Fwangmao12345678%2Fstory%2Fhomepage&openScene=4"
+                                f"=%2Fwangmao12345678%2Fstory%2Fhomepage&openScene=4"
                 })
 
     # 排序 attention_records 按比值从大到小
@@ -280,15 +283,16 @@ def analyze_workload_by_version(data_list):
 
     # 构造传给接口的消息列表
     attention_messages = [
-        f" 负责人:{rec['负责人']} 需求名称: {rec['需求名称']} 测试/研发比过高，需优化！测试: {rec['测试']}, 研发: {rec['研发']}," \
-        f" 比: {rec['比']},需求链接: {rec['需求链接']}"
+        f"{rec['需求名称']}。{get_user_name(rec['负责人'])} 。测试: {rec['测试']}, 研发: {rec['研发']}。 {rec['比']}。{rec['需求链接']}"
         for rec in sorted_attention
     ]
 
     # 调用接口，传排序好的数据
     if len(Lack_of_time) > 0:
-        start_send(function='Testing_and_Development', datas=Lack_of_time)
+        start_send(function='Testing_and_Development1', datas=Lack_of_time)
     if len(attention_messages) > 0:
+        for data in attention_messages:
+            start_record(data, types)
         start_send(function='Testing_and_Development', datas=attention_messages)
 
     # 聚合统计
@@ -316,11 +320,52 @@ def analyze_workload_by_version(data_list):
     }
 
 
+def get_user_name(uid_list):
+    """
+    :param uid_list:
+    :return: 获取用户列表
+    """
+    u_list = []
+    for uid in uid_list:
+        uname = fei.qa_list[0][int(uid)]
+        u_list.append(uname)
+    return u_list
+
+
 def get_check(date, uid, date_type):
-    return analyze_workload_by_version(get_items_node(date, uid, date_type))
+    type = date_type
+    return analyze_workload_by_version(get_items_node(date, uid, type), type)
+
+
+def start_record(data, types):
+    """
+    启动记录
+    :return:
+    """
+    url = ""
+    headers = feishu_backend_head
+    if types == 'person_incomplete_data':
+        url = fei.feishu_record_cloud_document
+    elif types == 'person_finished_data':
+        url = fei.feishu_record_finished_cloud_document
+    payload = json.dumps({
+        "fields": {
+            "测试研发数据": data.split("。")[2],
+            "负责人": data.split("。")[1],
+            "需求": data.split("。")[0],
+            "测试研发比结果": data.split("。")[3],
+            "需求链接": {
+                "text": data.split("。")[0],
+                "link": data.split("。")[4]
+            },
+        }
+    })
+    requests.request("POST", url, headers=headers, data=payload)
 
 
 if __name__ == '__main__':
+    # get_user_name([7205168573025697794, 7212971331053240348])
+
     # result = get_check(20250601, uid=None, date_type='person_incomplete_data')
     print(get_check(20250601, uid=None, date_type='person_finished_data'))
     # print(get_check(20250601, 7117238460611624964, 'person_finished_data'))

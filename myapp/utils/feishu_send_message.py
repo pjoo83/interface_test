@@ -552,6 +552,36 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
             "content": json.dumps(content)  # ✅ 这里必须转换成字符串
         }
         response = requests.post(url=send_url, headers=headers, json=data1, verify=True)
+
+    elif function == 'All_testing_and_Development':
+        content = {
+            "zh_cn": {
+                "title": "本次执行总数据",
+                "content": [
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"版本需求：{data['版本需求']}",
+                            "style": ["bold"]
+                        },
+                        {
+                            "tag": "text",
+                            "text": f"非版本需求：{data['非版本需求']}",
+                            "style": ["bold"]
+                        }
+                    ]
+                ]
+            }
+        }
+
+        data1 = {
+            "receive_id": chat_id,
+            "msg_type": "post",
+            "content": json.dumps(content)  # ✅ 这里必须转换成字符串
+        }
+        response = requests.post(url=send_url, headers=headers, json=data1, verify=True)
+
+
 def start_send(function, datas):
     """
     :return: 进行发送
@@ -678,6 +708,8 @@ def start_send(function, datas):
 
     elif function == 'Testing_and_Development1':
         send_msg('Testing_and_Development1', cid, 1, datas, datas, datas, datas, datas)
+    elif function == 'All_testing_and_Development':
+        send_msg('All_testing_and_Development', cid, 1, datas, datas, datas, datas, datas)
 
 
 def stamp_to_time(times):

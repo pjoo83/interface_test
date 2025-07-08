@@ -28,5 +28,5 @@ def td_testing_calculations(request):
                 data = get_check(date=date, uid=None, date_type=date_type)
             elif date_type == 'person_incomplete_data':
                 data = get_check(date=date, uid=None, date_type=date_type)
+        start_send("All_testing_and_Development", data)
         return JsonResponse(data, json_dumps_params={'ensure_ascii': False})
-

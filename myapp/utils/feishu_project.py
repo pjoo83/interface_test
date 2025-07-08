@@ -246,7 +246,7 @@ def filter_data_list2(data_list, cutoff_str):
 def analyze_workload_by_version(data_list, types):
     test_key = "测试阶段"
     version_keys = {
-        "Android端开发", "iOS端开发", "流媒体开发",  "主服务端开发", "互娱端开发",  "曲库开发", "音视频开发"
+        "Android端开发", "iOS端开发", "流媒体开发", "主服务端开发", "互娱端开发", "曲库开发", "音视频开发"
     }
 
     Lack_of_time = []
@@ -260,18 +260,28 @@ def analyze_workload_by_version(data_list, types):
             continue
 
         test = stages.get(test_key, 0)
-        develop = sum(v for k, v in stages.items() if k != test_key and k != 'qa')
 
+        # 提取开发阶段字段（除“测试阶段”和“qa”）
+        dev_stages = {k: v for k, v in stages.items() if k not in (test_key, 'qa')}
+
+        # 检查所有开发阶段是否都已填写（非 None、非空字符串）
+        if not dev_stages or not all(v not in (None, '') for v in dev_stages.values()):
+            continue  # 有开发字段为空，不继续处理
+
+        develop = sum(dev_stages.values())
+
+        # 分类版本需求
         if any(k in stages for k in version_keys):
             version_demands.append(item)
         else:
             non_version_demands.append(item)
 
+        # 测试时间为 0 时提醒
         if develop == 0:
             continue
         elif test == 0:
             Lack_of_time.append(
-                f"负责人{get_user_name(item['单个需求数据data']['qa'])},需求名称: {item['需求名称name']} 测试时间为0，请注意填写！！！"
+                f"负责人{get_user_name(stages.get('qa', ''))},需求名称: {item['需求名称name']} 测试时间为0，请注意填写！！！"
                 f"https://project.feishu.cn/wangmao12345678/story/detail/{item['需求id']}?"
                 f"parentUrl=%2Fwangmao12345678%2Fstory%2Fhomepage&openScene=4"
             )
@@ -279,17 +289,17 @@ def analyze_workload_by_version(data_list, types):
             ratio = round(develop / test, 3)
             if ratio < 3:
                 attention_records.append({
-                    '负责人': item['单个需求数据data']['qa'],
+                    '负责人': stages.get('qa', ''),
                     "需求id": item['需求id'],
                     "需求名称": item['需求名称name'],
                     "测试": test,
                     "研发": develop,
                     "比": ratio,
-                    "需求链接": f"https://project.feishu.cn/wangmao12345678/story/detail/{item['需求id']}?parentUrl"
-                                f"=%2Fwangmao12345678%2Fstory%2Fhomepage&openScene=4"
+                    "需求链接": f"https://project.feishu.cn/wangmao12345678/story/detail/{item['需求id']}?"
+                                f"parentUrl=%2Fwangmao12345678%2Fstory%2Fhomepage&openScene=4"
                 })
 
-    # 排序 attention_records 按比值从大到小
+    # 排序 attention_records 按比值从小到大
     sorted_attention = sorted(attention_records, key=lambda x: x['比'])
 
     # 构造传给接口的消息列表
@@ -298,15 +308,15 @@ def analyze_workload_by_version(data_list, types):
         for rec in sorted_attention
     ]
 
-    # 调用接口，传排序好的数据
-    if len(Lack_of_time) > 0:
+    # 调用接口发送提醒
+    if Lack_of_time:
         start_send(function='Testing_and_Development1', datas=Lack_of_time)
-    if len(attention_messages) > 0:
+    if attention_messages:
         for data in attention_messages:
             start_record(data, types)
         start_send(function='Testing_and_Development', datas=attention_messages)
 
-    # 聚合统计
+    # 聚合统计函数
     def compute_totals(demands):
         test_total = sum(item["单个需求数据data"].get(test_key, 0) for item in demands)
         dev_total = sum(

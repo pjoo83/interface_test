@@ -301,7 +301,7 @@ def analyze_workload_by_version(data_list, types):
         dev_total = sum(
             sum(v for k, v in item["单个需求数据data"].items() if k != test_key and k != 'qa') for item in demands
         )
-        ratio = round(dev_total / test_total, 3) if test_total else "N/A"
+        ratio = round(dev_total / test_total, 3) if test_total else "0"
         return test_total, dev_total, ratio
 
     v_test, v_dev, v_ratio = compute_totals(version_demands)
@@ -315,7 +315,7 @@ def analyze_workload_by_version(data_list, types):
             "数量": len(version_demands) + len(non_version_demands),
             "测试总时间": v_test + nv_test,
             "研发总时间": v_dev + nv_dev,
-            "研发/测试比值": round((v_dev + nv_dev) / (v_test + nv_test), 3) if (v_test + nv_test) else "N/A"
+            "研发/测试比值": round((v_dev + nv_dev) / (v_test + nv_test), 3) if (v_test + nv_test) else "0"
         }
     }
 

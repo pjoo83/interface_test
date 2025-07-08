@@ -24,6 +24,19 @@ THREADS = 3  # 控制并发线程数
 MAX_RETRIES = 5  # 最大重试次数
 
 
+def get_field_all():
+    """
+    :return: 获取指定空间或工作项类型（推荐）下所有“字段”的基础信息
+    """
+    project_key = '62a6fce5ed2541be7bf5c2d3'
+    url = f'{fei.feishu_project_url}{project_key}/field/all'
+    payload = json.dumps({
+        "work_item_type_key": "version"
+    })
+    response = requests.post(url=url, headers=feishu_project_head, data=payload)
+    print(response.json()['data'])
+
+
 def get_zero_timestamp_ms_from_int(date_int: int) -> int:
     dt = datetime.strptime(str(date_int), "%Y%m%d")
     return int(dt.timestamp() * 1000)
@@ -38,7 +51,6 @@ def get_business_key():
         "order": [""]
     })
     business = requests.post(url, headers=feishu_project_head, data=payload)
-    # print(business.json())
     return business.json()['data'][0]
 
 
@@ -234,8 +246,7 @@ def filter_data_list2(data_list, cutoff_str):
 def analyze_workload_by_version(data_list, types):
     test_key = "测试阶段"
     version_keys = {
-        "Android端开发", "iOS端开发", "流媒体开发", "测试阶段", "Web前端开发",
-        "Web后端开发", "主服务端开发", "互娱端开发", "游戏后端", "游戏前端", "曲库开发", "音视频开发"
+        "Android端开发", "iOS端开发", "流媒体开发",  "主服务端开发", "互娱端开发",  "曲库开发", "音视频开发"
     }
 
     Lack_of_time = []
@@ -367,7 +378,7 @@ if __name__ == '__main__':
     # get_user_name([7205168573025697794, 7212971331053240348])
 
     # result = get_check(20250601, uid=None, date_type='person_incomplete_data')
-    print(get_check(20250601, uid=None, date_type='person_finished_data'))
-    # print(get_check(20250601, 7117238460611624964, 'person_finished_data'))
+    # print(get_check(20250601, uid=None, date_type='person_finished_data'))
+    print(get_check(20250601, 7117238460611624964, 'person_finished_data'))
     # print(get_check(20250601, 7117238460611624964, 'person_incomplete_data'))
     # print(json.dumps(result, indent=2, ensure_ascii=False))

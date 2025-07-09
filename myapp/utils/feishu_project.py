@@ -264,9 +264,9 @@ def analyze_workload_by_version(data_list, types):
         # 提取开发阶段字段（除“测试阶段”和“qa”）
         dev_stages = {k: v for k, v in stages.items() if k not in (test_key, 'qa')}
 
-        # 检查所有开发阶段是否都已填写（非 None、非空字符串）
-        if not dev_stages or not all(v not in (None, '') for v in dev_stages.values()):
-            continue  # 有开发字段为空，不继续处理
+        # ✅ 如果有任意一个开发阶段没填（是 0、None、''），就跳过
+        if any(v in (0, None, '', [], {}) for v in dev_stages.values()):
+            continue
 
         develop = sum(dev_stages.values())
 
@@ -387,8 +387,8 @@ def start_record(data, types):
 if __name__ == '__main__':
     # get_user_name([7205168573025697794, 7212971331053240348])
 
-    # result = get_check(20250601, uid=None, date_type='person_incomplete_data')
+    result = get_check(20250701, uid=None, date_type='person_incomplete_data')
     # print(get_check(20250601, uid=None, date_type='person_finished_data'))
-    print(get_check(20250601, 7117238460611624964, 'person_finished_data'))
+    # print(get_check(20250601, 7117238460611624964, 'person_finished_data'))
     # print(get_check(20250601, 7117238460611624964, 'person_incomplete_data'))
     # print(json.dumps(result, indent=2, ensure_ascii=False))

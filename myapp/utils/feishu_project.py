@@ -54,20 +54,25 @@ def get_business_key():
     return business.json()['data'][0]
 
 
-def get_demand_finished_list(date, uid=None):
+def get_demand_finished_list(date, uid=None, finished_time=None):
     headers = feishu_project_head
     project_key = '62a6fce5ed2541be7bf5c2d3'
     url = f"{fei.feishu_project_url}{project_key}/work_item/story/search/params"
     search_params = [
-        {"param_key": "finish_time", "value": get_zero_timestamp_ms_from_int(date), "operator": ">="},
         {"param_key": "work_item_status", "value": ["end"], "operator": "="}
     ]
+    if date:
+        search_params.append(
+            {"param_key": "finish_time", "value": get_zero_timestamp_ms_from_int(date), "operator": ">="})
     if uid:
         search_params.append({
             "param_key": "role_owners",
             "value": [{"role": "qa", "owners": [f'{uid}']}],
             "operator": "HAS ANY OF"
         })
+    if finished_time:
+        search_params.append(
+            {"param_key": "finish_time", "value": get_zero_timestamp_ms_from_int(finished_time), "operator": "<="})
     return _paged_post(url, headers, search_params)
 
 
@@ -156,7 +161,8 @@ def batch_get_workflows(story_ids, project_key, headers):
 def calculate_points_if_has_test_stage(data):
     target_names = [
         "Android端开发", "iOS端开发", "流媒体开发", "测试阶段", "Web前端开发",
-        "Web后端开发", "主服务端开发", "互娱端开发", "游戏后端", "游戏前端", "曲库开发", "音视频开发"
+        "Web后端开发", "主服务端开发", "互娱端开发", "游戏后端", "游戏前端", "曲库开发", "音视频开发", "大数据端开发",
+        "算法端开发", "运维端开发"
     ]
     points_result = {}
 
@@ -173,10 +179,10 @@ def calculate_points_if_has_test_stage(data):
     return points_result
 
 
-def get_items_node(date, uid, date_type):
+def get_items_node(date, uid, date_type, finished_time):
     project_key = '62a6fce5ed2541be7bf5c2d3'
     if date_type == "person_finished_data":
-        node_list = get_demand_finished_list(date, uid)
+        node_list = get_demand_finished_list(date, uid, finished_time)
         node_list = filter_data_list2(node_list, str(date))
     else:
         node_list = get_demand_progress_list(uid)
@@ -246,7 +252,8 @@ def filter_data_list2(data_list, cutoff_str):
 def analyze_workload_by_version(data_list, types):
     test_key = "测试阶段"
     version_keys = {
-        "Android端开发", "iOS端开发", "流媒体开发", "主服务端开发", "互娱端开发", "曲库开发", "音视频开发"
+        "Android端开发", "iOS端开发", "流媒体开发", "主服务端开发", "互娱端开发", "曲库开发", "音视频开发",
+        "大数据端开发", "算法端开发"
     }
 
     Lack_of_time = []
@@ -310,6 +317,7 @@ def analyze_workload_by_version(data_list, types):
 
     # 调用接口发送提醒
     if Lack_of_time:
+        pass
         start_send(function='Testing_and_Development1', datas=Lack_of_time)
     if attention_messages:
         for data in attention_messages:
@@ -353,9 +361,9 @@ def get_user_name(uid_list):
     return u_list
 
 
-def get_check(date, uid, date_type):
+def get_check(date, uid, date_type, finished_time):
     type = date_type
-    return analyze_workload_by_version(get_items_node(date, uid, type), type)
+    return analyze_workload_by_version(get_items_node(date, uid, type, finished_time), type)
 
 
 def start_record(data, types):
@@ -387,8 +395,8 @@ def start_record(data, types):
 if __name__ == '__main__':
     # get_user_name([7205168573025697794, 7212971331053240348])
 
-    result = get_check(20250701, uid=None, date_type='person_incomplete_data')
+    # result = get_check(20250601, uid=None, date_type='person_incomplete_data', finished_time=20250630)
     # print(get_check(20250601, uid=None, date_type='person_finished_data'))
-    # print(get_check(20250601, 7117238460611624964, 'person_finished_data'))
+    print(get_check(20250501, 7117238460611624964, 'person_finished_data', finished_time=20250530))
     # print(get_check(20250601, 7117238460611624964, 'person_incomplete_data'))
     # print(json.dumps(result, indent=2, ensure_ascii=False))

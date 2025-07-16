@@ -502,6 +502,11 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
             response = requests.post(url=send_url, headers=headers, json=data1, verify=True)
 
     elif function == 'Testing_and_Development':
+        name = ''
+        if data[-1] == 'person_finished_data':
+            name = '未完成需求'
+        elif data[-1] == "person_incomplete_data":
+            name = '已经完成需求'
         content = {
             "zh_cn": {
                 "title": "注意注意注意！！！！",
@@ -509,13 +514,20 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
                     [
                         {
                             "tag": "text",
-                            "text": f"本次共出现{len(data)}条问题数据",
+                            "text": f"本次检测{name}的需求",
+                            "style": ["bold"]
+                        }
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"本次共出现{len(data) - 1}条问题数据",
                             "style": ["bold"]
                         },
                         {
                             "tag": "a",
                             "href": f"https://rg975ojk5z.feishu.cn/base/Xl3EbBH6daKFdYsL5Eac6l8rnDc?table=tble4vqz6RqVWndL&view=vewaGgEfMy",
-                            "text": "需求链接点这里",
+                            "text": "详情链接点这里",
                             "style": ["bold", "italic"]
                         },
                     ]

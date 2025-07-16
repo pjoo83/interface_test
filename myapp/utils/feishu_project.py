@@ -162,7 +162,7 @@ def calculate_points_if_has_test_stage(data):
     target_names = [
         "Android端开发", "iOS端开发", "流媒体开发", "测试阶段", "Web前端开发",
         "Web后端开发", "主服务端开发", "互娱端开发", "游戏后端", "游戏前端", "曲库开发", "音视频开发", "大数据端开发",
-        "算法端开发", "运维端开发"
+        "算法端开发", "运维端开发", "用例设计"
     ]
     points_result = {}
 
@@ -253,9 +253,9 @@ def analyze_workload_by_version(data_list, types):
     test_key = "测试阶段"
     version_keys = {
         "Android端开发", "iOS端开发", "流媒体开发", "主服务端开发", "互娱端开发", "曲库开发", "音视频开发",
-        "大数据端开发", "算法端开发"
+        "大数据端开发", "算法端开发",
     }
-
+    test_case = 0
     Lack_of_time = []
     attention_records = []
     version_demands = []
@@ -267,9 +267,11 @@ def analyze_workload_by_version(data_list, types):
             continue
 
         test = stages.get(test_key, 0)
+        if stages.get("用例设计", 0):
+            test_case = stages.get("用例设计", 0)
 
         # 提取开发阶段字段（除“测试阶段”和“qa”）
-        dev_stages = {k: v for k, v in stages.items() if k not in (test_key, 'qa')}
+        dev_stages = {k: v for k, v in stages.items() if k not in (test_key, 'qa', "用例设计")}
 
         # ✅ 如果有任意一个开发阶段没填（是 0、None、''），就跳过
         if any(v in (0, None, '', [], {}) for v in dev_stages.values()):
@@ -293,7 +295,7 @@ def analyze_workload_by_version(data_list, types):
                 f"parentUrl=%2Fwangmao12345678%2Fstory%2Fhomepage&openScene=4"
             )
         else:
-            ratio = round(develop / test, 3)
+            ratio = round(develop / (test + test_case), 3)
             if ratio < 3:
                 attention_records.append({
                     '负责人': stages.get('qa', ''),
@@ -301,6 +303,7 @@ def analyze_workload_by_version(data_list, types):
                     "需求名称": item['需求名称name'],
                     "测试": test,
                     "研发": develop,
+                    "测试用例": test_case,
                     "比": ratio,
                     "需求链接": f"https://project.feishu.cn/wangmao12345678/story/detail/{item['需求id']}?"
                                 f"parentUrl=%2Fwangmao12345678%2Fstory%2Fhomepage&openScene=4"
@@ -308,13 +311,12 @@ def analyze_workload_by_version(data_list, types):
 
     # 排序 attention_records 按比值从小到大
     sorted_attention = sorted(attention_records, key=lambda x: x['比'])
-
     # 构造传给接口的消息列表
     attention_messages = [
-        f"{rec['需求名称']}。{get_user_name(rec['负责人'])} 。测试: {rec['测试']}, 研发: {rec['研发']}。 {rec['比']}。{rec['需求链接']}"
+        f"{rec['需求名称']}。{get_user_name(rec['负责人'])}。测试: {rec['测试']}, " \
+        f"研发: {rec['研发']}，测试用例：{rec['测试用例']}。{rec['比']}。{rec['需求链接']}"
         for rec in sorted_attention
     ]
-
     # 调用接口发送提醒
     if Lack_of_time:
         pass
@@ -377,15 +379,16 @@ def start_record(data, types):
         url = fei.feishu_record_cloud_document
     elif types == 'person_finished_data':
         url = fei.feishu_record_finished_cloud_document
+    datas = data.split("。")
     payload = json.dumps({
         "fields": {
-            "测试研发数据": data.split("。")[2],
-            "负责人": data.split("。")[1],
-            "需求": data.split("。")[0],
-            "测试研发比结果": data.split("。")[3],
+            "测试研发数据": datas[2],
+            "负责人": datas[1],
+            "需求": datas[0],
+            "测试研发比结果": datas[3],
             "需求链接": {
-                "text": data.split("。")[0],
-                "link": data.split("。")[4]
+                "text": datas[0],
+                "link": datas[4]
             },
         }
     })
@@ -397,6 +400,6 @@ if __name__ == '__main__':
 
     # result = get_check(20250601, uid=None, date_type='person_incomplete_data', finished_time=20250630)
     # print(get_check(20250601, uid=None, date_type='person_finished_data'))
-    print(get_check(20250501, 7117238460611624964, 'person_finished_data', finished_time=20250530))
-    # print(get_check(20250601, 7117238460611624964, 'person_incomplete_data'))
+    # print(get_check(20250501, 7117238460611624964, 'person_finished_data', finished_time=20250530))
+    print(get_check(None, 7114962694473531395, 'person_incomplete_data', finished_time=None))
     # print(json.dumps(result, indent=2, ensure_ascii=False))

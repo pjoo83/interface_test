@@ -319,11 +319,11 @@ def analyze_workload_by_version(data_list, types):
     ]
     # 调用接口发送提醒
     if Lack_of_time:
-        pass
         start_send(function='Testing_and_Development1', datas=Lack_of_time)
     if attention_messages:
         for data in attention_messages:
             start_record(data, types)
+        attention_messages.append(types)
         start_send(function='Testing_and_Development', datas=attention_messages)
 
     # 聚合统计函数

@@ -1,3 +1,5 @@
+import ast
+
 import requests
 import json
 import time
@@ -249,19 +251,19 @@ def filter_data_list2(data_list, cutoff_str):
     return filtered_list
 
 
-def analyze_workload_by_version(data_list, types):
+def analyze_workload_by_version(data_list, types, date, finished_time):
     test_key = "测试阶段"
     version_keys = {
         "Android端开发", "iOS端开发", "流媒体开发", "主服务端开发", "互娱端开发", "曲库开发", "音视频开发",
         "大数据端开发", "算法端开发",
     }
-    test_case = 0
+
     Lack_of_time = []
     attention_records = []
     version_demands = []
     non_version_demands = []
-
     for item in data_list:
+        test_case = 0
         stages = item["单个需求数据data"]
         if test_key not in stages:
             continue
@@ -323,6 +325,8 @@ def analyze_workload_by_version(data_list, types):
     if attention_messages:
         for data in attention_messages:
             start_record(data, types)
+        attention_messages.append(date)
+        attention_messages.append(finished_time)
         attention_messages.append(types)
         start_send(function='Testing_and_Development', datas=attention_messages)
 
@@ -364,8 +368,17 @@ def get_user_name(uid_list):
 
 
 def get_check(date, uid, date_type, finished_time):
-    type = date_type
-    return analyze_workload_by_version(get_items_node(date, uid, type, finished_time), type)
+    return analyze_workload_by_version(get_items_node(date, uid, date_type, finished_time), date_type, date,
+                                       finished_time)
+
+
+def send_feishu_card(datas):
+    url = fei.feishu_card_url
+    headers = feishu_backend_head
+    payload = fei.feishu_card
+    for i in range(len(datas)):
+        payload['receive_id'] = datas[i]
+        requests.request("POST", url, headers=headers, data=json.dumps(payload))
 
 
 def start_record(data, types):
@@ -380,10 +393,13 @@ def start_record(data, types):
     elif types == 'person_finished_data':
         url = fei.feishu_record_finished_cloud_document
     datas = data.split("。")
+    user_list = ast.literal_eval(datas[1])
     payload = json.dumps({
         "fields": {
             "测试研发数据": datas[2],
-            "负责人": datas[1],
+            "负责人": [
+                {"id": str(open_id)} for open_id in user_list
+            ],
             "需求": datas[0],
             "测试研发比结果": datas[3],
             "需求链接": {
@@ -393,6 +409,7 @@ def start_record(data, types):
         }
     })
     requests.request("POST", url, headers=headers, data=payload)
+    # send_feishu_card(user_list)
 
 
 if __name__ == '__main__':
@@ -400,6 +417,6 @@ if __name__ == '__main__':
 
     # result = get_check(20250601, uid=None, date_type='person_incomplete_data', finished_time=20250630)
     # print(get_check(20250601, uid=None, date_type='person_finished_data'))
-    # print(get_check(20250501, 7117238460611624964, 'person_finished_data', finished_time=20250530))
-    print(get_check(None, 7114962694473531395, 'person_incomplete_data', finished_time=None))
+    print(get_check(20250601, 7117238460611624964, 'person_finished_data', finished_time=None))
+    # print(get_check(None, uid=None, date_type='person_incomplete_data', finished_time=None))
     # print(json.dumps(result, indent=2, ensure_ascii=False))

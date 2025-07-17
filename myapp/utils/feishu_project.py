@@ -299,6 +299,14 @@ def analyze_workload_by_version(data_list, types, date, finished_time):
         else:
             ratio = round(develop / (test + test_case), 3)
             if ratio < 3:
+                if test_case ==0:
+                    case_issues_result= "用例不占排期"
+                else:
+                    case_issues = test / test_case
+                    if case_issues > 0.25:
+                        case_issues_result = "测试用例估期较高请注意"
+                    else:
+                        case_issues_result = "测试用例估期正常"
                 attention_records.append({
                     '负责人': stages.get('qa', ''),
                     "需求id": item['需求id'],
@@ -308,15 +316,17 @@ def analyze_workload_by_version(data_list, types, date, finished_time):
                     "测试用例": test_case,
                     "比": ratio,
                     "需求链接": f"https://project.feishu.cn/wangmao12345678/story/detail/{item['需求id']}?"
-                                f"parentUrl=%2Fwangmao12345678%2Fstory%2Fhomepage&openScene=4"
+                                f"parentUrl=%2Fwangmao12345678%2Fstory%2Fhomepage&openScene=4",
+                    "用例设计": case_issues_result
                 })
 
     # 排序 attention_records 按比值从小到大
     sorted_attention = sorted(attention_records, key=lambda x: x['比'])
+
     # 构造传给接口的消息列表
     attention_messages = [
         f"{rec['需求名称']}。{get_user_name(rec['负责人'])}。测试: {rec['测试']}, " \
-        f"研发: {rec['研发']}，测试用例：{rec['测试用例']}。{rec['比']}。{rec['需求链接']}"
+        f"研发: {rec['研发']},测试用例：{rec['测试用例']}。{rec['比']}。{rec['需求链接']}。{rec['用例设计']}"
         for rec in sorted_attention
     ]
     # 调用接口发送提醒
@@ -394,6 +404,7 @@ def start_record(data, types):
         url = fei.feishu_record_finished_cloud_document
     datas = data.split("。")
     user_list = ast.literal_eval(datas[1])
+
     payload = json.dumps({
         "fields": {
             "测试研发数据": datas[2],
@@ -401,6 +412,7 @@ def start_record(data, types):
                 {"id": str(open_id)} for open_id in user_list
             ],
             "需求": datas[0],
+            "用例结论": datas[5],
             "测试研发比结果": datas[3],
             "需求链接": {
                 "text": datas[0],

@@ -9,6 +9,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from myapp.utils.feishu_data import Feishu_data
 from myapp.utils.feishu_get_token import get_plugin_access_token, get_tenant_access_token
 from myapp.utils.feishu_send_message import start_send
+from collections import defaultdict
 
 fei = Feishu_data()
 
@@ -57,6 +58,12 @@ def get_business_key():
 
 
 def get_demand_finished_list(date, uid=None, finished_time=None):
+    """
+    :param date: 开始时间
+    :param uid: 指定用户
+    :param finished_time: 完成时间
+    :return: 返回阶段时间内所有已完成的测试数据
+    """
     headers = feishu_project_head
     project_key = '62a6fce5ed2541be7bf5c2d3'
     url = f"{fei.feishu_project_url}{project_key}/work_item/story/search/params"
@@ -79,6 +86,10 @@ def get_demand_finished_list(date, uid=None, finished_time=None):
 
 
 def get_demand_progress_list(uid=None):
+    """
+    :param uid: 指定用户
+    :return: 返回测试阶段内所有已完成的测试数据
+    """
     headers = feishu_project_head
     project_key = '62a6fce5ed2541be7bf5c2d3'
     url = f"{fei.feishu_project_url}{project_key}/work_item/story/search/params"
@@ -226,6 +237,11 @@ def filter_data_list(data_list):
 
 
 def filter_data_list2(data_list, cutoff_str):
+    """
+    :param data_list:
+    :param cutoff_str:
+    :return:
+    """
     cutoff = datetime.strptime(cutoff_str, "%Y%m%d").replace(tzinfo=timezone.utc)
     filtered_list = []
 
@@ -252,6 +268,13 @@ def filter_data_list2(data_list, cutoff_str):
 
 
 def analyze_workload_by_version(data_list, types, date, finished_time):
+    """
+    :param data_list:
+    :param types:
+    :param date: 测试开始时间
+    :param finished_time: 需求结束节点时间
+    :return: 处理所有测试研发比十五
+    """
     test_key = "测试阶段"
     version_keys = {
         "Android端开发", "iOS端开发", "流媒体开发", "主服务端开发", "互娱端开发", "曲库开发", "音视频开发",
@@ -292,17 +315,17 @@ def analyze_workload_by_version(data_list, types, date, finished_time):
             continue
         elif test == 0:
             Lack_of_time.append(
-                f"负责人{get_user_name(stages.get('qa', ''))},需求名称: {item['需求名称name']} 测试时间为0，请注意填写！！！"
+                f"负责人{get_user_name(stages.get('qa', ''), 1)},需求名称: {item['需求名称name']} 测试时间为0，请注意填写！！！"
                 f"https://project.feishu.cn/wangmao12345678/story/detail/{item['需求id']}?"
                 f"parentUrl=%2Fwangmao12345678%2Fstory%2Fhomepage&openScene=4"
             )
         else:
             ratio = round(develop / (test + test_case), 3)
             if ratio < 3:
-                if test_case ==0:
-                    case_issues_result= "用例不占排期"
+                if test_case == 0:
+                    case_issues_result = ""
                 else:
-                    case_issues = test / test_case
+                    case_issues = test_case / test
                     if case_issues > 0.25:
                         case_issues_result = "测试用例估期较高请注意"
                     else:
@@ -325,7 +348,7 @@ def analyze_workload_by_version(data_list, types, date, finished_time):
 
     # 构造传给接口的消息列表
     attention_messages = [
-        f"{rec['需求名称']}。{get_user_name(rec['负责人'])}。测试: {rec['测试']}, " \
+        f"{rec['需求名称']}。{get_user_name(rec['负责人'], 1)}。测试: {rec['测试']}, " \
         f"研发: {rec['研发']},测试用例：{rec['测试用例']}。{rec['比']}。{rec['需求链接']}。{rec['用例设计']}"
         for rec in sorted_attention
     ]
@@ -365,15 +388,20 @@ def analyze_workload_by_version(data_list, types, date, finished_time):
     }
 
 
-def get_user_name(uid_list):
+def get_user_name(uid_list, nums):
     """
+    :param nums: 选择情况
     :param uid_list:
     :return: 获取用户列表
     """
     u_list = []
     for uid in uid_list:
-        uname = fei.qa_list[0][int(uid)]
-        u_list.append(uname)
+        if nums == 1:
+            uname = fei.qa_list[int(uid)][0]
+            u_list.append(uname)
+        elif nums == 2:
+            uname = fei.qa_list[int(uid)][1]
+            u_list.append(uname)
     return u_list
 
 
@@ -383,6 +411,10 @@ def get_check(date, uid, date_type, finished_time):
 
 
 def send_feishu_card(datas):
+    """
+    :param datas:
+    :return: 发送飞书卡片
+    """
     url = fei.feishu_card_url
     headers = feishu_backend_head
     payload = fei.feishu_card
@@ -424,11 +456,129 @@ def start_record(data, types):
     # send_feishu_card(user_list)
 
 
+def get_all_user_demand(create_date, uid, finished_time):
+    """
+    :return:返回查询数据，根据开始时间和结束时间
+    """
+    headers = feishu_project_head
+    project_key = '62a6fce5ed2541be7bf5c2d3'
+    url = f"{fei.feishu_project_url}{project_key}/work_item/story/search/params"
+    search_params = [{
+        "param_key": "all_states",
+        "value": ["测试阶段"],
+        "operator": "HAS ANY OF"
+    }]
+    if create_date:
+        search_params.append({
+            "param_key": "created_at",
+            "value": get_zero_timestamp_ms_from_int(create_date),
+            "operator": ">="
+        })
+    if uid:
+        search_params.append({
+            "param_key": "role_owners",
+            "value": [{"role": "qa", "owners": [f'{uid}']}],
+            "operator": "HAS ANY OF"
+        })
+    if finished_time:
+        search_params.append({
+            "param_key": "finish_time",
+            "value": get_zero_timestamp_ms_from_int(finished_time),
+            "operator": "<="
+        })
+    return _paged_post(url, headers, search_params)
+
+
+def get_all_user_finished_demand(create_date, uid, finished_time):
+    """
+    :param create_date: 需求开始时间
+    :param uid:
+    :param finished_time:
+    :return: 返回阶段
+    """
+    all_datas = get_all_user_demand(create_date, uid, finished_time)
+    all_datas_num = len(all_datas)
+    user_test_list = []
+    for i in range(len(all_datas)):
+        test_list = all_datas[i]['workflow_infos']['workflow_nodes']
+        test_name = all_datas[i]['name']
+        test_user = get_test_user(test_list)
+        user_test_list.append({"用户": get_user_name(test_user, 2), "需求名称": test_name})
+    user_data = user_classification_data(user_test_list)
+    print(user_data)
+    print(f"本次查询到总需求数量：{all_datas_num}条数据")
+
+
+def user_classification_data(data):
+    """
+    :param data: 传入需求数据
+    :return: 返回用户分类数据
+    """
+    user_map = defaultdict(list)
+
+    for item in data:
+        users = item.get('用户', [])
+        name = item.get('需求名称', '')
+
+        # 如果用户列表为空，默认添加“暂无”
+        if not users:
+            user_map["0"].append(name)
+        else:
+            for user in users:
+                user_map[user].append(name)
+
+    user_list = []
+    for user, names in user_map.items():
+        user_list.append({'user': user, "需求数量": len(names), "需求": names})
+
+    return user_list
+
+
+def get_test_user(data):
+    """
+    :param data:
+    :return: 获取测试id
+    """
+    owners_set = set()
+    for item in data:
+        if item.get('name') == '测试阶段':
+            # 顶层 owners
+            if 'owners' in item:
+                owners_set.update(item['owners'])
+
+            # node_schedule 内的 owners
+            if 'node_schedule' in item and isinstance(item['node_schedule'], dict):
+                owners_set.update(item['node_schedule'].get('owners', []))
+
+            # role_assignee 中的 owners
+            if 'role_assignee' in item and isinstance(item['role_assignee'], list):
+                for ra in item['role_assignee']:
+                    owners_set.update(ra.get('owners', []))
+
+            # schedules 中的 owners
+            if 'schedules' in item and isinstance(item['schedules'], list):
+                for sched in item['schedules']:
+                    owners_set.update(sched.get('owners', []))
+    return list(owners_set)
+
+
+def completion_rate(create_date, date, uid):
+    """
+
+    :return: 返回完成率
+    """
+    finished_demand_data = get_demand_finished_list(date=date, uid=uid, finished_time=None)
+    all_demand = get_all_user_demand(uid=None, finished_time=None, create_date=create_date)
+    proportion = len(finished_demand_data) / len(all_demand) if all_demand else 0
+    print(f"完成率：{proportion:.2%}")
+
+
 if __name__ == '__main__':
     # get_user_name([7205168573025697794, 7212971331053240348])
-
+    # get_all_user_finished_demand(create_date=20250715, uid=None, finished_time=None)
+    completion_rate(create_date=20250601, date=20250601, uid=7212971331053240348)
     # result = get_check(20250601, uid=None, date_type='person_incomplete_data', finished_time=20250630)
     # print(get_check(20250601, uid=None, date_type='person_finished_data'))
-    print(get_check(20250601, 7117238460611624964, 'person_finished_data', finished_time=None))
+    # print(get_check(20250601, 7117238460611624964, 'person_finished_data', finished_time=None))
     # print(get_check(None, uid=None, date_type='person_incomplete_data', finished_time=None))
     # print(json.dumps(result, indent=2, ensure_ascii=False))

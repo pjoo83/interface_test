@@ -10,7 +10,7 @@ def debris_mount_increase(request):
     headers = sql_data()[1]
     payload = "instance_name=cdb-sg-prod-starmaker-live-r2&db_name=fb_live&schema_name=&tb_name=&sql_content=select" \
               "+*+from++static_debris+order+by+debris_id+desc+limit+20"
-    data = requests.post(url=url, headers=headers, data=payload)
+    data = requests.post(url=url, headers=headers, data=payload, cookies=sql_data()[2])
     new_data = data.json()['data']['rows'][0]
     Mount_data = resource_check(3, 3)[0][2]
     if new_data[0] == Mount_data:

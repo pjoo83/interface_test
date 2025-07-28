@@ -10,7 +10,7 @@ def resource_mount_increase(request):
     headers = sql_data()[1]
     payload = "instance_name=cdb-sg-prod-starmaker-live-r2&db_name=fb_live&schema_name=&tb_name=horse&sql_content" \
               "=select+*+from++horse+order+by+horse_id+desc%3B&limit_num=20"
-    data = requests.post(url=url, data=payload, headers=headers)
+    data = requests.post(url=url, data=payload, headers=headers, cookies=sql_data()[2])
     Mount_data = resource_check(3, 1)[0][2]
     new_data = data.json()['data']['rows'][0]
     if Mount_data == new_data[0]:

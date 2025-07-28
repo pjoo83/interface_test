@@ -17,13 +17,13 @@ def check_equip(equip_datas, ids):
     url = sql_data()[0]
     headers = sql_data()[1]
     payload = equip_datas[0]
-    data = requests.post(url=url, headers=headers, data=payload)
+    data = requests.post(url=url, headers=headers, data=payload, cookies=sql_data()[2])
     new_data = data.json()['data']['rows'][0]
     Mount_data = resource_check(3, equip_datas[2])[0][2]
     if new_data[0] == Mount_data:
         print(equip_datas[1])
         return JsonResponse({'code': 200,
-                             'msg': '数据相同，没有更新'})
+                             'msg': '热血怪兽数据相同，没有更新'})
     else:
         datas = data.json()['data']['rows']
         pag_url = new_data[4]

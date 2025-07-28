@@ -10,13 +10,13 @@ def bubble_mount_increase(request):
     headers = sql_data()[1]
     payload = "instance_name=cdb-sg-prod-starmaker-live-r2&db_name=fb_live&schema_name=&tb_name=privilege_conf&sql_" \
               "content=select+*+from+privilege_conf+order+by++privilege_id+desc+limit+20%3B&limit_num=100"
-    data = requests.post(url=url, headers=headers, data=payload)
+    data = requests.post(url=url, headers=headers, data=payload, cookies=sql_data()[2])
     new_data = data.json()['data']['rows'][0]
     Mount_data = resource_check(3, 5)[0][2]
     if new_data[0] == Mount_data:
         print('特权数据相同，没有新增')
         return JsonResponse({'code': 200,
-                             'msg': '数据相同，没有更新'})
+                             'msg': '特权相同，没有更新'})
     else:
         datas = data.json()['data']['rows']
         pag_url = f'https://gift-resource.starmakerstudios.com/privilege/{new_data[4]}'

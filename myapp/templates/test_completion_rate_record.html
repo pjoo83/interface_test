@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>测试组数据统计</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.1.0"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .chart-container {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            align-items: center;
+        }
+        .chart-box {
+            width: 100%;
+            max-width: 1200px;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        .bar-wrapper {
+            height: 500px;
+        }
+        .pie-wrapper {
+            width: 100%;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        #modal {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px;
+            max-height: 70%;
+            background: white;
+            border: 1px solid #ccc;
+            padding: 20px;
+            display: none;
+            flex-direction: column;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            overflow-y: auto;
+            z-index: 9999;
+        }
+        #modal h3 { margin-top: 0; }
+        #modal ul { padding-left: 20px; }
+        #modalClose {
+            margin-top: 10px;
+            align-self: flex-end;
+            background: #d33;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chart-container">
+
+    <div class="chart-box bar-wrapper">
+        <canvas id="barChart"></canvas>
+    </div>
+
+    <div class="chart-box pie-wrapper">
+        <canvas id="pieChart"></canvas>
+    </div>
+
+</div>
+<div>
+    <div id='m1' style="width:90%; height:88%;margin-left:5%"></div>
+</div>
+
+<div id="modal">
+    <h3 id="modalTitle">用户需求列表</h3>
+    <ul id="modalList"></ul>
+    <button id="modalClose">关闭</button>
+</div>
+
+{{ user_data|json_script:"user-json" }}
+
+<script>
+const data = JSON.parse(document.getElementById('user-json').textContent);
+
+// 转为数字
+data.forEach(user => {
+    user.完成率值 = parseFloat(user["已承接的需求数量"]) || 0;
+});
+
+// 排序按承接数
+data.sort((a, b) => b["已承接的需求数量"] - a["已承接的需求数量"]);
+
+const labels = data.map(u => u.user);
+const completionRates = data.map(u => u.完成率值);
+const demandCounts = data.map(u => u["已承接的需求数量"]);
+
+// 计算均值
+const avgRate = completionRates.reduce((sum, val) => sum + val, 0) / completionRates.length;
+
+// 柱状图
+const barCtx = document.getElementById("barChart").getContext("2d");
+const barChart = new Chart(barCtx, {
+    type: 'bar',
+    data: {
+        labels: labels,
+        datasets: [{
+            label: '完成率（%）',
+            data: completionRates,
+            backgroundColor: 'rgba(54, 162, 235, 0.7)'
+        }]
+    },
+    options: {
+        responsive: true,
+        onClick: (evt, elements) => {
+            if (elements.length > 0) {
+                const idx = elements[0].index;
+                const user = data[idx];
+                const modal = document.getElementById('modal');
+                const title = document.getElementById('modalTitle');
+                const list = document.getElementById('modalList');
+
+                title.innerText = `${user.user} 的需求列表`;
+                list.innerHTML = '';
+                user["需求列表"].forEach(item => {
+                    const li = document.createElement("li");
+                    li.textContent = item;
+                    list.appendChild(li);
+                });
+
+                modal.style.display = 'flex';
+            }
+        },
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        const idx = context.dataIndex;
+                        const user = data[idx];
+                        return `完成率: ${user["完成需求占比"]}，承接数量: ${user["已承接的需求数量"]}`;
+                    }
+                }
+            },
+            legend: { display: false },
+            title: {
+                display: true,
+                text: '用户完成率柱状图（按承接数量排名）'
+            },
+            annotation: {
+                annotations: {
+                    avgLine: {
+                        type: 'line',
+                        yMin: avgRate,
+                        yMax: avgRate,
+                        borderColor: 'red',
+                        borderWidth: 2,
+                        label: {
+                            content: `承接需求均值 ${avgRate.toFixed(2)}`,
+                            enabled: true,
+                            position: 'end'
+                        }
+                    }
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                title: { display: true, text: '承接需求数' }
+            }
+        }
+    },
+    plugins: [Chart.registry.getPlugin('annotation')]
+});
+
+// 饼图
+const pieCtx = document.getElementById("pieChart").getContext("2d");
+const pieChart = new Chart(pieCtx, {
+    type: 'doughnut',
+    data: {
+        labels: labels,
+        datasets: [{
+            label: '完成率占比',
+            data: completionRates,
+            backgroundColor: labels.map((_, i) =>
+                `hsl(${i * 360 / labels.length}, 70%, 65%)`
+            ),
+            borderColor: '#fff',
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '0%', // 环形中空比例
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        const idx = context.dataIndex;
+                        const user = data[idx];
+                        return `${user.user}: ${user["完成需求占比"]}`;
+                    }
+                }
+            },
+            legend: {
+                position: 'right',
+                labels: {
+                    usePointStyle: true,
+                    padding: 20
+                }
+            },
+            title: {
+                display: true,
+                text: '用户完成率占比（环形图）'
+            }
+        }
+    }
+});
+
+// 关闭弹窗
+document.getElementById("modalClose").addEventListener("click", () => {
+    document.getElementById("modal").style.display = "none";
+});
+
+
+
+
+</script>
+
+</body>
+</html>

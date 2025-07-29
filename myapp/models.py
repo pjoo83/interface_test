@@ -257,3 +257,12 @@ class test_record(models.Model):
     id = models.IntegerField(verbose_name='顺序Id', primary_key=True)
     user_id = models.ForeignKey(test_user, on_delete=models.CASCADE, verbose_name='用户ID')
     record = models.TextField()
+
+
+class test_record_result(models.Model):
+    """
+        测试承接记录结果表
+    """
+    data_record = models.TextField(verbose_name='记录数据')
+    datatime = models.DateField(auto_now_add=True, verbose_name='执行时间', null=True)
+    all_record_num =models.IntegerField(verbose_name='记录总数', null=True, default=0)

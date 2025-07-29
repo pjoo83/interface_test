@@ -430,17 +430,12 @@ def get_user_name(uid_list, nums):
     u_list = []
     for uid in uid_list:
         if nums == 1:
-            try:
-                uname = fei.qa_list[int(uid)][0]
-                u_list.append(uname)
-            except (IndexError, KeyError, ValueError, TypeError):
-                u_list.append(uid)
+            uname = fei.qa_list[int(uid)][0]
+            u_list.append(uname)
+
         elif nums == 2:
-            try:
-                uname = fei.qa_list[int(uid)][1]
-                u_list.append(uname)
-            except (IndexError, KeyError, ValueError, TypeError):
-                u_list.append(uid)
+            uname = fei.qa_list[int(uid)][1]
+            u_list.append(uname)
     return u_list
 
 
@@ -532,13 +527,15 @@ def get_all_user_demand(create_date, uid, finished_time):
         })
     if finished_time:
         search_params.append({
-            "param_key": "feature_state_time",
-            "value": {
-                "state_name": "测试阶段",
-                "state_timestamp": get_zero_timestamp_ms_from_int(create_date),
-                "state_condition": 1},
-            "operator": ">="
-        })
+                "param_key": "feature_state_time",
+                "value": {
+                    "state_name": "测试阶段",
+                    "state_timestamp": get_zero_timestamp_ms_from_int(finished_time),
+                    "state_condition": 1
+                },
+                "operator": "<="
+            }
+)
     return _paged_post(url, headers, search_params)
 
 
@@ -556,8 +553,14 @@ def get_all_user_finished_demand(create_date, uid, finished_time):
         test_list = all_datas[i]['workflow_infos']['workflow_nodes']
         test_name = all_datas[i]['name']
         test_user = get_test_user(test_list)
-        user_test_list.append({"用户": get_user_name(test_user, 2), "用户id": test_user, "需求名称": test_name})
+        try:
+            user_test_list.append({"用户": get_user_name(test_user, 2), "用户id": test_user, "需求名称": test_name})
+        except Exception as e:
+            print(f"Error processing item {i}: {e}")
+            continue
     user_data = user_classification_data(user_test_list, all_datas_num)
+    print(user_data)
+
     return user_data,all_datas_num
     # print(f"本次查询到总需求数量：{all_datas_num}条数据")
 
@@ -641,7 +644,7 @@ def completion_rate(create_date=None, date=None, uid=None, finished_time=None):
 
 if __name__ == '__main__':
     # get_user_name([7205168573025697794, 7212971331053240348])
-    get_all_user_finished_demand(create_date=20250101, uid=None, finished_time=None)
+    get_all_user_finished_demand(create_date=20250101, uid=None, finished_time=20250108)
     # completion_rate(create_date=20250701, date=20250701, uid=7117238460611624964, finished_time=None)
     # result = get_check(20250601, uid=None, date_type='person_incomplete_data', finished_time=20250630)
     # get_field_all()

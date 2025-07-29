@@ -1,244 +1,242 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-    <meta charset="UTF-8">
-    <title>测试组数据统计</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.1.0"></script>
-    <style>
-        body {
-            font-family: sans-serif;
-            padding: 20px;
-            background-color: #f9f9f9;
-        }
-        .chart-container {
-            display: flex;
-            flex-direction: column;
-            gap: 40px;
-            align-items: center;
-        }
-        .chart-box {
-            width: 100%;
-            max-width: 1200px;
-            background: #fff;
-            padding: 20px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            border-radius: 8px;
-        }
-        .bar-wrapper {
-            height: 500px;
-        }
-        .pie-wrapper {
-            width: 100%;
-            height: 400px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        canvas {
-            width: 100% !important;
-            height: 100% !important;
-        }
-        #modal {
-            position: fixed;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 500px;
-            max-height: 70%;
-            background: white;
-            border: 1px solid #ccc;
-            padding: 20px;
-            display: none;
-            flex-direction: column;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            overflow-y: auto;
-            z-index: 9999;
-        }
-        #modal h3 { margin-top: 0; }
-        #modal ul { padding-left: 20px; }
-        #modalClose {
-            margin-top: 10px;
-            align-self: flex-end;
-            background: #d33;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            cursor: pointer;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>测试组已承接需求数据</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+  <style>
+    body { font-family: 'Segoe UI','Microsoft YaHei', sans-serif; padding: 24px; background:#f6f7fb; }
+    h2 { margin: 16px 0 8px; color:#2c3e50; }
+    #barChart, #pieChart { width:100%; height:420px; background:#fff; border-radius:12px; box-shadow:0 6px 16px rgba(0,0,0,.06); margin-bottom:28px; }
+    /* tooltip 容器样式（开启换行） */
+    .echarts-tooltip { max-width:520px; white-space:normal; word-break:break-word; line-height:1.6; }
+    /* 点击详情弹窗：按点击点在下方弹出 */
+    #modal {
+      position: fixed;
+      left: 0; top: 0; /* 由 JS 动态设置 */
+      transform: none;
+      display: none;
+      flex-direction: column;
+      width: 520px;
+      max-width: calc(100vw - 24px);
+      max-height: 60vh;
+      background: #fff;
+      border-radius: 10px;
+      border: 1px solid #e9ecef;
+      box-shadow: 0 12px 28px rgba(0,0,0,.15);
+      padding: 16px 16px 8px;
+      overflow-y: auto;
+      z-index: 1000;
+    }
+    #modal h3 { margin: 0 0 10px; color:#2c3e50; font-size: 18px; border-bottom:1px solid #eaeef3; padding-bottom:8px; }
+    #modal ul { list-style: none; padding-left: 0; margin: 0; }
+    #modal ul li { margin: 0 0 8px; padding: 8px 10px; background:#f8fafc; border-radius:6px; }
+    #modalClose {
+      align-self: flex-end; margin-top: 6px;
+      background:#e74c3c; color:#fff; border:0; border-radius:6px;
+      padding: 6px 12px; cursor:pointer;
+    }
+    #modalClose:hover { background:#c0392b; }
+  </style>
 </head>
 <body>
 
-<div class="chart-container">
+  <h2>用户承接需求数（点击柱查看明细）</h2>
+  <div id="barChart"></div>
 
-    <div class="chart-box bar-wrapper">
-        <canvas id="barChart"></canvas>
-    </div>
+  <h2>完成率占比（饼图）</h2>
+  <div id="pieChart"></div>
 
-    <div class="chart-box pie-wrapper">
-        <canvas id="pieChart"></canvas>
-    </div>
-
-</div>
-<div>
-    <div id='m1' style="width:90%; height:88%;margin-left:5%"></div>
-</div>
-
-<div id="modal">
+  <!-- 点击详情弹窗（靠近点击位置向下展示） -->
+  <div id="modal">
     <h3 id="modalTitle">用户需求列表</h3>
     <ul id="modalList"></ul>
     <button id="modalClose">关闭</button>
-</div>
+  </div>
 
-{{ user_data|json_script:"user-json" }}
-
-<script>
-const data = JSON.parse(document.getElementById('user-json').textContent);
-
-// 转为数字
-data.forEach(user => {
-    user.完成率值 = parseFloat(user["已承接的需求数量"]) || 0;
-});
-
-// 排序按承接数
-data.sort((a, b) => b["已承接的需求数量"] - a["已承接的需求数量"]);
-
-const labels = data.map(u => u.user);
-const completionRates = data.map(u => u.完成率值);
-const demandCounts = data.map(u => u["已承接的需求数量"]);
-
-// 计算均值
-const avgRate = completionRates.reduce((sum, val) => sum + val, 0) / completionRates.length;
-
-// 柱状图
-const barCtx = document.getElementById("barChart").getContext("2d");
-const barChart = new Chart(barCtx, {
-    type: 'bar',
-    data: {
-        labels: labels,
-        datasets: [{
-            label: '完成率（%）',
-            data: completionRates,
-            backgroundColor: 'rgba(54, 162, 235, 0.7)'
-        }]
-    },
-    options: {
-        responsive: true,
-        onClick: (evt, elements) => {
-            if (elements.length > 0) {
-                const idx = elements[0].index;
-                const user = data[idx];
-                const modal = document.getElementById('modal');
-                const title = document.getElementById('modalTitle');
-                const list = document.getElementById('modalList');
-
-                title.innerText = `${user.user} 的需求列表`;
-                list.innerHTML = '';
-                user["需求列表"].forEach(item => {
-                    const li = document.createElement("li");
-                    li.textContent = item;
-                    list.appendChild(li);
-                });
-
-                modal.style.display = 'flex';
-            }
-        },
-        plugins: {
-            tooltip: {
-                callbacks: {
-                    label: function(context) {
-                        const idx = context.dataIndex;
-                        const user = data[idx];
-                        return `完成率: ${user["完成需求占比"]}，承接数量: ${user["已承接的需求数量"]}`;
-                    }
-                }
-            },
-            legend: { display: false },
-            title: {
-                display: true,
-                text: '用户完成率柱状图（按承接数量排名）'
-            },
-            annotation: {
-                annotations: {
-                    avgLine: {
-                        type: 'line',
-                        yMin: avgRate,
-                        yMax: avgRate,
-                        borderColor: 'red',
-                        borderWidth: 2,
-                        label: {
-                            content: `承接需求均值 ${avgRate.toFixed(2)}`,
-                            enabled: true,
-                            position: 'end'
-                        }
-                    }
-                }
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                title: { display: true, text: '承接需求数' }
-            }
-        }
-    },
-    plugins: [Chart.registry.getPlugin('annotation')]
-});
-
-// 饼图
-const pieCtx = document.getElementById("pieChart").getContext("2d");
-const pieChart = new Chart(pieCtx, {
-    type: 'doughnut',
-    data: {
-        labels: labels,
-        datasets: [{
-            label: '完成率占比',
-            data: completionRates,
-            backgroundColor: labels.map((_, i) =>
-                `hsl(${i * 360 / labels.length}, 70%, 65%)`
-            ),
-            borderColor: '#fff',
-            borderWidth: 2
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '0%', // 环形中空比例
-        plugins: {
-            tooltip: {
-                callbacks: {
-                    label: function(context) {
-                        const idx = context.dataIndex;
-                        const user = data[idx];
-                        return `${user.user}: ${user["完成需求占比"]}`;
-                    }
-                }
-            },
-            legend: {
-                position: 'right',
-                labels: {
-                    usePointStyle: true,
-                    padding: 20
-                }
-            },
-            title: {
-                display: true,
-                text: '用户完成率占比（环形图）'
-            }
-        }
-    }
-});
-
-// 关闭弹窗
-document.getElementById("modalClose").addEventListener("click", () => {
-    document.getElementById("modal").style.display = "none";
-});
-
-
-
-
+  <!-- ======= 示例数据（Django中请替换为 json_script） ======= -->
+ <script id="user-json" type="application/json">
+  {{ user_data|safe }}
 </script>
+  <!-- ======= /示例数据 ======= -->
 
+  <script>
+    // ===== 工具：健壮的数值解析 =====
+    function toNumber(val) {
+      if (val === null || val === undefined) return NaN;
+      if (typeof val === 'number') return val;
+      const s = String(val).trim();
+      if (!s) return NaN;
+      if (s.endsWith('%')) return parseFloat(s.slice(0, -1));
+      const n = parseFloat(s);
+      return isNaN(n) ? NaN : n;
+    }
+
+    // 读取数据（Django：此处会用 json_script 注入）
+    const raw = JSON.parse(document.getElementById('user-json').textContent);
+
+    // 统一标准化：完成率可来自「完成需求占比」或「完成率/完成率值」
+    const data = raw.map(u => {
+      const rateRaw = u["完成需求占比"] ?? u["完成率"] ?? u["完成率值"];
+      return {
+        user: u.user || u["用户"] || "未知",
+        demandCount: toNumber(u["已承接的需求数量"]),
+        rate: toNumber(rateRaw),   // 纯数值（去%）
+        demandList: Array.isArray(u["需求列表"]) ? u["需求列表"] : (Array.isArray(u["需求"]) ? u["需求"] : [])
+      };
+    });
+
+    // 按承接数量排序（降序）
+    data.sort((a, b) => (b.demandCount || 0) - (a.demandCount || 0));
+
+    // 构造数组
+    const names = data.map(d => d.user);
+    const demands = data.map(d => d.demandCount || 0);
+    const rates = data.map(d => isNaN(d.rate) ? 0 : d.rate);
+
+    // 平均承接量（用于柱图均值线）
+    const avgDemand = demands.length ? (demands.reduce((a, b) => a + b, 0) / demands.length) : 0;
+
+    // ========= 柱状图 =========
+    const barChart = echarts.init(document.getElementById('barChart'));
+    const barOption = {
+      grid: { left: 60, right: 24, top: 40, bottom: 80 },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        className: 'echarts-tooltip',
+        confine: true,   // 防止超出
+        formatter: function (params) {
+          const idx = params[0].dataIndex;
+          const u = data[idx];
+          const list = u.demandList && u.demandList.length ? u.demandList.slice(0, 10).join('<br/>') : '无';
+          return `
+            <div class="echarts-tooltip">
+              <b>${u.user}</b><br/>
+              承接数量：${u.demandCount ?? 0}<br/>
+              完成率：${isNaN(u.rate) ? '--' : (u.rate.toFixed(1) + '%')}<br/>
+
+            </div>
+          `;
+        }
+      },
+      xAxis: { type: 'category', data: names, axisLabel: { rotate: 36 } },
+      yAxis: { type: 'value', name: '承接数量' },
+      series: [
+        {
+          name: '承接数量',
+          type: 'bar',
+          data: demands,
+          itemStyle: { color: '#4DA8DA' },
+          markLine: {
+            symbol: 'none',
+            label: {
+              formatter: `平均值：${avgDemand.toFixed(1)}`,
+              position: 'middle'
+            },
+            lineStyle: { type: 'dashed', color: '#e74c3c' },
+            data: [{ yAxis: avgDemand }]
+          }
+        }
+      ]
+    };
+    barChart.setOption(barOption);
+
+    // ========= 点击柱子 -> 在点击点下方弹窗 =========
+    const modal = document.getElementById('modal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalList = document.getElementById('modalList');
+    const modalClose = document.getElementById('modalClose');
+
+    function openModalAt(pageX, pageY, user) {
+      // 填充内容
+      modalTitle.textContent = `${user.user} 的需求列表（${user.demandCount ?? 0} 项）`;
+      modalList.innerHTML = '';
+      if (user.demandList && user.demandList.length) {
+        user.demandList.forEach(it => {
+          const li = document.createElement('li');
+          li.textContent = it;
+          modalList.appendChild(li);
+        });
+      } else {
+        const li = document.createElement('li');
+        li.textContent = '暂无需求';
+        modalList.appendChild(li);
+      }
+
+      // 先显示以便拿到尺寸
+      modal.style.display = 'flex';
+
+      const pad = 12;
+      // 期望在点击点下方 12px
+      const desiredTop = pageY + pad;
+      const desiredLeft = Math.max(pad, Math.min(pageX - modal.offsetWidth / 2, window.innerWidth - modal.offsetWidth - pad));
+      const maxTop = window.innerHeight - modal.offsetHeight - pad;
+      modal.style.top = Math.max(pad, Math.min(desiredTop, maxTop)) + 'px';
+      modal.style.left = desiredLeft + 'px';
+    }
+
+    barChart.on('click', function (params) {
+      if (!params || params.componentType !== 'series') return;
+      const idx = params.dataIndex;
+      const u = data[idx];
+      // 原始鼠标事件坐标（相对页面）
+      const e = params.event.event || {};
+      const pageX = e.pageX ?? (e.clientX + window.scrollX);
+      const pageY = e.pageY ?? (e.clientY + window.scrollY);
+      openModalAt(pageX, pageY, u);
+    });
+
+    // 关闭弹窗：按钮或点外部
+    modalClose.addEventListener('click', () => modal.style.display = 'none');
+    document.addEventListener('click', (ev) => {
+      if (modal.style.display === 'flex') {
+        const withinModal = modal.contains(ev.target);
+        const withinChart = document.getElementById('barChart').contains(ev.target);
+        if (!withinModal && !withinChart) modal.style.display = 'none';
+      }
+    });
+
+    // ========= 饼图（完成率占比） =========
+    const pieChart = echarts.init(document.getElementById('pieChart'));
+    // 清洗：只取有效 rate > 0 的
+    const pieData = data
+      .map(u => ({ name: u.user, value: isNaN(u.rate) ? 0 : u.rate }))
+      .filter(d => d.value > 0);
+
+    if (pieData.length === 0) {
+      pieChart.setOption({
+        title: { text: '暂无有效完成率数据', left: 'center', top: 'center', textStyle: { color:'#95a5a6' } }
+      });
+    } else {
+      pieChart.setOption({
+        tooltip: {
+          trigger: 'item',
+          formatter: (p) => `${p.name}：${p.value.toFixed(1)}%（占比 ${p.percent}%）`,
+          className: 'echarts-tooltip',
+          confine: true
+        },
+        legend: { bottom: 0, type: 'scroll' },
+        series: [{
+          name: '完成率占比',
+          type: 'pie',
+          radius: ['40%','65%'],
+          center: ['50%','50%'],
+          data: pieData,
+          label: {
+            formatter: '{b}\n{c}%',
+            overflow: 'truncate',
+            width: 120
+          },
+          emphasis: {
+            itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0,0,0,0.3)' }
+          }
+        }]
+      });
+    }
+
+    // 自适应
+    window.addEventListener('resize', () => { barChart.resize(); pieChart.resize(); });
+  </script>
 </body>
 </html>

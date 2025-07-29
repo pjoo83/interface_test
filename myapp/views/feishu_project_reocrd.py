@@ -17,7 +17,7 @@ def user_statistics_view(request):
 
         if datatime == today:
             user_data = ast.literal_eval(data_record)
-            return render(request, "test_completion_rate_record.html", {"user_data": user_data})
+            return render(request, "test_completion_rate_record.html", {"user_data": json.dumps(user_data, ensure_ascii=False)})
         else:
 
             new_date= feishu_project.get_all_user_finished_demand(create_date=20250101, uid=None, finished_time=None)

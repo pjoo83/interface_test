@@ -7,7 +7,8 @@
   <style>
     body { font-family: 'Segoe UI','Microsoft YaHei', sans-serif; padding: 24px; background:#f6f7fb; }
     h2 { margin: 16px 0 8px; color:#2c3e50; }
-    #barChart, #pieChart { width:100%; height:420px; background:#fff; border-radius:12px; box-shadow:0 6px 16px rgba(0,0,0,.06); margin-bottom:28px; }
+    #barChart{ width:100%; height:450px; background:#fff; border-radius:12px; box-shadow:0 6px 16px rgba(0,0,0,.06); margin-bottom:28px; }
+     #pieChart { width:100%; height:700px; background:#fff; border-radius:12px; box-shadow:0 6px 16px rgba(0,0,0,.06); margin-bottom:28px; }
     /* tooltip 容器样式（开启换行） */
     .echarts-tooltip { max-width:520px; white-space:normal; word-break:break-word; line-height:1.6; }
     /* 点击详情弹窗：按点击点在下方弹出 */
@@ -216,11 +217,12 @@
           className: 'echarts-tooltip',
           confine: true
         },
-        legend: { bottom: 0, type: 'scroll' },
+        legend: { orient: 'vertical',
+                left: 'left' },
         series: [{
           name: '完成率占比',
           type: 'pie',
-          radius: ['40%','65%'],
+          radius:'55%',
           center: ['50%','50%'],
           data: pieData,
           label: {
@@ -228,9 +230,13 @@
             overflow: 'truncate',
             width: 120
           },
-          emphasis: {
-            itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0,0,0,0.3)' }
-          }
+         emphasis: {
+        itemStyle: {
+          shadowBlur: 10,
+          shadowOffsetX: 0,
+          shadowColor: 'rgba(0, 0, 0, 0.5)'
+        }
+      }
         }]
       });
     }

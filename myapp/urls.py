@@ -68,6 +68,7 @@ urlpatterns = [
     # 研发测试比
     path("td_testing_calculations/", rd_testing_calculations.td_testing_calculations, name='rd_testing_calculations'),
     path("feishu_project_record/", feishu_project_reocrd.user_statistics_view, name='feishu_project_record'),
+    path("no_testing_project/", feishu_project_reocrd.no_testing_project, name='no_testing_project'),
 
     path("business/", business_view.business_list),
     path("business/del/", business_view.business_del),

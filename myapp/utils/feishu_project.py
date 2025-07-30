@@ -559,7 +559,6 @@ def get_all_user_finished_demand(create_date, uid, finished_time):
             print(f"Error processing item {i}: {e}")
             continue
     user_data = user_classification_data(user_test_list, all_datas_num)
-    print(user_data)
 
     return user_data,all_datas_num
     # print(f"本次查询到总需求数量：{all_datas_num}条数据")

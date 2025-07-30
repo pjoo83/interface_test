@@ -19,7 +19,7 @@ def user_statistics_view(request):
             user_data = ast.literal_eval(data_record)
             return render(request, "test_completion_rate_record.html", {"user_data": json.dumps(user_data, ensure_ascii=False)})
         else:
-
+            print('数据未更新,请等待更新')
             new_date= feishu_project.get_all_user_finished_demand(create_date=20250101, uid=None, finished_time=None)
             if new_date:
                 insert_data = test_record_result(
@@ -27,6 +27,7 @@ def user_statistics_view(request):
                     all_record_num=new_date[1]
                 )
                 insert_data.save()
+                print('数据已更新')
                 return JsonResponse({"status": False, "message": "正在更新进入数据"})
             else:
                 return JsonResponse({"status": False, "message": "没有数据"})

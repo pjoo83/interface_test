@@ -8,14 +8,13 @@
     body { font-family: 'Segoe UI','Microsoft YaHei', sans-serif; padding: 24px; background:#f6f7fb; }
     h2 { margin: 16px 0 8px; color:#2c3e50; }
     #barChart{ width:100%; height:450px; background:#fff; border-radius:12px; box-shadow:0 6px 16px rgba(0,0,0,.06); margin-bottom:28px; }
-     #pieChart { width:100%; height:700px; background:#fff; border-radius:12px; box-shadow:0 6px 16px rgba(0,0,0,.06); margin-bottom:28px; }
-    /* tooltip 容器样式（开启换行） */
+    #pieChart { width:100%; height:400px; background:#fff; border-radius:12px; box-shadow:0 6px 16px rgba(0,0,0,.06); margin-bottom:28px; }
     .echarts-tooltip { max-width:520px; white-space:normal; word-break:break-word; line-height:1.6; }
-    /* 点击详情弹窗：按点击点在下方弹出 */
-    #modal {
+
+    .modal {
       position: fixed;
-      left: 0; top: 0; /* 由 JS 动态设置 */
-      transform: none;
+      left: 50%; top: 20%;
+      transform: translateX(-50%);
       display: none;
       flex-direction: column;
       width: 520px;
@@ -29,40 +28,88 @@
       overflow-y: auto;
       z-index: 1000;
     }
-    #modal h3 { margin: 0 0 10px; color:#2c3e50; font-size: 18px; border-bottom:1px solid #eaeef3; padding-bottom:8px; }
-    #modal ul { list-style: none; padding-left: 0; margin: 0; }
-    #modal ul li { margin: 0 0 8px; padding: 8px 10px; background:#f8fafc; border-radius:6px; }
-    #modalClose {
-      align-self: flex-end; margin-top: 6px;
-      background:#e74c3c; color:#fff; border:0; border-radius:6px;
-      padding: 6px 12px; cursor:pointer;
+    .modal h3 {
+      margin: 0 0 10px;
+      color:#2c3e50;
+      font-size: 18px;
+      border-bottom:1px solid #eaeef3;
+      padding-bottom:8px;
     }
-    #modalClose:hover { background:#c0392b; }
+    .modal ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+    .modal ul li {
+      margin: 0 0 8px;
+      padding: 8px 10px;
+      background:#f8fafc;
+      border-radius:6px;
+    }
+    .modal ul li a {
+      color: #007BFF;
+      text-decoration: none;
+    }
+    .modal ul li a:hover {
+      text-decoration: underline;
+    }
+    .modal button.closeBtn {
+      align-self: flex-end;
+      margin-top: 6px;
+      background:#e74c3c;
+      color:#fff;
+      border:0;
+      border-radius:6px;
+      padding: 6px 12px;
+      cursor:pointer;
+    }
+    .modal button.closeBtn:hover {
+      background:#c0392b;
+    }
+
+    #no_testing_new {
+      background: #f39c12;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 16px;
+      cursor: pointer;
+      margin-bottom: 16px;
+      font-size: 14px;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
 
   <h2>用户承接需求数（点击柱查看明细）</h2>
+
+  <button id="no_testing_new">查看未安排测试的需求</button>
+
   <div id="barChart"></div>
 
   <h2>完成率占比（饼图）</h2>
   <div id="pieChart"></div>
 
-  <!-- 点击详情弹窗（靠近点击位置向下展示） -->
-  <div id="modal">
-    <h3 id="modalTitle">用户需求列表</h3>
-    <ul id="modalList"></ul>
-    <button id="modalClose">关闭</button>
+  <!-- 旧弹窗 -->
+  <div id="modalOld" class="modal">
+    <h3 id="modalTitleOld">标题</h3>
+    <ul id="modalListOld"></ul>
+    <button class="closeBtn" id="modalCloseOld">关闭</button>
   </div>
 
-  <!-- ======= 示例数据（Django中请替换为 json_script） ======= -->
- <script id="user-json" type="application/json">
-  {{ user_data|safe }}
-</script>
-  <!-- ======= /示例数据 ======= -->
+  <!-- 新弹窗 -->
+  <div id="modalNew" class="modal">
+    <h3 id="modalTitleNew">未安排测试的需求列表</h3>
+    <ul id="modalListNew"></ul>
+    <button class="closeBtn" id="modalCloseNew">关闭</button>
+  </div>
+
+  <script id="user-json" type="application/json">
+    {{ user_data|safe }}
+  </script>
 
   <script>
-    // ===== 工具：健壮的数值解析 =====
     function toNumber(val) {
       if (val === null || val === undefined) return NaN;
       if (typeof val === 'number') return val;
@@ -73,32 +120,29 @@
       return isNaN(n) ? NaN : n;
     }
 
-    // 读取数据（Django：此处会用 json_script 注入）
     const raw = JSON.parse(document.getElementById('user-json').textContent);
+    console.log('原始数据', raw);
 
-    // 统一标准化：完成率可来自「完成需求占比」或「完成率/完成率值」
     const data = raw.map(u => {
       const rateRaw = u["完成需求占比"] ?? u["完成率"] ?? u["完成率值"];
       return {
         user: u.user || u["用户"] || "未知",
         demandCount: toNumber(u["已承接的需求数量"]),
-        rate: toNumber(rateRaw),   // 纯数值（去%）
-        demandList: Array.isArray(u["需求列表"]) ? u["需求列表"] : (Array.isArray(u["需求"]) ? u["需求"] : [])
+        rate: toNumber(rateRaw),
+        demandList: Array.isArray(u["需求列表"]) ? u["需求列表"] : [],
+        demandIds: Array.isArray(u["需求id"]) ? u["需求id"] : []
       };
     });
 
-    // 按承接数量排序（降序）
     data.sort((a, b) => (b.demandCount || 0) - (a.demandCount || 0));
 
-    // 构造数组
     const names = data.map(d => d.user);
     const demands = data.map(d => d.demandCount || 0);
     const rates = data.map(d => isNaN(d.rate) ? 0 : d.rate);
 
-    // 平均承接量（用于柱图均值线）
     const avgDemand = demands.length ? (demands.reduce((a, b) => a + b, 0) / demands.length) : 0;
 
-    // ========= 柱状图 =========
+    // 初始化柱状图
     const barChart = echarts.init(document.getElementById('barChart'));
     const barOption = {
       grid: { left: 60, right: 24, top: 40, bottom: 80 },
@@ -106,17 +150,15 @@
         trigger: 'axis',
         axisPointer: { type: 'shadow' },
         className: 'echarts-tooltip',
-        confine: true,   // 防止超出
+        confine: true,
         formatter: function (params) {
           const idx = params[0].dataIndex;
           const u = data[idx];
-          const list = u.demandList && u.demandList.length ? u.demandList.slice(0, 10).join('<br/>') : '无';
           return `
             <div class="echarts-tooltip">
               <b>${u.user}</b><br/>
               承接数量：${u.demandCount ?? 0}<br/>
               完成率：${isNaN(u.rate) ? '--' : (u.rate.toFixed(1) + '%')}<br/>
-
             </div>
           `;
         }
@@ -143,106 +185,155 @@
     };
     barChart.setOption(barOption);
 
-    // ========= 点击柱子 -> 在点击点下方弹窗 =========
-    const modal = document.getElementById('modal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalList = document.getElementById('modalList');
-    const modalClose = document.getElementById('modalClose');
+    // 初始化饼图
+    const pieChart = echarts.init(document.getElementById('pieChart'));
 
-    function openModalAt(pageX, pageY, user) {
-      // 填充内容
-      modalTitle.textContent = `${user.user} 的需求列表（${user.demandCount ?? 0} 项）`;
-      modalList.innerHTML = '';
-      if (user.demandList && user.demandList.length) {
-        user.demandList.forEach(it => {
+    // 这里假设用 rates + names 生成饼图数据
+    const pieData = data.map(d => ({
+      name: d.user,
+      value: isNaN(d.rate) ? 0 : d.rate
+    })).filter(item => item.value > 0);
+
+    console.log('饼图数据', pieData);
+
+    const pieOption = {
+      tooltip: {
+        trigger: 'item',
+        formatter: '{b}: {c} ({d}%)',
+        className: 'echarts-tooltip',
+        confine: true,
+      },
+      legend: {
+        orient: 'vertical',
+        left: 10,
+        top: 20,
+        data: pieData.map(i => i.name),
+        textStyle: { fontSize: 12 }
+      },
+      series: [
+        {
+          name: '完成率占比',
+          type: 'pie',
+          radius: ['40%', '70%'],
+          avoidLabelOverlap: false,
+          label: {
+            show: true,
+            position: 'outside',
+            formatter: '{b}\n{d}%',
+            fontSize: 12,
+          },
+          labelLine: { show: true },
+          data: pieData
+        }
+      ]
+    };
+    pieChart.setOption(pieOption);
+
+    // 旧弹窗相关元素
+    const modalOld = document.getElementById('modalOld');
+    const modalTitleOld = document.getElementById('modalTitleOld');
+    const modalListOld = document.getElementById('modalListOld');
+    const modalCloseOld = document.getElementById('modalCloseOld');
+
+    // 新弹窗相关元素
+    const modalNew = document.getElementById('modalNew');
+    const modalTitleNew = document.getElementById('modalTitleNew');
+    const modalListNew = document.getElementById('modalListNew');
+    const modalCloseNew = document.getElementById('modalCloseNew');
+
+    // 旧功能，点击柱状图显示需求列表弹窗
+    barChart.on('click', function (params) {
+
+      if (!params || params.componentType !== 'series') return;
+      const idx = params.dataIndex;
+      const u = data[idx];
+      modalOld.style.display = 'flex';
+      //  setTimeout(() => {
+      // }, 0);
+      modalTitleOld.textContent = `${u.user} 的需求列表（${u.demandCount ?? 0} 项）`;
+      modalListOld.innerHTML = '';
+      if (u.demandList && u.demandList.length) {
+          console.log('8888',modalOld.style.display)
+        u.demandList.forEach((name, idx) => {
           const li = document.createElement('li');
-          li.textContent = it;
-          modalList.appendChild(li);
+          const a = document.createElement('a');
+          const demandId = u.demandIds?.[idx];
+          a.textContent = name;
+          a.href = demandId ? `https://project.feishu.cn/wangmao12345678/story/detail/${demandId}` : '#';
+          a.target = '_blank';
+          li.appendChild(a);
+          modalListOld.appendChild(li);
+          console.log(modalListOld)
         });
       } else {
         const li = document.createElement('li');
         li.textContent = '暂无需求';
-        modalList.appendChild(li);
+        modalListOld.appendChild(li);
       }
-
-      // 先显示以便拿到尺寸
-      modal.style.display = 'flex';
-
-      const pad = 12;
-      // 期望在点击点下方 12px
-      const desiredTop = pageY + pad;
-      const desiredLeft = Math.max(pad, Math.min(pageX - modal.offsetWidth / 2, window.innerWidth - modal.offsetWidth - pad));
-      const maxTop = window.innerHeight - modal.offsetHeight - pad;
-      modal.style.top = Math.max(pad, Math.min(desiredTop, maxTop)) + 'px';
-      modal.style.left = desiredLeft + 'px';
-    }
-
-    barChart.on('click', function (params) {
-      if (!params || params.componentType !== 'series') return;
-      const idx = params.dataIndex;
-      const u = data[idx];
-      // 原始鼠标事件坐标（相对页面）
-      const e = params.event.event || {};
-      const pageX = e.pageX ?? (e.clientX + window.scrollX);
-      const pageY = e.pageY ?? (e.clientY + window.scrollY);
-      openModalAt(pageX, pageY, u);
+    });
+    modalCloseOld.addEventListener('click', () => {
+      modalOld.style.display = 'none';
     });
 
-    // 关闭弹窗：按钮或点外部
-    modalClose.addEventListener('click', () => modal.style.display = 'none');
+    // 新功能，点击新按钮，显示“未安排测试需求”弹窗
+    document.getElementById('no_testing_new').addEventListener('click', () => {
+      modalTitleNew.textContent = '正在加载中...';
+      modalListNew.innerHTML = '<li style="color: gray;">加载中，请稍候...</li>';
+      modalNew.style.display = 'flex';
+     console.log('999',modalNew.style.display )
+      fetch('http://127.0.0.1:8000/autotest/no_testing_project/')
+        .then(res => res.json())
+        .then(res => {
+          if (!res.status || !Array.isArray(res.data) || res.data.length === 0) {
+            modalTitleNew.textContent = '未安排测试的需求列表';
+            modalListNew.innerHTML = '<li style="color: #999;">暂无未安排测试的需求</li>';
+            return;
+          }
+
+          modalTitleNew.textContent = '未安排测试的需求列表';
+          modalListNew.innerHTML = '';
+
+          res.data.forEach(itemStr => {
+            const match = itemStr.match(/^\('(.+?)',\s*(\d+)\)$/);
+            if (match) {
+              const title = match[1];
+              const id = match[2];
+              const li = document.createElement('li');
+              const a = document.createElement('a');
+              a.href = `https://project.feishu.cn/wangmao12345678/story/detail/${id}`;
+              a.textContent = title;
+              a.target = '_blank';
+              li.appendChild(a);
+              modalListNew.appendChild(li);
+            }
+          });
+        })
+        .catch(err => {
+          console.error('请求失败:', err);
+          modalTitleNew.textContent = '请求失败';
+          modalListNew.innerHTML = '<li style="color: red;">请求失败，请稍后再试</li>';
+        });
+    });
+
+    modalCloseNew.addEventListener('click', () => {
+      modalNew.style.display = 'none';
+    });
+
+    // 点击页面空白关闭弹窗
     document.addEventListener('click', (ev) => {
-      if (modal.style.display === 'flex') {
-        const withinModal = modal.contains(ev.target);
-        const withinChart = document.getElementById('barChart').contains(ev.target);
-        if (!withinModal && !withinChart) modal.style.display = 'none';
-      }
-    });
+      const target = ev.target;
+  // 更宽松的判断是否点击在 barChart 区域
+        const isBarClick = document.getElementById('barChart').contains(target);
 
-    // ========= 饼图（完成率占比） =========
-    const pieChart = echarts.init(document.getElementById('pieChart'));
-    // 清洗：只取有效 rate > 0 的
-    const pieData = data
-      .map(u => ({ name: u.user, value: isNaN(u.rate) ? 0 : u.rate }))
-      .filter(d => d.value > 0);
-
-    if (pieData.length === 0) {
-      pieChart.setOption({
-        title: { text: '暂无有效完成率数据', left: 'center', top: 'center', textStyle: { color:'#95a5a6' } }
-      });
-    } else {
-      pieChart.setOption({
-        tooltip: {
-          trigger: 'item',
-          formatter: (p) => `${p.name}：${p.value.toFixed(1)}%（占比 ${p.percent}%）`,
-          className: 'echarts-tooltip',
-          confine: true
-        },
-        legend: { orient: 'vertical',
-                left: 'left' },
-        series: [{
-          name: '完成率占比',
-          type: 'pie',
-          radius:'55%',
-          center: ['50%','50%'],
-          data: pieData,
-          label: {
-            formatter: '{b}\n{c}%',
-            overflow: 'truncate',
-            width: 120
-          },
-         emphasis: {
-        itemStyle: {
-          shadowBlur: 10,
-          shadowOffsetX: 0,
-          shadowColor: 'rgba(0, 0, 0, 0.5)'
-        }
-      }
-        }]
-      });
+    if (modalOld.style.display === 'flex' && !modalOld.contains(target) && !isBarClick) {
+      modalOld.style.display = 'none';
     }
+  if (modalNew.style.display === 'flex' && !modalNew.contains(target) && target.id !== 'no_testing_new') {
+    modalNew.style.display = 'none';
+  }
+});
 
-    // 自适应
-    window.addEventListener('resize', () => { barChart.resize(); pieChart.resize(); });
   </script>
+
 </body>
 </html>

@@ -490,7 +490,7 @@ def start_record(data, types):
     # send_feishu_card(user_list)
 
 
-def get_all_user_demand(create_date, uid, finished_time):
+def get_all_user_demand(create_date, uid, finished_time, no_testing=None):
     """
     :return:返回查询数据，根据开始时间和结束时间
     """
@@ -527,15 +527,23 @@ def get_all_user_demand(create_date, uid, finished_time):
         })
     if finished_time:
         search_params.append({
-                "param_key": "feature_state_time",
-                "value": {
-                    "state_name": "测试阶段",
-                    "state_timestamp": get_zero_timestamp_ms_from_int(finished_time),
-                    "state_condition": 1
-                },
-                "operator": "<="
-            }
-)
+            "param_key": "feature_state_time",
+            "value": {
+                "state_name": "测试阶段",
+                "state_timestamp": get_zero_timestamp_ms_from_int(finished_time),
+                "state_condition": 1
+            },
+            "operator": "<="
+        }
+        )
+    if no_testing:
+        search_params.append({
+            "param_key": "work_item_status",
+            "value": ['sub_stage_1658482927664',
+                      'linshihong_3331583830269491',
+                      '20avolygh', 'sub_stage_1657610860899', 'end', 'closed'],
+            "operator": "HAS NONE OF"
+        })
     return _paged_post(url, headers, search_params)
 
 
@@ -552,15 +560,19 @@ def get_all_user_finished_demand(create_date, uid, finished_time):
     for i in range(len(all_datas)):
         test_list = all_datas[i]['workflow_infos']['workflow_nodes']
         test_name = all_datas[i]['name']
+        test_id = all_datas[i]['id']
+
         test_user = get_test_user(test_list)
         try:
-            user_test_list.append({"用户": get_user_name(test_user, 2), "用户id": test_user, "需求名称": test_name})
+            user_test_list.append({"用户": get_user_name(test_user, 2), "用户id": test_user,
+                                   "需求名称": test_name, '需求id': test_id})
         except Exception as e:
             print(f"Error processing item {i}: {e}")
             continue
+        # url = f"https://project.feishu.cn/wangmao12345678/story/detail/{test_id}?parentUrl=%2Fwangmao12345678%2Fstory%2Fhomepage&openScene=4"
+        # print(url)
     user_data = user_classification_data(user_test_list, all_datas_num)
-
-    return user_data,all_datas_num
+    return user_data, all_datas_num
     # print(f"本次查询到总需求数量：{all_datas_num}条数据")
 
 
@@ -570,13 +582,13 @@ def user_classification_data(data, all_datas_num):
     :param data: 传入需求数据，每项包含 '用户', '用户id', '需求名称'
     :return: 返回每个用户的需求列表和数量等信息
     """
-    user_map = defaultdict(lambda: {"需求列表": [], "user_id": None})
+    user_map = defaultdict(lambda: {"需求列表": [], "user_id": None, "需求id": []})
 
     for item in data:
         users = item.get('用户', [])
         ids = item.get("用户id", [])
         name = item.get('需求名称', '')
-
+        project_id = item.get('需求id', '')
         if not users:
             # 用户为空则归为“暂无”
             user_map["暂无"]["需求列表"].append(name)
@@ -584,6 +596,7 @@ def user_classification_data(data, all_datas_num):
         else:
             for i, user in enumerate(users):
                 user_map[user]["需求列表"].append(name)
+                user_map[user]["需求id"].append(project_id)
                 # 绑定用户id（如果有）
                 if i < len(ids):
                     user_map[user]["user_id"] = ids[i]
@@ -595,9 +608,9 @@ def user_classification_data(data, all_datas_num):
             "user_id": info["user_id"],
             "已承接的需求数量": len(info["需求列表"]),
             "完成需求占比": f"{len(info['需求列表']) / all_datas_num:.2%}" if all_datas_num else "0%",
-            "需求列表": info["需求列表"]
+            "需求列表": info["需求列表"],
+            '需求id': info['需求id']
         })
-
     return user_list
 
 
@@ -641,12 +654,31 @@ def completion_rate(create_date=None, date=None, uid=None, finished_time=None):
     print(f"完成率：{proportion:.2%}")
 
 
+def get_no_testing_requirements():
+    """
+    :return: 返回没有安排测试的需求
+    """
+    all_datas = get_all_user_demand(create_date=None, uid=None, finished_time=None, no_testing=1)
+    no_testing_list = []
+    for i in range(len(all_datas)):
+        test_list = all_datas[i]['workflow_infos']['workflow_nodes']
+        test_user = get_test_user(test_list)
+        if len(test_user) == 0:
+            test_name = all_datas[i]['name']
+            test_id = all_datas[i]['id']
+            no_testing_list.append(f'{test_name, int(test_id)}')
+    # print(no_testing_list)
+    # no_testing_list =["('Happyday后台自定义开启优化', 6239798650)", "('巅峰对决-金牌房间', 6238889653)", "('小游戏-slots-埃及宾果', 6237192539)", "('BD直播/语音房账号', 6237187668)", "('使用模板的作品展示改动', 6237043245)", "('周周挑战赛-任务迭代', 6236985358)", "('BD小游戏账号优化3', 6236962343)", "('机审人脸识别需求', 6231928985)", "('OM后台作品信息增加', 6231484534)", "('亲密列表置顶关系新增信物图鉴入口', 6230725039)", "('通用卡片支持显示webp', 6225821388)", "('upay越南地区大额充值渠道接入', 6218367414)", "('抢唱房间恢复-部分大区', 6212061601)", "('房间玩法-数字炸弹', 6212013100)", "('模板展示排序优化', 6211879719)", "('活动循环配置', 6209892226)", "('个人主页 小 Banner 更改设计规范', 6195692927)", "('亲密回忆录', 6195522457)", "('直播活动-美食狂欢吸底逻辑优化', 6195519582)", "('币商协议优化', 6195446729)", "('家族任务荣耀之路资源投放优化', 6192618630)", "('随从增加主属性', 6178279743)", "('溢出碎片转化', 6178271039)", "('审核池排序优化二期（20250611）', 6169911619)", "('宠物支持针对性的配置某些宠物的词条随机范围', 6116020489)", "('全屏订阅页新增策略-新设备免费试用', 6093112024)", "('认证 H5 UI 优化', 5982284390)", "('扭蛋增加秒杀礼物', 5975038090)", "('PRO-同账号重复订阅问题', 5911127745)", "('IN跨区打赏优化2', 5910600657)", "('社群招募版主活动', 5828520298)", "('FB数据删除回调链接', 5825178756)", "('ef后台-直播间转盘小工具', 5691628086)", "('单社群精选主题活动', 5574540717)", "('新手送宠物', 5571298431)", "('新手礼包页签', 5549731201)", "('新手礼包弹窗弹出(前端)', 5549419840)", "('新手礼包支持经验值', 5524361128)", "('风控策略：异常设备登录拦截', 5508506301)", "('7.5期需求第二批', 5475903304)", "('BD体验账号 客户端需求', 5383385863)", "('系统消息-游戏消息频率A/B Testing', 5347589316)", "('老消息页面遗留问题优化 2期', 5344665117)", "('荣耀之路7.5期的留存弹窗', 5337757507)", "('OM后台新增未成年模型特征', 5305651229)", "('捕鱼数值放大', 5246984514)", "('[iOS] 应用内支付流程优化', 5114303450)", "('未成年历史逻辑更改', 5046986958)", "('荣耀之路拉新活动', 5046438498)", "('EVA发布动态需求', 5046351859)", "('CAP审核池内容写入SMP审核池需求', 5046349107)", "('拉黑场景屏蔽需求', 5046144192)", "('[Android] 客户端已全量AB实验代码和资源移除', 5045401775)", "('幸运奖励等你拿', 5043852701)", "('私信系统消息页面通知开关引导', 5010445960)", "('新增性别选项', 4975096956)", "('勋章-分享', 4974833038)", "('黑名单设置优化需求', 4974022995)", "('增加单麦房合唱pk进度实时通知', 4960018543)", "('个人账户权限设置', 4959127462)", "('iOS 房间公屏消息Cell高度自适应重构', 4947495558)", "('iOS IM消息Cell高度自适应重构', 4947495554)", "('直播&KTV房间长链接同步GIF消息', 4939201684)", "('入场动画资源增加md5校验', 4892850601)", "('APP登录和注册拆分', 4873230798)", "('Feed流实验全量', 4638241064)", "('H5页面用户特权显示规范', 4635639873)", "('Figma转h5页面模板', 4517236873)", "('礼物贴纸后台', 4500752419)", "('大区宝箱&宝箱奖励解耦', 4426354643)", "('特权奖励、碎片逻辑&原背包页面优化', 4425181007)", "('Sing页面迭代-全量', 4420537185)", "('Prod后台直播监控增加历史直播录像', 4346266087)", "('小视频支持多码率', 4323405952)", "('直播间任务宝箱逻辑优化', 4195455792)", "('搜索改版需求', 4086823438)", "('主播端新增开播测试能力', 4083427469)", "('“一起看”房间视频鉴黄', 3987636580)", "('公告支持多条件跳转', 3902098754)", "('搜索改版需求', 3614629245)", "('Android语音房坐席性能优化', 3508984823)", "('目前的作品滚动效果具有卡顿的感觉，需要优化一下，使得滚动效果更加平缓。', 3019649743)", "('耳返场景上线无延迟的limiter', 3016903647)", "('高等级小号广告任务限制', 3005009494)", "('用户自定义敏感词与评论设置第二期(已内审待排期)', 3002751166)", "('AI导唱V1.0', 3002456046)", "('iOS-运营弹窗接口统一和自研弹窗组件接入', 3001366987)", "('删除首页歌曲推荐卡片相关代码', 3001141371)", "('通知打开引导优化', 25336636)", "('退出房间交互优化', 21805997)", "('OCR头像识别', 21431973)", "('家族唱歌投稿活跃玩法', 20625564)", "('盲盒礼物动效&聊聊展示优化', 20552966)", "('抢唱新星周', 19727182)", "('每日福利活动设计', 18476108)", "('家族群里增加通用卡片推送', 16856276)", "('全平台优化头像框比例（二期）', 16182050)", "('订阅引导', 15090216)", "('头像挂件在多人场景露出', 15088023)", "('登录注册优化-手机号绑定&验证', 15074030)", "('公聊区气泡规范统一', 15047249)", "('菠菜房包装和导流方案', 12816699)", "('IOS注册流程实验及注册渠道新增', 12816371)", "('系统消息新增邮件发奖模块', 12796609)", "('用户家乡和居住地选择', 12778412)", "('空播问题治理', 12778211)", "('KTV推荐弹窗优化', 12741943)", "('语音房feed样式优化', 12741599)", "('私信举报详情页优化', 12175944)", "('KTV房间重构：统一麦位管理及相关视图', 9342093)", "('梳理长连接底层逻辑，排查隐藏的风险', 9277548)", "('家族列车、家族大乱斗redis层存储逻辑优化', 6540056)", "('录制默认音频导致的无法自动分享同步问题处理', 5531396)", "('转盘及活动通用发奖日志表拆分迁移', 4067641)"]
+    return no_testing_list
+
+
 if __name__ == '__main__':
+    get_no_testing_requirements()
+    # get_all_user_finished_demand(create_date=20250715, uid=7117238460611624964, finished_time=None)
     # get_user_name([7205168573025697794, 7212971331053240348])
-    get_all_user_finished_demand(create_date=20250101, uid=None, finished_time=20250108)
+    # get_all_user_finished_demand(create_date=20250101, uid=None, finished_time=20250108)
     # completion_rate(create_date=20250701, date=20250701, uid=7117238460611624964, finished_time=None)
     # result = get_check(20250601, uid=None, date_type='person_incomplete_data', finished_time=20250630)
-    # get_field_all()
     # print(get_check(20250601, uid=None, date_type='person_finished_data'))
     # print(get_check(20250601, 7117238460611624964, 'person_finished_data', finished_time=None))
     # print(get_check(None, uid=None, date_type='person_incomplete_data', finished_time=None))

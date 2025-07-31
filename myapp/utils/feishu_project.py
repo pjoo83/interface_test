@@ -362,19 +362,20 @@ def analyze_workload_by_version(data_list, types, date, finished_time):
                     if case_issues > 0.25:
                         case_issues_result = "测试用例估期较高请注意"
                     else:
-                        case_issues_result = "测试用例估期正常"
-                attention_records.append({
-                    '负责人': stages.get('qa', ''),
-                    "需求id": item['需求id'],
-                    "需求名称": item['需求名称name'],
-                    "测试": test,
-                    "研发": develop,
-                    "测试用例": test_case,
-                    "比": ratio,
-                    "需求链接": f"https://project.feishu.cn/wangmao12345678/story/detail/{item['需求id']}?"
+                        case_issues_result = ""
+                if test>1:
+                    attention_records.append({
+                        '负责人': stages.get('qa', ''),
+                        "需求id": item['需求id'],
+                        "需求名称": item['需求名称name'],
+                        "测试": test,
+                        "研发": develop,
+                        "测试用例": test_case,
+                        "比": ratio,
+                        "需求链接": f"https://project.feishu.cn/wangmao12345678/story/detail/{item['需求id']}?"
                                 f"parentUrl=%2Fwangmao12345678%2Fstory%2Fhomepage&openScene=4",
-                    "用例设计": case_issues_result
-                })
+                        "用例设计": case_issues_result
+                    })
 
     # 排序 attention_records 按比值从小到大
     sorted_attention = sorted(attention_records, key=lambda x: x['比'])
@@ -694,19 +695,17 @@ def get_no_testing_requirements():
             demand_name = item.get("name", "未命名需求")
             demand_id = item.get("id", 0)
             no_testing_list.append(f'{demand_name, int(demand_id)}')
-
-    print(no_testing_list)
     return no_testing_list
 
 
 if __name__ == '__main__':
-    get_no_testing_requirements()
+    # get_no_testing_requirements()
     # get_all_user_finished_demand(create_date=20250715, uid=7117238460611624964, finished_time=None)
     # get_user_name([7205168573025697794, 7212971331053240348])
     # get_all_user_finished_demand(create_date=20250101, uid=None, finished_time=20250108)
     # completion_rate(create_date=20250701, date=20250701, uid=7117238460611624964, finished_time=None)
     # result = get_check(20250601, uid=None, date_type='person_incomplete_data', finished_time=20250630)
-    # print(get_check(20250601, uid=None, date_type='person_finished_data'))
+    print(get_check(20250701, uid=None, date_type='person_finished_data', finished_time=None))
     # print(get_check(20250601, 7117238460611624964, 'person_finished_data', finished_time=None))
     # print(get_check(None, uid=None, date_type='person_incomplete_data', finished_time=None))
     # print(json.dumps(result, indent=2, ensure_ascii=False))

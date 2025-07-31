@@ -26,7 +26,7 @@ def user_statistics_view(request):
                 insert_data = test_record_result(
                     data_record=new_date[0],
                     all_record_num=new_date[1],
-                    types='测试数据'
+                    type='测试数据'
                 )
                 insert_data.save()
                 print('数据已更新')

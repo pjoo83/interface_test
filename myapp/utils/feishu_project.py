@@ -10,14 +10,43 @@ from myapp.utils.feishu_data import Feishu_data
 from myapp.utils.feishu_get_token import get_plugin_access_token, get_tenant_access_token
 from myapp.utils.feishu_send_message import start_send
 from collections import defaultdict
+import time
+from datetime import datetime, timedelta
 
 fei = Feishu_data()
 
+_plugin_token_cache = {
+    "token": None,
+    "expire_time": None,
+}
+
+
+def get_plugin_access_token_cached(force_refresh=False):
+    """
+    获取 plugin_token，支持缓存和跨天自动刷新
+    """
+    now = datetime.now()
+
+    # 条件：没 token，或者 token 过期，或者强制刷新
+    if (
+            _plugin_token_cache["token"] is None or
+            _plugin_token_cache["expire_time"] is None or
+            now >= _plugin_token_cache["expire_time"] or
+            force_refresh
+    ):
+        print("刷新 plugin_token")
+        token_info = get_plugin_access_token()  # 你已有的方法
+        _plugin_token_cache["token"] = token_info
+        _plugin_token_cache["expire_time"] = now.replace(hour=23, minute=59, second=59)  # 每天晚上强制过期
+
+    return _plugin_token_cache["token"]
+
+
 feishu_project_head = {
-    "X-PLUGIN-TOKEN": f"{get_plugin_access_token()}",
+    "X-PLUGIN-TOKEN": get_plugin_access_token_cached(force_refresh=False),
     'Content-Type': 'application/json',
     'X-USER-KEY': '7117238460611624964',
-    "plugin_token": f"{get_plugin_access_token()}"
+    "plugin_token": get_plugin_access_token_cached(force_refresh=False)
 }
 
 feishu_backend_head = fei.content_type1
@@ -122,8 +151,11 @@ def get_demand_progress_list(uid=None):
     project_key = '62a6fce5ed2541be7bf5c2d3'
     url = f"{fei.feishu_project_url}{project_key}/work_item/story/search/params"
     search_params = [
-        {"param_key": "work_item_status", "value": ["end"], "operator": "!="},
-        {"param_key": "created_at", "value": 1735660800000, "operator": ">="},
+        {
+            "param_key": "work_item_status",
+            "value": ['sub_stage_1658482927664', '20avolygh', 'sub_stage_1657610860899', 'end', 'closed'],
+            "operator": "HAS NONE OF"
+        },
         {
             "param_key": "all_states",
             "value": ["测试阶段"],
@@ -348,7 +380,7 @@ def analyze_workload_by_version(data_list, types, date, finished_time):
             continue
         elif test == 0:
             Lack_of_time.append(
-                f"负责人{get_user_name(stages.get('qa', ''), 1)},需求名称: {item['需求名称name']} 测试时间为0，请注意填写！！！"
+                f"负责人{get_user_name(stages.get('qa', ''), 2)},需求名称: {item['需求名称name']} 测试时间为0，请注意填写！！！"
                 f"https://project.feishu.cn/wangmao12345678/story/detail/{item['需求id']}?"
                 f"parentUrl=%2Fwangmao12345678%2Fstory%2Fhomepage&openScene=4"
             )
@@ -363,7 +395,7 @@ def analyze_workload_by_version(data_list, types, date, finished_time):
                         case_issues_result = "测试用例估期较高请注意"
                     else:
                         case_issues_result = ""
-                if test>1:
+                if test > 1:
                     attention_records.append({
                         '负责人': stages.get('qa', ''),
                         "需求id": item['需求id'],
@@ -373,7 +405,7 @@ def analyze_workload_by_version(data_list, types, date, finished_time):
                         "测试用例": test_case,
                         "比": ratio,
                         "需求链接": f"https://project.feishu.cn/wangmao12345678/story/detail/{item['需求id']}?"
-                                f"parentUrl=%2Fwangmao12345678%2Fstory%2Fhomepage&openScene=4",
+                                    f"parentUrl=%2Fwangmao12345678%2Fstory%2Fhomepage&openScene=4",
                         "用例设计": case_issues_result
                     })
 
@@ -431,7 +463,7 @@ def get_user_name(uid_list, nums):
     u_list = []
     for uid in uid_list:
         if nums == 1:
-            uname = fei.qa_list[int(uid)][0]
+            uname = fei.qa_list[int(uid)][1]
             u_list.append(uname)
 
         elif nums == 2:
@@ -701,11 +733,12 @@ def get_no_testing_requirements():
 if __name__ == '__main__':
     # get_no_testing_requirements()
     # get_all_user_finished_demand(create_date=20250715, uid=7117238460611624964, finished_time=None)
-    # get_user_name([7205168573025697794, 7212971331053240348])
+    get_user_name([7205168573025697794, 7212971331053240348])
     # get_all_user_finished_demand(create_date=20250101, uid=None, finished_time=20250108)
     # completion_rate(create_date=20250701, date=20250701, uid=7117238460611624964, finished_time=None)
     # result = get_check(20250601, uid=None, date_type='person_incomplete_data', finished_time=20250630)
-    print(get_check(20250701, uid=None, date_type='person_finished_data', finished_time=None))
+    # print(get_check(20250701, uid=None, date_type='person_finished_data', finished_time=None))
     # print(get_check(20250601, 7117238460611624964, 'person_finished_data', finished_time=None))
     # print(get_check(None, uid=None, date_type='person_incomplete_data', finished_time=None))
     # print(json.dumps(result, indent=2, ensure_ascii=False))
+    # print(get_plugin_access_token_cached())

@@ -101,6 +101,16 @@ def get_demand_finished_list(date, uid=None, finished_time=None):
             "param_key": "all_states",
             "value": ["测试阶段"],
             "operator": "HAS ANY OF"
+        },
+        {
+            "param_key": "field_651093",
+            "value": [4258930],
+            "operator": "HAS NONE OF",
+        },
+        {
+            "param_key": "field_dd59b3",
+            "value": [2411840],
+            "operator": "HAS NONE OF",
         }
     ]
     if date:
@@ -160,6 +170,16 @@ def get_demand_progress_list(uid=None):
             "param_key": "all_states",
             "value": ["测试阶段"],
             "operator": "HAS ANY OF"
+        },
+        {
+            "param_key": "field_651093",
+            "value": [4258930],
+            "operator": "HAS NONE OF",
+        },
+        {
+            "param_key": "field_dd59b3",
+            "value": [2411840],
+            "operator": "HAS NONE OF",
         }
     ]
     if uid:
@@ -463,7 +483,7 @@ def get_user_name(uid_list, nums):
     u_list = []
     for uid in uid_list:
         if nums == 1:
-            uname = fei.qa_list[int(uid)][1]
+            uname = fei.qa_list[int(uid)][0]
             u_list.append(uname)
 
         elif nums == 2:
@@ -503,7 +523,6 @@ def start_record(data, types):
         url = fei.feishu_record_finished_cloud_document
     datas = data.split("。")
     user_list = ast.literal_eval(datas[1])
-
     payload = json.dumps({
         "fields": {
             "测试研发数据": datas[2],
@@ -520,7 +539,6 @@ def start_record(data, types):
         }
     })
     requests.request("POST", url, headers=headers, data=payload)
-    # send_feishu_card(user_list)
 
 
 def get_all_user_demand(create_date, uid, finished_time, no_testing=None):
@@ -568,7 +586,7 @@ def get_all_user_demand(create_date, uid, finished_time, no_testing=None):
                 "state_timestamp": get_zero_timestamp_ms_from_int(finished_time),
                 "state_condition": 1
             },
-            "operator": "<="
+            "operator": ">="
         }
         )
     if no_testing:
@@ -646,11 +664,10 @@ def get_all_user_finished_demand(create_date, uid, finished_time):
         except Exception as e:
             print(f"Error processing item {i}: {e}")
             continue
-        # url = f"https://project.feishu.cn/wangmao12345678/story/detail/{test_id}?parentUrl=%2Fwangmao12345678%2Fstory%2Fhomepage&openScene=4"
-        # print(url)
     user_data = user_classification_data(user_test_list, all_datas_num)
+    print(f"本次查询到总需求数量：{all_datas_num}条数据,{user_data}")
+
     return user_data, all_datas_num
-    # print(f"本次查询到总需求数量：{all_datas_num}条数据")
 
 
 def user_classification_data(data, all_datas_num):
@@ -741,7 +758,6 @@ def get_no_testing_requirements():
     }
 
     all_datas = get_all_user_demand(create_date=None, uid=None, finished_time=None, no_testing=1)
-    print(all_datas)
     no_testing_list = []
 
     for item in all_datas:
@@ -770,20 +786,21 @@ def get_no_testing_requirements():
             demand_name = item.get("name", "未命名需求")
             demand_id = item.get("id", 0)
             no_testing_list.append(f'{demand_name, int(demand_id)}')
-    print(no_testing_list)
     return no_testing_list
 
 
 if __name__ == '__main__':
-    get_no_testing_requirements()
+    # get_no_testing_requirements()
     # get_field_all()
-    # get_all_user_finished_demand(create_date=20250715, uid=7117238460611624964, finished_time=None)
+    # get_all_user_finished_demand(create_date=20250815, uid=7117238460611624964, finished_time=None)
+    # get_all_user_finished_demand(create_date=None, uid=7117238460611624964, finished_time=20250715)
+
     # get_user_name([7205168573025697794, 7212971331053240348])
     # get_all_user_finished_demand(create_date=20250101, uid=None, finished_time=20250108)
     # completion_rate(create_date=20250701, date=20250701, uid=7117238460611624964, finished_time=None)
     # result = get_check(20250601, uid=None, date_type='person_incomplete_data', finished_time=20250630)
     # print(get_check(20250701, uid=None, date_type='person_finished_data', finished_time=None))
-    # print(get_check(20250601, 7117238460611624964, 'person_finished_data', finished_time=None))
+    print(get_check(20250701, uid=None, date_type='person_incomplete_data', finished_time=None))
     # print(get_check(None, uid=None, date_type='person_incomplete_data', finished_time=None))
     # print(json.dumps(result, indent=2, ensure_ascii=False))
     # print(get_plugin_access_token_cached())

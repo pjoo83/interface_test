@@ -504,9 +504,17 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
     elif function == 'Testing_and_Development':
         name = ''
         if data[-1] == 'person_finished_data':
-            name = '未完成需求'
+            name = '所有测试节点未完成的需求'
         elif data[-1] == "person_incomplete_data":
-            name = '已经完成需求'
+            name = '所有节点已经完成需求'
+        if data[-3] is not None:
+            start_time = data[-3]
+        else:
+            start_time = '2025年1月1日'
+        if data[-2] is not None:
+            finished_time = data[-2]
+        else:
+            finished_time = '今天'
         content = {
             "zh_cn": {
                 "title": "注意注意注意！！！！",
@@ -521,7 +529,14 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
                     [
                         {
                             "tag": "text",
-                            "text": f"本次共出现{len(data) - 1}条问题数据",
+                            "text": f"检测时间{start_time}至{finished_time}",
+                            "style": ["bold"]
+                        }
+                    ],
+                    [
+                        {
+                            "tag": "text",
+                            "text": f"共出现{len(data) - 3}条问题数据",
                             "style": ["bold"]
                         },
                         {
@@ -545,12 +560,12 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
     elif function == 'Testing_and_Development1':
         content = {
             "zh_cn": {
-                "title": "注意注意注意！！！！",
+                "title": "注意！！本次检测有未填写估期的需求!",
                 "content": [
                     [
                         {
                             "tag": "text",
-                            "text": f"测试数据：{line}",
+                            "text": f"{line}",
                             "style": ["bold"]
                         }
                     ] for line in data
@@ -565,34 +580,33 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
         }
         response = requests.post(url=send_url, headers=headers, json=data1, verify=True)
 
-    elif function == 'All_testing_and_Development':
-        content = {
-            "zh_cn": {
-                "title": "本次执行总数据",
-                "content": [
-                    [
-                        {
-                            "tag": "text",
-                            "text": f"版本需求：{data['版本需求']}",
-                            "style": ["bold"]
-                        },
-                        {
-                            "tag": "text",
-                            "text": f"非版本需求：{data['非版本需求']}",
-                            "style": ["bold"]
-                        }
-                    ]
-                ]
-            }
-        }
-
-        data1 = {
-            "receive_id": chat_id,
-            "msg_type": "post",
-            "content": json.dumps(content)  # ✅ 这里必须转换成字符串
-        }
-        response = requests.post(url=send_url, headers=headers, json=data1, verify=True)
-
+    # elif function == 'All_testing_and_Development':
+    #     content = {
+    #         "zh_cn": {
+    #             "title": "本次执行总数据",
+    #             "content": [
+    #                 [
+    #                     {
+    #                         "tag": "text",
+    #                         "text": f"版本需求：{data['版本需求']}",
+    #                         "style": ["bold"]
+    #                     },
+    #                     {
+    #                         "tag": "text",
+    #                         "text": f"非版本需求：{data['非版本需求']}",
+    #                         "style": ["bold"]
+    #                     }
+    #                 ]
+    #             ]
+    #         }
+    #     }
+    #
+    #     data1 = {
+    #         "receive_id": chat_id,
+    #         "msg_type": "post",
+    #         "content": json.dumps(content)  # ✅ 这里必须转换成字符串
+    #     }
+    #     requests.post(url=send_url, headers=headers, json=data1, verify=True)
 
 def start_send(function, datas):
     """
@@ -720,11 +734,14 @@ def start_send(function, datas):
 
     elif function == 'Testing_and_Development1':
         send_msg('Testing_and_Development1', cid, 1, datas, datas, datas, datas, datas)
-    elif function == 'All_testing_and_Development':
-        send_msg('All_testing_and_Development', cid, 1, datas, datas, datas, datas, datas)
+    # elif function == 'All_testing_and_Development':
+    #     send_msg('All_testing_and_Development', cid, 1, datas, datas, datas, datas, datas)
 
 
 def stamp_to_time(times):
     dt = datetime.datetime.fromtimestamp(times)
     date_str = dt.strftime('%Y-%m-%d %H:%M:%S')
     return date_str
+
+
+start_send('test', 'test')

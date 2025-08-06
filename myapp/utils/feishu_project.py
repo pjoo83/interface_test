@@ -12,6 +12,7 @@ from myapp.utils.feishu_send_message import start_send
 from collections import defaultdict
 import time
 from datetime import datetime, timedelta
+from myapp.utils.feishu_Webhook_robot import feishu_card_rot
 
 fei = Feishu_data()
 
@@ -352,8 +353,9 @@ def filter_data_list2(data_list, cutoff_str):
     return filtered_list
 
 
-def analyze_workload_by_version(data_list, types, date, finished_time):
+def analyze_workload_by_version(data_list, types, date, finished_time, uid):
     """
+    :param uid: 传人用
     :param data_list:
     :param types:
     :param date: 测试开始时间
@@ -362,8 +364,7 @@ def analyze_workload_by_version(data_list, types, date, finished_time):
     """
     test_key = "测试阶段"
     version_keys = {
-        "Android端开发", "iOS端开发", "流媒体开发", "主服务端开发", "互娱端开发", "曲库开发", "音视频开发",
-        "大数据端开发", "算法端开发",
+        "Android端开发", "iOS端开发"
     }
 
     Lack_of_time = []
@@ -447,7 +448,10 @@ def analyze_workload_by_version(data_list, types, date, finished_time):
         attention_messages.append(date)
         attention_messages.append(finished_time)
         attention_messages.append(types)
-        start_send(function='Testing_and_Development', datas=attention_messages)
+        # start_send(function='Testing_and_Development', datas=attention_messages)
+        attention_messages.append('detail')
+        attention_messages.append(uid)
+        feishu_card_rot(attention_messages)
 
     # 聚合统计函数
     def compute_totals(demands):
@@ -462,13 +466,15 @@ def analyze_workload_by_version(data_list, types, date, finished_time):
     nv_test, nv_dev, nv_ratio = compute_totals(non_version_demands)
 
     return {
-        "版本需求": {"数量": len(version_demands), "测试总时间": v_test, "研发总时间": v_dev, "研发/测试比值": v_ratio},
-        "非版本需求": {"数量": len(non_version_demands), "测试总时间": nv_test, "研发总时间": nv_dev,
+        "版本需求": {"数量": len(version_demands), "测试总时间": round(v_test, 1), "研发总时间": round(v_dev, 1),
+                     "研发/测试比值": v_ratio},
+        "非版本需求": {"数量": len(non_version_demands), "测试总时间": round(nv_test, 1),
+                       "研发总时间": round(nv_dev, 1),
                        "研发/测试比值": nv_ratio},
         "总需求数": {
             "数量": len(version_demands) + len(non_version_demands),
-            "测试总时间": v_test + nv_test,
-            "研发总时间": v_dev + nv_dev,
+            "测试总时间": round(v_test + nv_test, 1),
+            "研发总时间": round(v_dev + nv_dev, 1),
             "研发/测试比值": round((v_dev + nv_dev) / (v_test + nv_test), 3) if (v_test + nv_test) else "0"
         }
     }
@@ -493,8 +499,15 @@ def get_user_name(uid_list, nums):
 
 
 def get_check(date, uid, date_type, finished_time):
-    return analyze_workload_by_version(get_items_node(date, uid, date_type, finished_time), date_type, date,
-                                       finished_time)
+    dates = analyze_workload_by_version(get_items_node(date, uid, date_type, finished_time), date_type, date,
+                                        finished_time, uid)
+    # dates = {'版本需求': {'数量': 1, '测试总时间': 5, '研发总时间': 14, '研发/测试比值': 2.8},
+    #          '非版本需求': {'数量': 3, '测试总时间': 30.5, '研发总时间': 73.0, '研发/测试比值': 2.393},
+    #          '总需求数': {'数量': 4, '测试总时间': 35.5, '研发总时间': 87.0, '研发/测试比值': 2.451}}
+    # data_list =["小游戏-球球-增加奖池玩法。['ou_baf2770fc108d7429e4fe97f324a9517', 'ou_687dacad56496bad19cf82f399502cc7']。测试: 4, 研发: 7,测试用例：0。1.75。https://project.feishu.cn/wangmao12345678/story/detail/6240785738?parentUrl=%2Fwangmao12345678%2Fstory%2Fhomepage&openScene=4。", "热血怪兽12期-2。['ou_baf2770fc108d7429e4fe97f324a9517', 'ou_263cf3031c5dfe98472b0fdedcdb3fd5']。测试: 19.5, 研发: 47.0,测试用例：0。2.41。https://project.feishu.cn/wangmao12345678/story/detail/6195598978?parentUrl=%2Fwangmao12345678%2Fstory%2Fhomepage&openScene=4。", "战斗力打boss。['ou_baf2770fc108d7429e4fe97f324a9517']。测试: 7, 研发: 19,测试用例：0。2.714。https://project.feishu.cn/wangmao12345678/story/detail/6127794526?parentUrl=%2Fwangmao12345678%2Fstory%2Fhomepage&openScene=4。", "小游戏-广告用户引导小游戏计划。['ou_baf2770fc108d7429e4fe97f324a9517']。测试: 5, 研发: 14,测试用例：0。2.8。https://project.feishu.cn/wangmao12345678/story/detail/6195396982?parentUrl=%2Fwangmao12345678%2Fstory%2Fhomepage&openScene=4。", 20250701, None, 'person_incomplete_data', 'detail']
+    data_list = [dates, uid, date_type, finished_time, date, 'all']
+
+    feishu_card_rot(data_list)
 
 
 def send_feishu_card(datas):
@@ -799,8 +812,8 @@ if __name__ == '__main__':
     # get_all_user_finished_demand(create_date=20250101, uid=None, finished_time=20250108)
     # completion_rate(create_date=20250701, date=20250701, uid=7117238460611624964, finished_time=None)
     # result = get_check(20250601, uid=None, date_type='person_incomplete_data', finished_time=20250630)
-    # print(get_check(20250701, uid=None, date_type='person_finished_data', finished_time=None))
-    print(get_check(20250701, uid=None, date_type='person_incomplete_data', finished_time=None))
+    print(get_check(20250701, uid=7117238460611624964, date_type='person_finished_data', finished_time=None))
+    # print(get_check(20250701, uid=None, date_type='person_incomplete_data', finished_time=None))
     # print(get_check(None, uid=None, date_type='person_incomplete_data', finished_time=None))
     # print(json.dumps(result, indent=2, ensure_ascii=False))
     # print(get_plugin_access_token_cached())

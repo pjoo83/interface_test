@@ -130,7 +130,8 @@
         demandCount: toNumber(u["已承接的需求数量"]),
         rate: toNumber(rateRaw),
         demandList: Array.isArray(u["需求列表"]) ? u["需求列表"] : [],
-        demandIds: Array.isArray(u["需求id"]) ? u["需求id"] : []
+        demandIds: Array.isArray(u["需求id"]) ? u["需求id"] : [],
+        demandCount1:toNumber(u["需求总耗时"]) || 0,
       };
     });
 
@@ -159,6 +160,7 @@
               <b>${u.user}</b><br/>
               承接数量：${u.demandCount ?? 0}<br/>
               完成率：${isNaN(u.rate) ? '--' : (u.rate.toFixed(1) + '%')}<br/>
+              测试总耗时：${u.demandCount1 ?? 0}天
             </div>
           `;
         }
@@ -280,7 +282,7 @@
       modalTitleNew.textContent = '正在加载中...';
       modalListNew.innerHTML = '<li style="color: gray;">加载中，请稍候...</li>';
       modalNew.style.display = 'flex';
-     console.log('999',modalNew.style.display )
+     // console.log('999',modalNew.style.display )
       fetch('http://127.0.0.1:8000/autotest/no_testing_project/')
         .then(res => res.json())
         .then(res => {

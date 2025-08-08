@@ -103,19 +103,28 @@ def get_demand_finished_list(date, uid=None, finished_time=None):
             "value": ["测试阶段"],
             "operator": "HAS ANY OF"
         },
-        {
-            "param_key": "field_651093",
-            "value": [4258930],
-            "operator": "HAS NONE OF",
-        },
-        {
-            "param_key": "field_dd59b3",
-            "value": [2411840],
-            "operator": "HAS NONE OF",
-        }
+        # {
+        #     "param_key": "field_651093",
+        #     "value": [4258930],
+        #     "operator": "HAS NONE OF",
+        # },
+        # {
+        #     "param_key": "field_dd59b3",
+        #     "value": [2411840],
+        #     "operator": "HAS NONE OF",
+        # }
     ]
     if date:
         search_params.append(
+            #     "param_key": "feature_state_schedule",
+            #     "operator": ">=",
+            #     "value": get_zero_timestamp_ms_from_int(date)
+            # })
+            # search_params.append({
+            #     "param_key": "62a6fce5ed2541be7bf5c2d3",
+            #     "operator": "<=",
+            #     "value": get_zero_timestamp_ms_from_int(finished_time)
+            # })
             {
                 "param_key": "feature_state_time",
                 "value": {
@@ -124,6 +133,16 @@ def get_demand_finished_list(date, uid=None, finished_time=None):
                     "state_condition": 1},
                 "operator": ">="
             })
+        search_params.append(
+            {
+                "param_key": "feature_state_time",
+                "value": {
+                    "state_name": "测试阶段",
+                    "state_timestamp": get_zero_timestamp_ms_from_int(finished_time),
+                    "state_condition": 1},
+                "operator": "<="
+            }
+        )
     else:
         search_params.append(
             {
@@ -364,7 +383,7 @@ def analyze_workload_by_version(data_list, types, date, finished_time, uid):
     """
     test_key = "测试阶段"
     version_keys = {
-        "Android端开发", "iOS端开发"
+        "Android端开发", "iOS端开发", '音视频开发'
     }
 
     Lack_of_time = []
@@ -666,13 +685,14 @@ def get_all_user_finished_demand(create_date, uid, finished_time):
     all_datas_num = len(all_datas)
     user_test_list = []
     for i in range(len(all_datas)):
+        # 获取每个需求的测试节点信息
         test_list = all_datas[i]['workflow_infos']['workflow_nodes']
         test_name = all_datas[i]['name']
         test_id = all_datas[i]['id']
-
+        points = get_test_point(test_list)
         test_user = get_test_user(test_list)
         try:
-            user_test_list.append({"用户": get_user_name(test_user, 2), "用户id": test_user,
+            user_test_list.append({"用户": get_user_name(test_user, 2), "用户id": test_user, "需求耗时": points,
                                    "需求名称": test_name, '需求id': test_id})
         except Exception as e:
             print(f"Error processing item {i}: {e}")
@@ -686,24 +706,43 @@ def get_all_user_finished_demand(create_date, uid, finished_time):
 def user_classification_data(data, all_datas_num):
     """
     :param all_datas_num: 总需求数量
-    :param data: 传入需求数据，每项包含 '用户', '用户id', '需求名称'
-    :return: 返回每个用户的需求列表和数量等信息
+    :param data: 传入需求数据，每项包含 '用户', '用户id', '需求名称', '需求耗时', '需求id'
+    :return: 返回每个用户的需求列表和数量及总耗时信息
     """
-    user_map = defaultdict(lambda: {"需求列表": [], "user_id": None, "需求id": []})
+    user_map = defaultdict(lambda: {
+        "需求列表": [],
+        "user_id": None,
+        "需求id": [],
+        "需求耗时列表": [],  # 用于累积需求耗时
+        "需求总耗时": 0.0  # 累计总耗时
+    })
 
     for item in data:
         users = item.get('用户', [])
         ids = item.get("用户id", [])
         name = item.get('需求名称', '')
         project_id = item.get('需求id', '')
+        # 这里假设"需求耗时"是可迭代的，取第一个元素转float，如果没有直接0.0
+        point_data = 0.0
+        if item.get("需求耗时"):
+            try:
+                point_data = float(next(iter(item.get("需求耗时"))))
+            except Exception:
+                point_data = 0.0
+
         if not users:
             # 用户为空则归为“暂无”
             user_map["暂无"]["需求列表"].append(name)
+            user_map["暂无"]["需求id"].append(project_id)
+            user_map["暂无"]["需求耗时列表"].append(point_data)
+            user_map["暂无"]["需求总耗时"] += point_data
             user_map["暂无"]["user_id"] = "0"
         else:
             for i, user in enumerate(users):
                 user_map[user]["需求列表"].append(name)
                 user_map[user]["需求id"].append(project_id)
+                user_map[user]["需求耗时列表"].append(point_data)
+                user_map[user]["需求总耗时"] += point_data
                 # 绑定用户id（如果有）
                 if i < len(ids):
                     user_map[user]["user_id"] = ids[i]
@@ -716,7 +755,8 @@ def user_classification_data(data, all_datas_num):
             "已承接的需求数量": len(info["需求列表"]),
             "完成需求占比": f"{len(info['需求列表']) / all_datas_num:.2%}" if all_datas_num else "0%",
             "需求列表": info["需求列表"],
-            '需求id': info['需求id']
+            "需求id": info["需求id"],
+            "需求总耗时": round(info["需求总耗时"], 2),  # 保留两位小数
         })
     return user_list
 
@@ -747,6 +787,58 @@ def get_test_user(data):
                 for sched in item['schedules']:
                     owners_set.update(sched.get('owners', []))
     return list(owners_set)
+
+
+def get_test_point(data):
+    owners_set = set()
+
+    for item in data:
+        if item.get('name') == '测试阶段':
+            # 顶层 points
+            points = item.get('points')
+            if isinstance(points, (list, set, tuple)):
+                owners_set.update(points)
+            elif points is not None:
+                owners_set.add(points)
+
+            # node_schedule
+            ns = item.get('node_schedule')
+            if isinstance(ns, dict):
+                points = ns.get('points')
+                if isinstance(points, (list, set, tuple)):
+                    owners_set.update(points)
+                elif points is not None:
+                    owners_set.add(points)
+
+            # role_assignee
+            ra_list = item.get('role_assignee')
+            if isinstance(ra_list, list):
+                for ra in ra_list:
+                    points = ra.get('points')
+                    if isinstance(points, (list, set, tuple)):
+                        owners_set.update(points)
+                    elif points is not None:
+                        owners_set.add(points)
+
+            # schedules
+            scheds = item.get('schedules')
+            if isinstance(scheds, list):
+                for sched in scheds:
+                    points = sched.get('points')
+                    if isinstance(points, (list, set, tuple)):
+                        owners_set.update(points)
+                    elif points is not None:
+                        owners_set.add(points)
+
+    # 转成 float，过滤异常，保留小数
+    float_points = set()
+    for p in owners_set:
+        try:
+            float_points.add(float(p))
+        except (ValueError, TypeError):
+            pass
+
+    return float_points
 
 
 def completion_rate(create_date=None, date=None, uid=None, finished_time=None):
@@ -806,13 +898,13 @@ if __name__ == '__main__':
     # get_no_testing_requirements()
     # get_field_all()
     # get_all_user_finished_demand(create_date=20250815, uid=7117238460611624964, finished_time=None)
-    # get_all_user_finished_demand(create_date=None, uid=7117238460611624964, finished_time=20250715)
+    get_all_user_finished_demand(create_date=None, uid=None, finished_time=20250807)
 
     # get_user_name([7205168573025697794, 7212971331053240348])
     # get_all_user_finished_demand(create_date=20250101, uid=None, finished_time=20250108)
     # completion_rate(create_date=20250701, date=20250701, uid=7117238460611624964, finished_time=None)
     # result = get_check(20250601, uid=None, date_type='person_incomplete_data', finished_time=20250630)
-    print(get_check(20250701, uid=7117238460611624964, date_type='person_finished_data', finished_time=None))
+    # print(get_check(20250701, uid=None, date_type='person_finished_data', finished_time=20250731))
     # print(get_check(20250701, uid=None, date_type='person_incomplete_data', finished_time=None))
     # print(get_check(None, uid=None, date_type='person_incomplete_data', finished_time=None))
     # print(json.dumps(result, indent=2, ensure_ascii=False))

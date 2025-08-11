@@ -10,7 +10,7 @@ def feishu_card_rot(data_list):
     :return:
     """
     url = "https://open.feishu.cn/open-apis/bot/v2/hook/102f3e05-d3c1-49b3-863b-379b7601427c"
-    # pro_url ='https://open.feishu.cn/open-apis/bot/v2/hook/dfa244c7-40c6-4ecf-b82e-7f2b603017c7'
+    pro_url ='https://open.feishu.cn/open-apis/bot/v2/hook/dfa244c7-40c6-4ecf-b82e-7f2b603017c7'
     if data_list[5] == 'all':
         if data_list[1] is None:
             uid = '本次检测所有测试同学'
@@ -30,7 +30,7 @@ def feishu_card_rot(data_list):
             if data_list[3] is None:
                 time = f'本次检测{data_list[4]}至今'
             else:
-                time = f'本次检测{data_list[3]}至{data_list[4]}'
+                time = f'本次检测{data_list[4]}至{data_list[3]}'
 
     else:
         if data_list[-1] is None:

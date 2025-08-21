@@ -3,7 +3,7 @@ from myapp.utils.data import sql_data
 import requests
 from myapp.utils.database_tools import execute_sql
 from myapp.utils.feishu_send_message import start_send
-from myapp.utils.feishu_project import get_check
+from myapp.utils.feishu_project import get_check,get_check2
 from django.views.decorators.csrf import csrf_exempt
 import json
 
@@ -35,3 +35,13 @@ def td_testing_calculations(request):
         start_send("All_testing_and_Development", data)
         return JsonResponse({"code": 200,
                              "msg": data}, json_dumps_params={'ensure_ascii': False})
+
+
+def no_test_time(request):
+    if request.method == "GET":
+        date= request.GET.get("date", None)
+        finished_time = request.GET.get('finished_time', None)
+        get_check2(date=date, uid=None, date_type="person_incomplete_data", finished_time=finished_time)
+        return JsonResponse({"code": 200,
+                             "msg": "查询完毕"}, json_dumps_params={'ensure_ascii': False})
+

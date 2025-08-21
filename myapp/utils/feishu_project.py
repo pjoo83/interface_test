@@ -2,7 +2,6 @@ import ast
 
 import requests
 import json
-import time
 from datetime import datetime, timezone
 from dateutil.parser import parse
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -11,34 +10,42 @@ from myapp.utils.feishu_get_token import get_plugin_access_token, get_tenant_acc
 from myapp.utils.feishu_send_message import start_send
 from collections import defaultdict
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 from myapp.utils.feishu_Webhook_robot import feishu_card_rot
 
 fei = Feishu_data()
 
-_plugin_token_cache = {
-    "token": None,
-    "expire_time": None,
-}
+_plugin_token_cache = {"token": None, "expire_time": None}
+
+
+def get_plugin_access_tokens():
+    """
+    这里替换成你获取 token 的真实逻辑
+    """
+    token = get_plugin_access_token()
+    return token
 
 
 def get_plugin_access_token_cached(force_refresh=False):
-    """
-    获取 plugin_token，支持缓存和跨天自动刷新
-    """
+    global _plugin_token_cache
+
     now = datetime.now()
 
-    # 条件：没 token，或者 token 过期，或者强制刷新
+    # 判断是否需要刷新
     if (
-            _plugin_token_cache["token"] is None or
-            _plugin_token_cache["expire_time"] is None or
+            not _plugin_token_cache["token"] or
+            not _plugin_token_cache["expire_time"] or
             now >= _plugin_token_cache["expire_time"] or
             force_refresh
     ):
-        # print("刷新 plugin_token")
-        token_info = get_plugin_access_token()  # 你已有的方法
+        print("刷新 plugin_token...")
+        token_info = get_plugin_access_tokens()  # 这里自己实现
+        # 如果返回 dict，比如 {"access_token": "xxx"}，就取里面的值
+        if isinstance(token_info, dict):
+            token_info = token_info.get("access_token", "")
         _plugin_token_cache["token"] = token_info
-        _plugin_token_cache["expire_time"] = now.replace(hour=23, minute=59, second=59)  # 每天晚上强制过期
+        # 每天 23:59:59 过期
+        _plugin_token_cache["expire_time"] = now.replace(hour=23, minute=59, second=59)
 
     return _plugin_token_cache["token"]
 
@@ -372,8 +379,9 @@ def filter_data_list2(data_list, cutoff_str):
     return filtered_list
 
 
-def analyze_workload_by_version(data_list, types, date, finished_time, uid):
+def analyze_workload_by_version(data_list, types, date, finished_time, uid, num):
     """
+    :param num: 用来传是否需要执行发消息
     :param uid: 传人用
     :param data_list:
     :param types:
@@ -461,42 +469,46 @@ def analyze_workload_by_version(data_list, types, date, finished_time, uid):
     # 调用接口发送提醒
     if Lack_of_time:
         start_send(function='Testing_and_Development1', datas=Lack_of_time)
-    if attention_messages:
-        for data in attention_messages:
-            start_record(data, types)
-        attention_messages.append(date)
-        attention_messages.append(finished_time)
-        attention_messages.append(types)
-        # start_send(function='Testing_and_Development', datas=attention_messages)
-        attention_messages.append('detail')
-        attention_messages.append(uid)
-        feishu_card_rot(attention_messages)
+    if num == 1:
+        if attention_messages:
+            for data in attention_messages:
+                start_record(data, types)
+            attention_messages.append(date)
+            attention_messages.append(finished_time)
+            attention_messages.append(types)
+            # 旧版本发送卡片消息，停用
+            # start_send(function='Testing_and_Development', datas=attention_messages)
+            attention_messages.append('detail')
+            attention_messages.append(uid)
+            feishu_card_rot(attention_messages)
 
-    # 聚合统计函数
-    def compute_totals(demands):
-        test_total = sum(item["单个需求数据data"].get(test_key, 0) for item in demands)
-        dev_total = sum(
-            sum(v for k, v in item["单个需求数据data"].items() if k != test_key and k != 'qa') for item in demands
-        )
-        ratio = round(dev_total / test_total, 3) if test_total else "0"
-        return test_total, dev_total, ratio
+        # 聚合统计函数
+        def compute_totals(demands):
+            test_total = sum(item["单个需求数据data"].get(test_key, 0) for item in demands)
+            dev_total = sum(
+                sum(v for k, v in item["单个需求数据data"].items() if k != test_key and k != 'qa') for item in demands
+            )
+            ratio = round(dev_total / test_total, 3) if test_total else "0"
+            return test_total, dev_total, ratio
 
-    v_test, v_dev, v_ratio = compute_totals(version_demands)
-    nv_test, nv_dev, nv_ratio = compute_totals(non_version_demands)
+        v_test, v_dev, v_ratio = compute_totals(version_demands)
+        nv_test, nv_dev, nv_ratio = compute_totals(non_version_demands)
 
-    return {
-        "版本需求": {"数量": len(version_demands), "测试总时间": round(v_test, 1), "研发总时间": round(v_dev, 1),
-                     "研发/测试比值": v_ratio},
-        "非版本需求": {"数量": len(non_version_demands), "测试总时间": round(nv_test, 1),
-                       "研发总时间": round(nv_dev, 1),
-                       "研发/测试比值": nv_ratio},
-        "总需求数": {
-            "数量": len(version_demands) + len(non_version_demands),
-            "测试总时间": round(v_test + nv_test, 1),
-            "研发总时间": round(v_dev + nv_dev, 1),
-            "研发/测试比值": round((v_dev + nv_dev) / (v_test + nv_test), 3) if (v_test + nv_test) else "0"
+        return {
+            "版本需求": {"数量": len(version_demands), "测试总时间": round(v_test, 1), "研发总时间": round(v_dev, 1),
+                         "研发/测试比值": v_ratio},
+            "非版本需求": {"数量": len(non_version_demands), "测试总时间": round(nv_test, 1),
+                           "研发总时间": round(nv_dev, 1),
+                           "研发/测试比值": nv_ratio},
+            "总需求数": {
+                "数量": len(version_demands) + len(non_version_demands),
+                "测试总时间": round(v_test + nv_test, 1),
+                "研发总时间": round(v_dev + nv_dev, 1),
+                "研发/测试比值": round((v_dev + nv_dev) / (v_test + nv_test), 3) if (v_test + nv_test) else "0"
+            }
         }
-    }
+    else:
+        pass
 
 
 def get_user_name(uid_list, nums):
@@ -519,14 +531,15 @@ def get_user_name(uid_list, nums):
 
 def get_check(date, uid, date_type, finished_time):
     dates = analyze_workload_by_version(get_items_node(date, uid, date_type, finished_time), date_type, date,
-                                        finished_time, uid)
-    # dates = {'版本需求': {'数量': 1, '测试总时间': 5, '研发总时间': 14, '研发/测试比值': 2.8},
-    #          '非版本需求': {'数量': 3, '测试总时间': 30.5, '研发总时间': 73.0, '研发/测试比值': 2.393},
-    #          '总需求数': {'数量': 4, '测试总时间': 35.5, '研发总时间': 87.0, '研发/测试比值': 2.451}}
-    # data_list =["小游戏-球球-增加奖池玩法。['ou_baf2770fc108d7429e4fe97f324a9517', 'ou_687dacad56496bad19cf82f399502cc7']。测试: 4, 研发: 7,测试用例：0。1.75。https://project.feishu.cn/wangmao12345678/story/detail/6240785738?parentUrl=%2Fwangmao12345678%2Fstory%2Fhomepage&openScene=4。", "热血怪兽12期-2。['ou_baf2770fc108d7429e4fe97f324a9517', 'ou_263cf3031c5dfe98472b0fdedcdb3fd5']。测试: 19.5, 研发: 47.0,测试用例：0。2.41。https://project.feishu.cn/wangmao12345678/story/detail/6195598978?parentUrl=%2Fwangmao12345678%2Fstory%2Fhomepage&openScene=4。", "战斗力打boss。['ou_baf2770fc108d7429e4fe97f324a9517']。测试: 7, 研发: 19,测试用例：0。2.714。https://project.feishu.cn/wangmao12345678/story/detail/6127794526?parentUrl=%2Fwangmao12345678%2Fstory%2Fhomepage&openScene=4。", "小游戏-广告用户引导小游戏计划。['ou_baf2770fc108d7429e4fe97f324a9517']。测试: 5, 研发: 14,测试用例：0。2.8。https://project.feishu.cn/wangmao12345678/story/detail/6195396982?parentUrl=%2Fwangmao12345678%2Fstory%2Fhomepage&openScene=4。", 20250701, None, 'person_incomplete_data', 'detail']
+                                        finished_time, uid, 1)
     data_list = [dates, uid, date_type, finished_time, date, 'all']
 
     feishu_card_rot(data_list)
+
+
+def get_check2(date, uid, date_type, finished_time):
+    analyze_workload_by_version(get_items_node(date, uid, date_type, finished_time), date_type, date,
+                                finished_time, uid, 2)
 
 
 def send_feishu_card(datas):

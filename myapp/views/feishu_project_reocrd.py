@@ -70,5 +70,12 @@ def no_testing_project(request):
                 print('数据已更新')
                 return JsonResponse({"status": False, "message": "正在更新进入数据"})
             else:
+                insert_data = test_record_result(
+                    data_record=data,
+                    all_record_num=len(data),
+                    type='无测试'
+                )
+                insert_data.save()
+                print('数据已更新')
                 return JsonResponse({"status": False, "message": "没有没有测试的项目"})
 

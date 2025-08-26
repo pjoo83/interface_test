@@ -3,15 +3,20 @@ import requests
 import json
 
 fei = Feishu_data()
+import datetime
 
 
 def get_tenant_access_token():
     """
     :return: 自建应用获取tenant_access_token
     """
+    current_timestamp = datetime.datetime.now().timestamp()
+
     body = json.dumps(fei.req_token_body)
     headers = fei.content_type1
-    response = requests.post(url=fei.tenant_access_token_url, data=body, headers=headers)
+    url1 = fei.tenant_access_token_url
+    url2= url1+f"?timestamp={int(current_timestamp)}"
+    response = requests.post(url=url2, data=body, headers=headers)
     if response.json()['code'] == 0:
         tenant_token = response.json()['tenant_access_token']
         return tenant_token

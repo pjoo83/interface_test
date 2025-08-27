@@ -54,7 +54,8 @@ def get_plugin_access_token():
     """
     :return: 返回访问plugin_access_token
     """
-    url = "https://project.feishu.cn/open_api/authen/plugin_token"
+    current_timestamp = datetime.datetime.now().timestamp()
+    url = "https://project.feishu.cn/open_api/authen/plugin_token"+f"?timestamp={int(current_timestamp)}"
 
     payload = json.dumps({
         "plugin_id": "MII_6784DC70B348001C",

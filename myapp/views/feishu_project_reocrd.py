@@ -48,34 +48,38 @@ def no_testing_project(request):
     """
     获取没有测试的项目
     """
-    query_time = test_record_result.objects.filter(type='无测试').order_by('-id').first()
-    if query_time:
-        data_record = query_time.data_record
-        datatime = str(query_time.datatime)
-        today = str(date.today().strftime("%Y-%m-%d"))
 
-        if datatime == today:
-            data = ast.literal_eval(data_record)
-            return JsonResponse({"status": True, "data": data})
-        else:
-            print('数据未更新,请等待更新')
-            data = feishu_project.get_no_testing_requirements()
-            if data:
-                insert_data = test_record_result(
-                    data_record=data,
-                    all_record_num=len(data[0]),
-                    type='无测试'
-                )
-                insert_data.save()
-                print('数据已更新')
-                return JsonResponse({"status": False, "message": "正在更新进入数据"})
-            else:
-                insert_data = test_record_result(
-                    data_record=data,
-                    all_record_num=len(data),
-                    type='无测试'
-                )
-                insert_data.save()
-                print('数据已更新')
-                return JsonResponse({"status": False, "message": "没有没有测试的项目"})
+    data = feishu_project.get_no_testing_requirements()
+    return JsonResponse({"status": True, "data": data})
+
+    # query_time = test_record_result.objects.filter(type='无测试').order_by('-id').first()
+    # if query_time:
+    #     data_record = query_time.data_record
+    #     datatime = str(query_time.datatime)
+    #     today = str(date.today().strftime("%Y-%m-%d"))
+    #
+    #     if datatime == today:
+    #         data = ast.literal_eval(data_record)
+    #         return JsonResponse({"status": True, "data": data})
+    #     else:
+    #         print('数据未更新,请等待更新')
+    #         data = feishu_project.get_no_testing_requirements()
+    #         if data:
+    #             insert_data = test_record_result(
+    #                 data_record=data,
+    #                 all_record_num=len(data[0]),
+    #                 type='无测试'
+    #             )
+    #             insert_data.save()
+    #             print('数据已更新')
+    #             return JsonResponse({"status": False, "message": "正在更新进入数据"})
+    #         else:
+    #             insert_data = test_record_result(
+    #                 data_record=data,
+    #                 all_record_num=len(data),
+    #                 type='无测试'
+    #             )
+    #             insert_data.save()
+    #             print('数据已更新')
+    #             return JsonResponse({"status": False, "message": "没有没有测试的项目"})
 

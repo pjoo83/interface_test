@@ -35,7 +35,7 @@ class LoginRequiredMiddleware:
                         '/autotest/ab_experiment_increase/', '/autotest/bubble_mount_increase/',
                         '/autotest/check_crazy_monster_all/', '/autotest/td_testing_calculations/',
                         '/autotest/feishu_project_record/', '/autotest/no_testing_project/',
-                        '/autotest/no_testing_time/']
+                        '/autotest/no_testing_time/','/autotest/check_update/','/autotest/no_testing_time/']
         if request.path_info in exclude_urls:
             # 如果请求的URL在排除列表中，则直接跳过验证
             response = self.get_response(request)

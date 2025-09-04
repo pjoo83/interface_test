@@ -42,6 +42,7 @@ def no_test_time(request):
         date= request.GET.get("date", None)
         finished_time = request.GET.get('finished_time', None)
         get_check2(date=date, uid=None, date_type="person_incomplete_data", finished_time=finished_time)
+        print('未填写测试排期，查询完毕')
         return JsonResponse({"code": 200,
                              "msg": "查询完毕"}, json_dumps_params={'ensure_ascii': False})
 

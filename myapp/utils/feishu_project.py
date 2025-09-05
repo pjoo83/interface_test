@@ -427,10 +427,19 @@ def analyze_workload_by_version(data_list, types, date, finished_time, uid, num)
         if develop == 0:
             continue
         elif test == 0:
+            user_id = stages.get('qa', '')
+            if get_user_name(user_id, 2):
+                name =get_user_name(user_id, 2)
+            else:
+                name = '[暂未安排，请安排]'
+            if get_user_name(user_id, 1):
+                uid =get_user_name(user_id, 1)
+            else:
+                uid = '[暂未安排，请安排]'
             Lack_of_time.append(
-                f"负责人{get_user_name(stages.get('qa', ''), 2)},需求名称: {item['需求名称name']} 测试时间为0，请注意填写！！！"
-                f"https://project.feishu.cn/wangmao12345678/story/detail/{item['需求id']}?"
-                f"parentUrl=%2Fwangmao12345678%2Fstory%2Fhomepage&openScene=4"
+                [f"负责人：{name},需求名称:https://project.feishu.cn/wangmao12345678/story"
+                 f"/detail/{item['需求id']}?parentUrl=%2Fwangmao12345678%2Fstory%2Fhomepage&openScene=4，测试时间为0，"
+                 f"请注意填写！！！", uid]
             )
         else:
             ratio = round(develop / (test + test_case), 3)
@@ -467,8 +476,6 @@ def analyze_workload_by_version(data_list, types, date, finished_time, uid, num)
         for rec in sorted_attention
     ]
     # 调用接口发送提醒
-    if Lack_of_time:
-        start_send(function='Testing_and_Development1', datas=Lack_of_time)
     if num == 1:
         if attention_messages:
             for data in attention_messages:
@@ -508,7 +515,8 @@ def analyze_workload_by_version(data_list, types, date, finished_time, uid, num)
             }
         }
     else:
-        pass
+        if Lack_of_time:
+            start_send(function='Testing_and_Development1', datas=Lack_of_time)
 
 
 def get_user_name(uid_list, nums):
@@ -904,15 +912,47 @@ def get_no_testing_requirements():
             demand_name = item.get("name", "未命名需求")
             demand_id = item.get("id", 0)
             no_testing_list.append(f'{demand_name, int(demand_id)}')
+    print(no_testing_list)
     return no_testing_list
 
 
-if __name__ == '__main__':
-    # get_no_testing_requirements()
-    # get_field_all()
-    # get_all_user_finished_demand(create_date=20250815, uid=7117238460611624964, finished_time=None)
-    get_all_user_finished_demand(create_date=None, uid=None, finished_time=20250807)
+def get_user_opening_bug(uid):
+    """
+    :return: 返回未关闭的bug
+    """
+    headers = feishu_project_head
+    print(headers)
+    project_key = '62a6fce5ed2541be7bf5c2d3'
+    url = f"{fei.feishu_project_url}{project_key}/work_item/issue/filter"
+    search_params = json.dumps({
+        "work_item_type_keys": [
+            "story"
+        ],
+        "created_at": {
+            "start": 1633776611033
+        },
+        "updated_at": {
+            "start": 1633776611033,
+            "end": 1633776613033
+        },
+        "work_item_status": [
+            {
+                "state_key": "started"
+            }
+        ],
+        "page_size": 50
+    }
+    )
+    response = requests.post(url, headers, search_params)
+    print(response.text)
 
+
+if __name__ == '__main__':
+    get_no_testing_requirements()
+    # get_field_all()
+    # get_user_opening_bug(7117238460611624964)
+    # get_all_user_finished_demand(create_date=20250830, uid=7117238460611624964, finished_time=None)
+    # get_all_user_finished_demand(create_date=None, uid=None, finished_time=20250807)
     # get_user_name([7205168573025697794, 7212971331053240348])
     # get_all_user_finished_demand(create_date=20250101, uid=None, finished_time=20250108)
     # completion_rate(create_date=20250701, date=20250701, uid=7117238460611624964, finished_time=None)

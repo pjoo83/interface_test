@@ -565,9 +565,15 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
                     [
                         {
                             "tag": "text",
-                            "text": f"{line}",
+                            "text": f"{line[0]}",
                             "style": ["bold"]
+                        },
+                        {
+                            "tag": "at",
+                            "user_id": line[1][0],
+                            "style": ["underline"]
                         }
+
                     ] for line in data
                 ]
             }
@@ -607,6 +613,7 @@ def send_msg(function, chat_id, horse_count, horse_id, horse_png, horse_pag, hor
     #         "content": json.dumps(content)  # ✅ 这里必须转换成字符串
     #     }
     #     requests.post(url=send_url, headers=headers, json=data1, verify=True)
+
 
 def start_send(function, datas):
     """

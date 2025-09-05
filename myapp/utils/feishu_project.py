@@ -51,10 +51,10 @@ def get_plugin_access_token_cached(force_refresh=False):
 
 
 feishu_project_head = {
-    "X-PLUGIN-TOKEN": get_plugin_access_token_cached(force_refresh=False),
+    "X-PLUGIN-TOKEN": get_plugin_access_tokens(),
     'Content-Type': 'application/json',
     'X-USER-KEY': '7117238460611624964',
-    "plugin_token": get_plugin_access_token_cached(force_refresh=False)
+    "plugin_token": get_plugin_access_tokens()
 }
 
 feishu_backend_head = fei.content_type1

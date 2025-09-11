@@ -1,5 +1,6 @@
 from django.shortcuts import redirect
 from django.utils.deprecation import MiddlewareMixin
+from django.http import HttpResponseNotFound
 
 
 # class AuthMiddleWare(MiddlewareMixin):
@@ -35,7 +36,8 @@ class LoginRequiredMiddleware:
                         '/autotest/ab_experiment_increase/', '/autotest/bubble_mount_increase/',
                         '/autotest/check_crazy_monster_all/', '/autotest/td_testing_calculations/',
                         '/autotest/feishu_project_record/', '/autotest/no_testing_project/',
-                        '/autotest/no_testing_time/','/autotest/check_update/','/autotest/no_testing_time/']
+                        '/autotest/no_testing_time/', '/autotest/check_update/', '/autotest/no_testing_time/',
+                        '/autotest/get_all_user_msg/', '/autotest/get_last_time/']
         if request.path_info in exclude_urls:
             # 如果请求的URL在排除列表中，则直接跳过验证
             response = self.get_response(request)
@@ -50,3 +52,14 @@ class LoginRequiredMiddleware:
             # 如果有session信息，则继续执行请求
         response = self.get_response(request)
         return response
+
+
+class RequestFilterMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        # 只放行 /api/ 开头的请求，其余一律拦截
+        if not request.path.startswith('/api/'):
+            return HttpResponseNotFound("Invalid request")
+        return self.get_response(request)

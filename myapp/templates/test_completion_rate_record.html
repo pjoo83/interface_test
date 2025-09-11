@@ -67,7 +67,7 @@
       background:#c0392b;
     }
 
-    #no_testing_new {
+    #no_testing_new,#no_testing_new1 {
       background: #f39c12;
       color: #fff;
       border: none;
@@ -78,6 +78,28 @@
       font-size: 14px;
       font-weight: 600;
     }
+     /* 简单的加载动画 */
+    #loading {
+      display: none; /* 默认隐藏 */
+      font-size: 16px;
+      color: #007bff;
+    }
+
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #007bff;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
@@ -85,7 +107,11 @@
   <h2>用户承接需求数（点击柱查看明细）</h2>
 
   <button id="no_testing_new">查看未安排测试的需求</button>
-
+  <button id="no_testing_new1">更新数据</button>
+  <span id = "msg_time" style="color: #18ce0f"></span>
+  <div id="loading">
+    <span class="spinner"></span> 加载中，请稍候...
+  </div>
   <div id="barChart"></div>
 
   <h2>完成率占比（饼图）</h2>
@@ -108,7 +134,7 @@
   <script id="user-json" type="application/json">
     {{ user_data|safe }}
   </script>
-
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
     function toNumber(val) {
       if (val === null || val === undefined) return NaN;
@@ -333,6 +359,44 @@
     modalNew.style.display = 'none';
   }
 });
+ document.addEventListener("DOMContentLoaded", () => {
+  const button = document.getElementById("no_testing_new1");
+  const loading = document.getElementById("loading");
+
+  button.addEventListener("click", () => {
+    // 显示加载动画
+    loading.style.display = "block";
+
+    fetch("http://127.0.0.1:8000/autotest/get_all_user_msg/")
+      .then(response => {
+        console.log("收到响应：", response);
+        // 如果后端不是返回 JSON，可以改成 response.text()
+        return response.json();
+      })
+      .then(data => {
+        console.log("请求成功：", data);
+
+      })
+      .catch(error => {
+        console.error("请求失败：", error);
+      })
+      .finally(() => {
+        console.log("隐藏动画");
+         alert("数据已更新，请刷新页面")
+        loading.style.display = "none"; // 一定执行
+      });
+  });
+});
+  time = document.getElementById('msg_time')
+    $.ajax({
+      url: "/autotest/get_last_time/",
+      type:'get',
+      dataType:'json',
+        success:function(data){
+        console.log(data)
+            time.innerHTML = '数据更新时间：' + data.data
+        }
+    })
 
   </script>
 

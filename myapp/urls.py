@@ -70,7 +70,8 @@ urlpatterns = [
     path("feishu_project_record/", feishu_project_reocrd.user_statistics_view, name='feishu_project_record'),
     path("no_testing_project/", feishu_project_reocrd.no_testing_project, name='no_testing_project'),
     path("no_testing_time/", rd_testing_calculations.no_test_time, name='no_testing_time'),
-
+    path("get_all_user_msg/", feishu_project_reocrd.get_all_user_msg, name='get_all_user_msg'),
+    path("get_last_time/", feishu_project_reocrd.get_last_time, name='get_last_time'),
 
     path("business/", business_view.business_list),
     path("business/del/", business_view.business_del),

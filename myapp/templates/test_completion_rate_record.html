@@ -382,7 +382,8 @@
       })
       .finally(() => {
         console.log("隐藏动画");
-         alert("数据已更新，请刷新页面")
+         alert("数据已更新，将会自动刷新")
+         location.reload();
         loading.style.display = "none"; // 一定执行
       });
   });

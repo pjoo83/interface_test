@@ -35,6 +35,18 @@ def td_testing_calculations(request):
         start_send("All_testing_and_Development", data)
         return JsonResponse({"code": 200,
                              "msg": data}, json_dumps_params={'ensure_ascii': False})
+    if request.method == 'POST':
+        data = json.loads(request.body.decode("utf-8"))
+        types = data.get("type")
+        if types =='person_finished_data':
+            start_date = data.get("start_date", None).replace('-', '')
+            end_date = data.get("end_date", None).replace('-', '')
+            get_check(date=start_date, uid=None, date_type=types, finished_time=end_date)
+        elif types =='person_incomplete_data':
+            get_check(date=None, uid=None, date_type=types, finished_time=None)
+
+        return JsonResponse({"code": 200,
+                             "msg": 'hhhh'}, json_dumps_params={'ensure_ascii': False})
 
 
 def no_test_time(request):

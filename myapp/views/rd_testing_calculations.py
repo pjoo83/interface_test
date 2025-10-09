@@ -46,7 +46,7 @@ def td_testing_calculations(request):
             get_check(date=None, uid=None, date_type=types, finished_time=None)
 
         return JsonResponse({"code": 200,
-                             "msg": 'hhhh'}, json_dumps_params={'ensure_ascii': False})
+                             "msg": '查询完成哈哈哈哈'}, json_dumps_params={'ensure_ascii': False})
 
 
 def no_test_time(request):

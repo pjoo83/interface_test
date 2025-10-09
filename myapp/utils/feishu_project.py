@@ -51,10 +51,10 @@ def get_plugin_access_token_cached(force_refresh=False):
 
 
 feishu_project_head = {
-    "X-PLUGIN-TOKEN": get_plugin_access_tokens(),
+    "X-PLUGIN-TOKEN": get_plugin_access_token(),
     'Content-Type': 'application/json',
     'X-USER-KEY': '7117238460611624964',
-    "plugin_token": get_plugin_access_tokens()
+    "plugin_token": get_plugin_access_token()
 }
 
 feishu_backend_head = fei.content_type1
@@ -429,11 +429,11 @@ def analyze_workload_by_version(data_list, types, date, finished_time, uid, num)
         elif test == 0:
             user_id = stages.get('qa', '')
             if get_user_name(user_id, 2):
-                name =get_user_name(user_id, 2)
+                name = get_user_name(user_id, 2)
             else:
                 name = '[暂未安排，请安排]'
             if get_user_name(user_id, 1):
-                uid =get_user_name(user_id, 1)
+                uid = get_user_name(user_id, 1)
             else:
                 uid = '[暂未安排，请安排]'
             Lack_of_time.append(
@@ -947,18 +947,23 @@ def get_user_opening_bug(uid):
     print(response.text)
 
 
+def get_user_incomplete_list(uid):
+    a =get_demand_progress_list(uid)
+    print(a)
+
 if __name__ == '__main__':
     get_no_testing_requirements()
     # get_field_all()
     # get_user_opening_bug(7117238460611624964)
-    # get_all_user_finished_demand(create_date=20250830, uid=7117238460611624964, finished_time=None)
+    # get_all_user_finished_demand(create_date=20250930, uid=7117238460611624964, finished_time=None)
     # get_all_user_finished_demand(create_date=None, uid=None, finished_time=20250807)
     # get_user_name([7205168573025697794, 7212971331053240348])
     # get_all_user_finished_demand(create_date=20250101, uid=None, finished_time=20250108)
     # completion_rate(create_date=20250701, date=20250701, uid=7117238460611624964, finished_time=None)
     # result = get_check(20250601, uid=None, date_type='person_incomplete_data', finished_time=20250630)
-    # print(get_check(20250701, uid=None, date_type='person_finished_data', finished_time=20250731))
+    # print(get_check(20250701, uid=7117238460611624964, date_type='person_finished_data', finished_time=20250731))
     # print(get_check(20250701, uid=None, date_type='person_incomplete_data', finished_time=None))
+    get_user_incomplete_list(7117238460611624964)
     # print(get_check(None, uid=None, date_type='person_incomplete_data', finished_time=None))
     # print(json.dumps(result, indent=2, ensure_ascii=False))
     # print(get_plugin_access_token_cached())

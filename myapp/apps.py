@@ -1,6 +1,6 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from django.apps import AppConfig
-from utils.feishu_get_token import _plugin_token_cache, get_plugin_access_token
+from myapp.utils.feishu_get_token import _plugin_token_cache, get_plugin_access_token
 import datetime
 
 

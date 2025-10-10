@@ -25,36 +25,13 @@ def get_plugin_access_tokens():
     return token
 
 
-def get_plugin_access_token_cached(force_refresh=False):
-    global _plugin_token_cache
-
-    now = datetime.now()
-
-    # 判断是否需要刷新
-    if (
-            not _plugin_token_cache["token"] or
-            not _plugin_token_cache["expire_time"] or
-            now >= _plugin_token_cache["expire_time"] or
-            force_refresh
-    ):
-        print("刷新 plugin_token...")
-        token_info = get_plugin_access_tokens()  # 这里自己实现
-        # 如果返回 dict，比如 {"access_token": "xxx"}，就取里面的值
-        if isinstance(token_info, dict):
-            token_info = token_info.get("access_token", "")
-        _plugin_token_cache["token"] = token_info
-        # 每天 23:59:59 过期
-        _plugin_token_cache["expire_time"] = now.replace(hour=23, minute=59, second=59)
-
-    return _plugin_token_cache["token"]
-
-
-feishu_project_head = {
-    "X-PLUGIN-TOKEN": get_plugin_access_token(),
-    'Content-Type': 'application/json',
-    'X-USER-KEY': '7117238460611624964',
-    # "plugin_token": get_plugin_access_token()
-}
+#
+# feishu_project_head = {
+#     "X-PLUGIN-TOKEN": get_plugin_access_token(),
+#     'Content-Type': 'application/json',
+#     'X-USER-KEY': '7117238460611624964',
+#     # "plugin_token": get_plugin_access_token()
+# }
 
 
 def get_feishu_headers():

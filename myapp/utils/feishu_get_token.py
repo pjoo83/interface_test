@@ -76,12 +76,22 @@ _plugin_token_cache = {
 }
 
 
+import datetime
+import json
+import requests
+
+# ✅ 初始化缓存字典（避免 None 报错）
+_plugin_token_cache = {
+    "token": None,
+    "expire_time": None
+}
+
 def get_plugin_access_token():
     """
-    调飞书接口，获取新的 plugin token
+    向飞书接口请求 plugin_token
     """
-    current_timestamp = int(datetime.datetime.now().timestamp())
-    url = f"https://project.feishu.cn/open_api/authen/plugin_token?timestamp={current_timestamp}"
+    current_timestamp = datetime.datetime.now().timestamp()
+    url = f"https://project.feishu.cn/open_api/authen/plugin_token?timestamp={int(current_timestamp)}"
 
     payload = json.dumps({
         "plugin_id": "MII_6784DC70B348001C",
@@ -92,21 +102,32 @@ def get_plugin_access_token():
 
     response = requests.post(url, headers=headers, data=payload)
     data = response.json()
-    token = data['data']['token']
-    print("获取新 token 成功:", token)
-    return token
+    return data["data"]["token"], data["data"]["expire_time"]
 
 
-def get_valid_plugin_token(_plugin_token_cache=None):
+def get_valid_plugin_token():
     """
-    获取当前可用的 token，如过期则刷新
+    检查缓存的 plugin_token 是否过期，若过期则自动刷新。
+    返回一个可用的 token。
     """
+    global _plugin_token_cache
     now = datetime.datetime.now()
-    if _plugin_token_cache["token"] and _plugin_token_cache["expire_time"] > now:
+
+    # ✅ 判断是否已有缓存且未过期
+    if (
+        _plugin_token_cache["token"]
+        and _plugin_token_cache["expire_time"]
+        and _plugin_token_cache["expire_time"] > now
+    ):
         return _plugin_token_cache["token"]
 
-    # 否则重新获取
-    new_token = get_plugin_access_token()
-    _plugin_token_cache["token"] = new_token
-    _plugin_token_cache["expire_time"] = now + datetime.timedelta(hours=1, minutes=55)
-    return new_token
+    # ✅ 否则重新请求
+    token, expire_timestamp = get_plugin_access_token()
+    expire_time = datetime.datetime.fromtimestamp(expire_timestamp)
+
+    # ✅ 缓存新 token
+    _plugin_token_cache["token"] = token
+    _plugin_token_cache["expire_time"] = expire_time
+
+    print(f"[INFO] Plugin token refreshed, valid until {expire_time}")
+    return token

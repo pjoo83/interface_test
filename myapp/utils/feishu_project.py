@@ -10,7 +10,6 @@ from myapp.utils.feishu_get_token import get_plugin_access_token, get_tenant_acc
 from myapp.utils.feishu_send_message import start_send
 from collections import defaultdict
 import time
-from datetime import datetime
 from myapp.utils.feishu_Webhook_robot import feishu_card_rot
 
 fei = Feishu_data()
@@ -54,7 +53,7 @@ feishu_project_head = {
     "X-PLUGIN-TOKEN": get_plugin_access_token(),
     'Content-Type': 'application/json',
     'X-USER-KEY': '7117238460611624964',
-    "plugin_token": get_plugin_access_token()
+    # "plugin_token": get_plugin_access_token()
 }
 
 feishu_backend_head = fei.content_type1
@@ -479,6 +478,7 @@ def analyze_workload_by_version(data_list, types, date, finished_time, uid, num)
     if num == 1:
         if attention_messages:
             for data in attention_messages:
+                # print("记录成功",data)
                 start_record(data, types)
             attention_messages.append(date)
             attention_messages.append(finished_time)
@@ -952,7 +952,7 @@ def get_user_incomplete_list(uid):
     print(a)
 
 if __name__ == '__main__':
-    get_no_testing_requirements()
+    # get_no_testing_requirements()
     # get_field_all()
     # get_user_opening_bug(7117238460611624964)
     # get_all_user_finished_demand(create_date=20250930, uid=7117238460611624964, finished_time=None)
@@ -962,8 +962,8 @@ if __name__ == '__main__':
     # completion_rate(create_date=20250701, date=20250701, uid=7117238460611624964, finished_time=None)
     # result = get_check(20250601, uid=None, date_type='person_incomplete_data', finished_time=20250630)
     # print(get_check(20250701, uid=7117238460611624964, date_type='person_finished_data', finished_time=20250731))
-    # print(get_check(20250701, uid=None, date_type='person_incomplete_data', finished_time=None))
-    get_user_incomplete_list(7117238460611624964)
+    print(get_check(20250701, uid=None, date_type='person_incomplete_data', finished_time=None))
+    # get_user_incomplete_list(7117238460611624964)
     # print(get_check(None, uid=None, date_type='person_incomplete_data', finished_time=None))
     # print(json.dumps(result, indent=2, ensure_ascii=False))
     # print(get_plugin_access_token_cached())

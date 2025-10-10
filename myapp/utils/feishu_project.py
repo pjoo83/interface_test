@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from dateutil.parser import parse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from myapp.utils.feishu_data import Feishu_data
-from myapp.utils.feishu_get_token import get_plugin_access_token, get_tenant_access_token
+from myapp.utils.feishu_get_token import get_plugin_access_token, get_tenant_access_token,get_valid_plugin_token
 from myapp.utils.feishu_send_message import start_send
 from collections import defaultdict
 import time
@@ -56,6 +56,18 @@ feishu_project_head = {
     # "plugin_token": get_plugin_access_token()
 }
 
+
+def get_feishu_headers():
+    """
+    每次调用接口前动态生成请求头，保证token是最新的
+    """
+    return {
+        "X-PLUGIN-TOKEN": get_valid_plugin_token(),  # ✅ 改这里
+        "Content-Type": "application/json",
+        "X-USER-KEY": "7117238460611624964",
+    }
+
+
 feishu_backend_head = fei.content_type1
 feishu_backend_head['Authorization'] = f"Bearer {get_tenant_access_token()}"
 
@@ -72,7 +84,7 @@ def get_field_all():
     payload = json.dumps({
         "work_item_type_key": "story"
     })
-    response = requests.post(url=url, headers=feishu_project_head, data=payload)
+    response = requests.post(url=url, headers=get_feishu_headers(), data=payload)
     print(response.json()['data'])
 
 
@@ -89,7 +101,7 @@ def get_business_key():
         "asset_key": "",
         "order": [""]
     })
-    business = requests.post(url, headers=feishu_project_head, data=payload)
+    business = requests.post(url, headers=get_feishu_headers(), data=payload)
     return business.json()['data'][0]
 
 
@@ -100,7 +112,7 @@ def get_demand_finished_list(date, uid=None, finished_time=None):
     :param finished_time: 完成时间
     :return: 返回阶段时间内所有已完成的测试数据
     """
-    headers = feishu_project_head
+    headers = get_feishu_headers()
     project_key = '62a6fce5ed2541be7bf5c2d3'
     url = f"{fei.feishu_project_url}{project_key}/work_item/story/search/params"
     search_params = [
@@ -183,7 +195,7 @@ def get_demand_progress_list(uid=None):
     :param uid: 可传指定用户指定用户
     :return: 返回测试阶段内所有已完成的测试数据
     """
-    headers = feishu_project_head
+    headers = get_feishu_headers()
     project_key = '62a6fce5ed2541be7bf5c2d3'
     url = f"{fei.feishu_project_url}{project_key}/work_item/story/search/params"
     search_params = [
@@ -312,7 +324,7 @@ def get_items_node(date, uid, date_type, finished_time):
         node_list = get_demand_progress_list(uid)
         # node_list = filter_data_list(node_list)
     story_ids = [item['id'] for item in node_list]
-    workflow_data_list = batch_get_workflows(story_ids, project_key, feishu_project_head)
+    workflow_data_list = batch_get_workflows(story_ids, project_key, get_feishu_headers())
     result = []
     for sid, data in workflow_data_list:
         points = calculate_points_if_has_test_stage(data)
@@ -598,7 +610,7 @@ def get_all_user_demand(create_date, uid, finished_time, no_testing=None):
     """
     :return:返回查询数据，根据开始时间和结束时间
     """
-    headers = feishu_project_head
+    headers = get_feishu_headers()
     project_key = '62a6fce5ed2541be7bf5c2d3'
     url = f"{fei.feishu_project_url}{project_key}/work_item/story/search/params"
 
@@ -920,7 +932,7 @@ def get_user_opening_bug(uid):
     """
     :return: 返回未关闭的bug
     """
-    headers = feishu_project_head
+    headers = get_feishu_headers()
     print(headers)
     project_key = '62a6fce5ed2541be7bf5c2d3'
     url = f"{fei.feishu_project_url}{project_key}/work_item/issue/filter"
@@ -948,8 +960,9 @@ def get_user_opening_bug(uid):
 
 
 def get_user_incomplete_list(uid):
-    a =get_demand_progress_list(uid)
+    a = get_demand_progress_list(uid)
     print(a)
+
 
 if __name__ == '__main__':
     # get_no_testing_requirements()

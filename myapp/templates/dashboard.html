@@ -47,8 +47,9 @@
         </div>
     </div>
     <div class="puleftboxtbott">
-        <h2 class="tith2 pt1">舆情环比分析</h2>
-        <div class="lefttoday_tit"><p class="fl">状态：正常</p>
+        <h2 class="tith2 pt1">测试已完成需求数据</h2>
+        <div class="lefttoday_tit"><p class="fl">
+            <button class="detail_msg" style="background: #f39c12;color: #fff;border: none;border-radius: 6px;padding: 8px 16px;cursor: pointer;margin-bottom: 16px;font-size: 14px;font-weight: 600;}">具体数据</button></p>
             <p class="fr"></p></div>
         <div class="box pbox">
             <div id="puleftboxtbott1" class="fl puleftboxtbott1"></div>
@@ -200,135 +201,6 @@
 </div>
 
 
-<script type="text/javascript">
-    var myChart = echarts.init(document.getElementById('puleftboxtbott1'));
-    var data = [
-        [[28604, 77, 17099, 'Australia', 1990], [31163, 77.4, 2440, 'Canada', 1990], [1516, 68, 1605773, 'China', 1990], [13670, 74.7, 10082, 'Cuba', 1990], [28599, 75, 49805, 'Finland', 1990], [29476, 77.1, 569499, 'France', 1990], [31476, 75.4, 789237, 'Germany', 1990], [28666, 78.1, 254830, 'Iceland', 1990], [1777, 57.7, 870776, 'India', 1990], [29550, 79.1, 129285, 'Japan', 1990], [2076, 67.9, 201954, 'North Korea', 1990], [12087, 72, 42954, 'South Korea', 1990], [24021, 75.4, 33934, 'New Zealand', 1990], [43296, 76.8, 4240375, 'Norway', 1990], [10088, 70.8, 381958, 'Poland', 1990], [19349, 69.6, 1475652, 'Russia', 1990], [10670, 67.3, 53905, 'Turkey', 1990], [26424, 75.7, 57117, 'United Kingdom', 1990], [37062, 75.4, 252810, 'United States', 1990]],
-        [[44056, 81.8, 23973, 'Australia', 2015], [43294, 81.7, 35927, 'Canada', 2015], [13334, 76.9, 1376043, 'China', 2015], [21291, 78.5, 11562, 'Cuba', 2015], [38923, 80.8, 55057, 'Finland', 2015], [37599, 81.9, 64345, 'France', 2015], [44053, 81.1, 80545, 'Germany', 2015], [42182, 82.8, 329425, 'Iceland', 2015], [5903, 66.8, 1311027, 'India', 2015], [36162, 83.5, 126571, 'Japan', 2015], [1390, 71.4, 251317, 'North Korea', 2015], [34644, 80.7, 503439, 'South Korea', 2015], [34186, 80.6, 4528526, 'New Zealand', 2015], [64304, 81.6, 5210967, 'Norway', 2015], [24787, 77.3, 386194, 'Poland', 2015], [23038, 73.13, 143918, 'Russia', 2015], [19360, 76.5, 78630, 'Turkey', 2015], [38225, 81.4, 64715810, 'United Kingdom', 2015], [53354, 79.1, 321771, 'United States', 2015]]
-    ];
-
-    option = {
-        backgroundColor: 'rgba(1,202,217,.2)',
-        grid: {
-            left: 60,
-            right: 40,
-            top: 45,
-            bottom: 40
-        },
-        title: {
-            top: 5,
-            left: 20,
-            textStyle: {
-                fontSize: 10,
-                color: 'rgba(255,255,255,.6)'
-            },
-            text: '环比类型：日环比'
-        },
-        legend: {
-            right: 10,
-            top: 5,
-            textStyle: {
-                fontSize: 10,
-                color: 'rgba(255,255,255,.6)'
-            },
-            data: ['1990', '2015']
-        },
-        xAxis: {
-            axisLine: {
-                lineStyle: {
-                    color: 'rgba(255,255,255,.2)'
-                }
-            },
-            splitLine: {
-                lineStyle: {
-                    color: 'rgba(255,255,255,.1)'
-                }
-            },
-            axisLabel: {
-                color: "rgba(255,255,255,.7)"
-            }
-        },
-        yAxis: {
-            axisLine: {
-                lineStyle: {
-                    color: 'rgba(255,255,255,.2)'
-                }
-            },
-            splitLine: {
-                lineStyle: {
-                    color: 'rgba(255,255,255,.1)'
-                }
-            },
-            axisLabel: {
-                color: "rgba(255,255,255,.7)"
-            },
-
-            scale: true
-        },
-        series: [{
-            name: '1990',
-            data: data[0],
-            type: 'scatter',
-            symbolSize: function (data) {
-                return Math.sqrt(data[2]) / 5e2;
-            },
-            label: {
-                emphasis: {
-                    show: true,
-                    formatter: function (param) {
-                        return param.data[3];
-                    },
-                    position: 'top'
-                }
-            },
-            itemStyle: {
-                normal: {
-                    shadowBlur: 10,
-                    shadowColor: 'rgba(120, 36, 50, 0.5)',
-                    shadowOffsetY: 5,
-                    color: new echarts.graphic.RadialGradient(0.4, 0.3, 1, [{
-                        offset: 0,
-                        color: 'rgb(251, 118, 123)'
-                    }, {
-                        offset: 1,
-                        color: 'rgb(204, 46, 72)'
-                    }])
-                }
-            }
-        }, {
-            name: '2015',
-            data: data[1],
-            type: 'scatter',
-            symbolSize: function (data) {
-                return Math.sqrt(data[2]) / 5e2;
-            },
-            label: {
-                emphasis: {
-                    show: true,
-                    formatter: function (param) {
-                        return param.data[3];
-                    },
-                    position: 'top'
-                }
-            },
-            itemStyle: {
-                normal: {
-                    shadowBlur: 10,
-                    shadowColor: 'rgba(25, 100, 150, 0.5)',
-                    shadowOffsetY: 5,
-                    color: new echarts.graphic.RadialGradient(0.4, 0.3, 1, [{
-                        offset: 0,
-                        color: 'rgb(129, 227, 238)'
-                    }, {
-                        offset: 1,
-                        color: 'rgb(25, 183, 207)'
-                    }])
-                }
-            }
-        }]
-    };
-    myChart.setOption(option);
-</script>
 
 
 <script type="text/javascript">
@@ -339,6 +211,7 @@
         initBar4();
         initBar5();
         initBar6();
+        initBar7();
     })
 
 
@@ -389,9 +262,9 @@
 
     // 多语言饼图
     function initBar1() {
-        var chartDom = document.getElementById('m2')
-        var myChart = echarts.init(chartDom);
-        var option = {
+        const chartDom = document.getElementById('m2');
+        const myChart = echarts.init(chartDom);
+        const option = {
             backgroundColor: 'rgba(1,202,217,.2)',
             tooltip: {
                 trigger: 'item'
@@ -447,8 +320,8 @@
 
     // 接口测试折线图区域
     function initBar2() {
-        var myChart = echarts.init(document.getElementById('pumiddboxtbott1'));
-        var option = {
+        const myChart = echarts.init(document.getElementById('pumiddboxtbott1'));
+        const option = {
             backgroundColor: 'rgba(1,202,217,.2)',
             grid: {
                 left: 60,
@@ -625,9 +498,9 @@
 
     <!--安卓端自动化饼图-->
     function initBar3() {
-        var  android_passing_rate = document.getElementById('android_passing_rate')
-        var myChart = echarts.init(document.getElementById('purightboxtop'))
-        var option = {
+        const android_passing_rate = document.getElementById('android_passing_rate');
+        const myChart = echarts.init(document.getElementById('purightboxtop'));
+        const option = {
             color: ['#00f1fc', '#00b7ee', '#5578cf', '#5ebbeb', '#d16ad8', '#f8e19a', '#00b7ee', '#81dabe', '#5fc5ce'],
             backgroundColor: 'rgba(1,202,217,.2)',
             series: [
@@ -664,9 +537,9 @@
 
     <!--ios自动化饼图-->
     function initBar4(){
-        var ios_passing_rate = document.getElementById('ios_passing_rate')
-        var myChart = echarts.init(document.getElementById('purightboxbott2'));
-        var option = {
+        const ios_passing_rate = document.getElementById('ios_passing_rate');
+        const myChart = echarts.init(document.getElementById('purightboxbott2'));
+        const option = {
             color: ['#00f1fc', '#00b7ee', '#5578cf', '#5ebbeb', '#d16ad8', '#f8e19a', '#00b7ee', '#81dabe', '#5fc5ce'],
             backgroundColor: 'rgba(1,202,217,.2)',
             series: [
@@ -702,8 +575,8 @@
 
     // ui自动化用例数与通过率
     function initBar5() {
-        var myChart = echarts.init(document.getElementById('purightboxmidd'))
-        var option = {
+        const myChart = echarts.init(document.getElementById('purightboxmidd'));
+        const option = {
             backgroundColor: 'rgba(1,202,217,.2)',
 
             tooltip: {
@@ -799,8 +672,8 @@
 
     // 多语言表格
     function initBar6() {
-        var myChart = echarts.init(document.getElementById('m1'))
-        var option = {
+        const myChart = echarts.init(document.getElementById('m1'));
+        const option = {
             backgroundColor: 'rgba(1,202,217,.2)',
             tooltip: {
                 trigger: 'axis',
@@ -862,12 +735,12 @@
     roll(35);
     };
      function roll(t) {
-            var ul1 = document.getElementById("comment1");
-            var ul2 = document.getElementById("comment2");
-            var ulbox = document.getElementById("review_box");
-            ul2.innerHTML = ul1.innerHTML;
+         const ul1 = document.getElementById("comment1");
+         const ul2 = document.getElementById("comment2");
+         const ulbox = document.getElementById("review_box");
+         ul2.innerHTML = ul1.innerHTML;
             ulbox.scrollTop = 0; // 开始无滚动时设为0
-            var timer = setInterval(rollStart, t); // 设置定时器，参数t用在这为间隔时间（单位毫秒），参数t越小，滚动速度越快
+         let timer = setInterval(rollStart, t); // 设置定时器，参数t用在这为间隔时间（单位毫秒），参数t越小，滚动速度越快
             // 鼠标移入div时暂停滚动
             ulbox.onmouseover = function () {
                 clearInterval(timer);
@@ -880,9 +753,9 @@
 
         // 开始滚动函数
         function rollStart() {
-            var ul1 = document.getElementById("comment1");
-            var ul2 = document.getElementById("comment2");
-            var ulbox = document.getElementById("review_box");
+            const ul1 = document.getElementById("comment1");
+            const ul2 = document.getElementById("comment2");
+            const ulbox = document.getElementById("review_box");
             // 正常滚动不断给scrollTop的值+1,当滚动高度大于列表内容高度时恢复为0
             if (ulbox.scrollTop >= ul1.scrollHeight) {
                 ulbox.scrollTop = 0;
@@ -890,6 +763,113 @@
                 ulbox.scrollTop += 1;
             }
     }
+    function initBar7(){
+        const myChart = echarts.init(document.getElementById('puleftboxtbott1'));
+     const option = {
+  backgroundColor: 'rgba(1,202,217,.2)',
+  grid: {
+    left: '5%',
+    right: '5%',
+    bottom: '10%',
+    top: '10%',
+    containLabel: true
+  },
+  xAxis: {
+    type: 'category',
+    data: [],
+    axisLine: {
+      lineStyle: {
+        color: '#00FFFF' // 横轴线颜色
+      }
+    },
+    axisLabel: {
+      color: '#FFFFFF', // 横轴文字颜色
+      fontSize: 12,
+      interval: 0, // ✅ 强制显示所有标签
+      formatter: function (value) {
+        return value.split("").join("\n"); // ✅ 每个字竖排显示
+      },
+      lineHeight: 14
+    },
+    axisTick: {
+      show: false
+    }
+  },
+  yAxis: {
+    type: 'value',
+    axisLine: {
+      lineStyle: {
+        color: '#00FFFF' // 纵轴线颜色
+      }
+    },
+    axisLabel: {
+      color: '#FFFFFF',
+      fontSize: 12
+    },
+    splitLine: {
+      lineStyle: {
+        color: 'rgba(255,255,255,0.2)' // 网格线颜色
+      }
+    }
+  },
+  dataZoom: [
+    {
+      type: 'slider',
+      show: true,
+      start: 0,
+      end: 40, // 默认显示前 40%
+      xAxisIndex: [0],
+      height: 12,
+      bottom: 0,
+      borderColor: 'transparent',
+      backgroundColor: 'rgba(255,255,255,0.1)',
+      fillerColor: 'rgba(0,255,255,0.4)',
+      handleStyle: {
+        color: '#00FFFF'
+      },
+      textStyle: {
+        color: '#00FFFF'
+      }
+    }
+  ],
+  series: [
+    {
+      data: [],
+      type: 'bar',
+      barWidth: '45%',
+      itemStyle: {
+        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+          { offset: 0, color: '#00FFFF' },
+          { offset: 1, color: '#0066FF' }
+        ]),
+        borderRadius: [4, 4, 0, 0],
+        shadowColor: 'rgba(0, 255, 255, 0.5)',
+        shadowBlur: 10
+      },
+      label: {
+        show: true,
+        position: 'top',
+        color: '#00FFFF',
+        fontSize: 12
+      }
+    }
+  ]
+};
+    $.ajax({
+            url: 'dashboard_qa_data/',
+            type: "get",
+            dataType: "JSON",
+            success: function (res) {
+                if (res) {
+                    option.series[0].data = res.series;
+                    option.xAxis.data = res.xAxis;
+                }
+                myChart.setOption(option);
+            }
+        })
+    }
 </script>
 </body>
 </html>
+
+

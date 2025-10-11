@@ -24,7 +24,8 @@ urlpatterns = [
     path("dashboard/dashboard_executions_translate_total/", dashboard_view.dashboard_executions_translate_total,
          name='dashboard_executions_total'),
     path("dashboard/dashboard_translate_pie/", dashboard_view.dashboard_translate_pie, name='dashboard_translate_pie'),
-
+    # 底部qa测试数据柱状图
+    path("dashboard/dashboard_qa_data/", dashboard_view.dashboard_qa_data, name='dashboard_qa_data'),
     #  接口数据插入
     path('dashboard/interface/insert_api/', interface_view.interface_insert_data, name='interface_insert_data'),
     # 接口折线图显示区域

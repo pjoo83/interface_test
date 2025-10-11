@@ -1,5 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import render
+import ast
+from myapp.models import test_record_result
 from myapp.utils.database_tools import execute_sql, package_execute
 
 
@@ -148,3 +150,22 @@ def dashboard_translate_pie(request):
             "data_list": data}
     }
     return JsonResponse(result)
+
+
+def dashboard_qa_data(request):
+    query_time = test_record_result.objects.filter(type='测试数据').order_by('-id').first()
+    data_record = query_time.data_record
+    user_data = ast.literal_eval(data_record)
+    qa_datas = []
+    for i in user_data:
+        qa_datas.append({'name': i['user'], 'num': i['已承接的需求数量']})
+    clean_data = [item for item in qa_datas if isinstance(item, dict)]
+    # 按 num 从大到小排序
+    sorted_data = sorted(clean_data, key=lambda x: x['num'], reverse=True)
+
+    names = [item['name'] for item in sorted_data]
+    nums = [item['num'] for item in sorted_data]
+    return JsonResponse({
+        'xAxis': names,
+        'series': nums,
+    })

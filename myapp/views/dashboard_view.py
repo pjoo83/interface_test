@@ -22,7 +22,6 @@ def dashboard_translate_bar(request):
     package_execute(server_new_list, 1, 3, 'newly_quantity')
     flutter_new_list = []
     package_execute(flutter_new_list, 1, 5, 'newly_quantity')
-    print(ios_new_list)
     series = [
         {
             'name': 'android新增',
@@ -189,8 +188,6 @@ def dashboard_resource_show(request):
     numbers_debris = [d.resource_sum for d in debris][::-1]
     numbers_ab = [a.resource_sum for a in ab][::-1]
     numbers_bubble = [b.resource_sum for b in bubble][::-1]
-
-    print(numbers_bubble, numbers_ab, numbers_debris, numbers_pendent, numbers_resource)
     date = {'numbers_resource': numbers_resource,
             'numbers_pendent': numbers_pendent,
             'numbers_debris': numbers_debris,

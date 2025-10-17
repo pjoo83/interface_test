@@ -299,14 +299,13 @@
             data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
           },
           yAxis: {
-            type: 'value',
-                axisLine: {
-                    lineStyle: {
-                        color: '#00FFFF' // 纵轴线颜色
-                    }
+              type: 'value',
+              axisLine: { lineStyle: { color: '#00FFFF' } },
+              splitLine: { lineStyle: { color: '#0ff2' } },
+              max: function (value) {
+                  return Math.ceil(value.max / 10) * 10; // 自动上浮到10的倍数
                 }
-
-          },
+            },
           series: [
             {
               name: '坐骑',

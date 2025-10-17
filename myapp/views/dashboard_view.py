@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import render
 import ast
-from myapp.models import test_record_result
+from myapp.models import test_record_result, resource_date_record
 from myapp.utils.database_tools import execute_sql, package_execute
 
 
@@ -153,6 +153,10 @@ def dashboard_translate_pie(request):
 
 
 def dashboard_qa_data(request):
+    """
+    :param request: 测试数据
+    :return:
+    """
     query_time = test_record_result.objects.filter(type='测试数据').order_by('-id').first()
     data_record = query_time.data_record
     user_data = ast.literal_eval(data_record)
@@ -169,3 +173,28 @@ def dashboard_qa_data(request):
         'xAxis': names,
         'series': nums,
     })
+
+
+def dashboard_resource_show(request):
+    """
+    :return: 返回当前资源id
+    """
+    resource = resource_date_record.objects.filter(resource_name='resource').order_by('-id')[:10]
+    pendent = resource_date_record.objects.filter(resource_name='pendent').order_by('-id')[:10]
+    debris = resource_date_record.objects.filter(resource_name='debris').order_by('-id')[:10]
+    ab = resource_date_record.objects.filter(resource_name='ab').order_by('-id')[:10]
+    bubble = resource_date_record.objects.filter(resource_name='bubble').order_by('-id')[:10]
+    numbers_resource = [r.resource_sum for r in resource]
+    numbers_pendent = [p.resource_sum for p in pendent]
+    numbers_debris = [d.resource_sum for d in debris]
+    numbers_ab = [a.resource_sum for a in ab]
+    numbers_bubble = [b.resource_sum for b in bubble]
+
+    print(numbers_bubble, numbers_ab, numbers_debris, numbers_pendent, numbers_resource)
+    date = {'numbers_resource': numbers_resource,
+            'numbers_pendent': numbers_pendent,
+            'numbers_debris': numbers_debris,
+            'numbers_ab': numbers_ab,
+            'numbers_bubble': numbers_bubble,
+            }
+    return JsonResponse({"code": 200, 'date': date})

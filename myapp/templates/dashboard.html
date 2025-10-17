@@ -38,12 +38,12 @@
     <div class="pulefttop">
         <!-- 折线图区域-->
         <h2 class="tith2">多语言自动化结果</h2>
-        <div id='m1' style="width:90%; height:88%;margin-left:5%"></div>
+        <div id='m1' style="width:90%; height:88%;margin-left:5%;margin-top: 10px"></div>
     </div>
     <div class="puleftboxtmidd">
-        <h2 class="tith2">多语言统计</h2>
-        <div class="box pbox" style="width: auto;height: 88%;margin-top: 2px">
-            <div id='m2' style="width:90%; height:117%;margin-left:5%"></div>
+        <h2 class="tith2">资源统计</h2>
+        <div class="box pbox" style="width: auto;height: 100%;margin-top: 2px">
+            <div id='m2' style="width:90%; height:85%;margin-left:5%;margin-top: 30px;"></div>
         </div>
     </div>
     <div class="puleftboxtbott">
@@ -266,52 +266,93 @@
         const myChart = echarts.init(chartDom);
         const option = {
             backgroundColor: 'rgba(1,202,217,.2)',
-            tooltip: {
-                trigger: 'item'
-            },
-            legend: {
-                top: '5%',
-                left: 'center',
-                textStyle: {
-                    color: 'yellow'
-                }
-            },
-            series: [
-                {
-                    name: '',
-                    type: 'pie',
-                    radius: ['40%', '70%'],
-                    avoidLabelOverlap: false,
-                    padAngle: 5,
-                    itemStyle: {
-                        borderRadius: 30
-                    },
-                    label: {
+          tooltip: {
+            trigger: 'axis'
+          },
+          legend: {
+            data: ['坐骑', '头像', '碎片', 'ab实验', '资源']
+            ,textStyle: {
+              color: 'yellow',
 
-                        show: false,
-                        position: 'center'
-                    },
-                    emphasis: {
-                        label: {
-                            show: true,
-                            fontSize: 40,
-                            fontWeight: 'bold'
-                        }
-                    },
-                    labelLine: {
-                        show: false
-                    },
-                    data: []
+            }
+
+          },
+          grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+          },
+          toolbox: {
+            feature: {
+              saveAsImage: {}
+            }
+          },
+          xAxis: {
+            type: 'category',
+            boundaryGap: false,
+              axisLine: {
+                  lineStyle: {
+                      color: '#00FFFF' // 横轴线颜色
+                  }
+              },
+            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+          },
+          yAxis: {
+            type: 'value',
+                axisLine: {
+                    lineStyle: {
+                        color: '#00FFFF' // 纵轴线颜色
+                    }
                 }
-            ]
+
+          },
+          series: [
+            {
+              name: '坐骑',
+              type: 'line',
+              stack: 'Total',
+              data: []
+            },
+            {
+              name: '头像',
+              type: 'line',
+              stack: 'Total',
+              data: []
+            },
+            {
+              name: '碎片',
+              type: 'line',
+              stack: 'Total',
+              data: []
+            },
+            {
+              name: 'ab实验',
+              type: 'line',
+              stack: 'Total',
+              data: []
+            },
+            {
+              name: '资源',
+              type: 'line',
+              stack: 'Total',
+              data: []
+            }
+          ]
         };
         $.ajax({
-            url: "dashboard_translate_pie/",
+            url: "dashboard_resource_show/",
             type: "get",
             dataType: "JSON",
             success: function (res) {
-                if (res.status) {
-                    option.series[0].data = res.data.data_list;
+                if (res.code) {
+                    console.log('hhhh',res.date['numbers_ab'])
+                    option.series[0].data = res.date['numbers_resource'];
+                    option.series[1].data = res.date['numbers_pendent'];
+                    option.series[2].data = res.date['numbers_debris'];
+                    option.series[3].data = res.date['numbers_ab'];
+                    option.series[4].data = res.date['numbers_bubble'];
+
                 }
                 myChart.setOption(option)
             }
@@ -373,7 +414,7 @@
                     type: 'value',
                     name: '',
                     min: 0,
-                    max: 450,
+                    max: null,
                     interval: 50,
                     axisLine: {
                         lineStyle: {
@@ -485,6 +526,7 @@
             dataType: "JSON",
             success: function (res) {
                 if (res.status) {
+                    option.yAxis[0].max = res.data['total_interface'].at(-1) + 50;
                     option.series[0].data = res.data['total_interface'];
                     option.series[1].data = res.data['total_pass'];
                     option.series[2].data = res.data['total_fail'];
@@ -661,9 +703,9 @@
             success:function (res){
                 if (res.status){
                     option.series[1].data=res['android_statistics'];
-                    console.log(option.series[1].data)
+                    // console.log(option.series[1].data)
                     option.series[0].data = res['ios_statistics']
-                    console.log(option.series[0].data)
+                    // console.log(option.series[0].data)
                 }
                  myChart.setOption(option);
             }

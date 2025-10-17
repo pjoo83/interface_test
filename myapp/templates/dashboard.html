@@ -296,7 +296,7 @@
                       color: '#00FFFF' // 横轴线颜色
                   }
               },
-            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+            data: []
           },
           yAxis: {
               type: 'value',
@@ -351,6 +351,7 @@
                     option.series[2].data = res.date['numbers_debris'];
                     option.series[3].data = res.date['numbers_ab'];
                     option.series[4].data = res.date['numbers_bubble'];
+                    option.xAxis.data=res.date['date']
 
                 }
                 myChart.setOption(option)

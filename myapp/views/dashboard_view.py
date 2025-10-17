@@ -188,10 +188,12 @@ def dashboard_resource_show(request):
     numbers_debris = [d.resource_sum for d in debris][::-1]
     numbers_ab = [a.resource_sum for a in ab][::-1]
     numbers_bubble = [b.resource_sum for b in bubble][::-1]
+    date = [b.record_date for b in bubble][::-1]
     date = {'numbers_resource': numbers_resource,
             'numbers_pendent': numbers_pendent,
             'numbers_debris': numbers_debris,
             'numbers_ab': numbers_ab,
             'numbers_bubble': numbers_bubble,
+            'date': date
             }
     return JsonResponse({"code": 200, 'date': date})

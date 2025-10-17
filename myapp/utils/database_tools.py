@@ -55,6 +55,17 @@ def execute_sql(sid=None, channel_id=None, content=None, name=None, record_pag_u
             print(e, '更新失败')
         db.commit()
         db.close()
+    elif sid == 5:
+        cursor = db.cursor()
+        insert_execute_statistics = 'INSERT INTO myapp_resource_date_record (resource_name, resource_sum)' \
+                                    ' VALUES ( %s, %s)'
+        value = (name, content)
+        try:
+            cursor.execute(insert_execute_statistics, value)
+            # result = cursor.fetchall()
+            db.commit()
+        except pymysql.MySQLError as e:
+            print(e, '插入失败')
 
 
 def package_execute(new_list, sid, cid, statement):

@@ -184,11 +184,11 @@ def dashboard_resource_show(request):
     debris = resource_date_record.objects.filter(resource_name='debris').order_by('-id')[:10]
     ab = resource_date_record.objects.filter(resource_name='ab').order_by('-id')[:10]
     bubble = resource_date_record.objects.filter(resource_name='bubble').order_by('-id')[:10]
-    numbers_resource = [r.resource_sum for r in resource]
-    numbers_pendent = [p.resource_sum for p in pendent]
-    numbers_debris = [d.resource_sum for d in debris]
-    numbers_ab = [a.resource_sum for a in ab]
-    numbers_bubble = [b.resource_sum for b in bubble]
+    numbers_resource = [r.resource_sum for r in resource][-1:-1:-1]
+    numbers_pendent = [p.resource_sum for p in pendent][-1:-1:-1]
+    numbers_debris = [d.resource_sum for d in debris][-1:-1:-1]
+    numbers_ab = [a.resource_sum for a in ab][-1:-1:-1]
+    numbers_bubble = [b.resource_sum for b in bubble][-1:-1:-1]
 
     print(numbers_bubble, numbers_ab, numbers_debris, numbers_pendent, numbers_resource)
     date = {'numbers_resource': numbers_resource,

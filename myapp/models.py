@@ -265,5 +265,14 @@ class test_record_result(models.Model):
     """
     data_record = models.TextField(verbose_name='记录数据')
     datatime = models.DateField(auto_now_add=True, verbose_name='执行时间', null=True)
-    all_record_num =models.IntegerField(verbose_name='记录总数', null=True, default=0)
-    type = models.CharField(max_length=50, verbose_name='记录类型',null=True, default='测试数据')
+    all_record_num = models.IntegerField(verbose_name='记录总数', null=True, default=0)
+    type = models.CharField(max_length=50, verbose_name='记录类型', null=True, default='测试数据')
+
+
+class resource_date_record(models.Model):
+    """
+        资源每日记录表
+    """
+    resource_name = models.CharField(verbose_name='资源名称', null=True, max_length=100)
+    resource_sum = models.IntegerField(verbose_name='资源数量', null=True, default=0)
+    record_date = models.DateField(auto_now_add=True, verbose_name='记录日期', null=True)

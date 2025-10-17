@@ -27,7 +27,7 @@ def main():
         max_instances=1,
         replace_existing=True
     )
-    trigger2=IntervalTrigger(hours=12)
+    trigger2 = CronTrigger(hour='0', minute=0)  # 每天午夜执行
     scheduler.add_job(
         date_record,
         trigger=trigger2,

@@ -5,7 +5,7 @@ def execute_sql(sid=None, channel_id=None, content=None, name=None, record_pag_u
     db = pymysql.connect(
         host='127.0.0.1',
         user='root',
-        password='zxcv1234',
+        password='123456',
         database='localhost_interface'
     )
     if sid in (1, 2, 3):
@@ -57,9 +57,9 @@ def execute_sql(sid=None, channel_id=None, content=None, name=None, record_pag_u
         db.close()
     elif sid == 5:
         cursor = db.cursor()
-        insert_execute_statistics = 'INSERT INTO myapp_resource_date_record (resource_name, resource_sum)' \
-                                    ' VALUES ( %s, %s)'
-        value = (name, content)
+        insert_execute_statistics = 'INSERT INTO myapp_resource_date_record (resource_name, resource_sum,record_date)' \
+                                    ' VALUES ( %s, %s,%s)'
+        value = (name, content, record_pag_url)
         try:
             cursor.execute(insert_execute_statistics, value)
             # result = cursor.fetchall()
